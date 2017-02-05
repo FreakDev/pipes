@@ -1,0 +1,40 @@
+{
+  "name": "pipes",
+  "version": "0.1",
+  "description": "Programming In Pretty Easy Stuff",
+  "license": "MIT",
+  "author": {
+    "name": "Mathias Desloges",
+    "email": "freakdev@gmail.com",
+    "url": ""
+  },
+  "scripts": {
+    "audit": "source-map-explorer public/dist/main.bundle.js",
+    "clear": "rm -rf public/dist/",
+    "clear:all": "rm -rf node_modules/ && npm run clear",
+    "count": "find src -name '*.js' | xargs wc -l | sort -r",
+    "build": "webpack",
+    "watch": "webpack -w",
+    "start": "node public/dist/main.bundle.js"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
+    "babel-loader": "^8.0.5",
+    "css-loader": "^2.1.1",
+    "mini-css-extract-plugin": "^0.6.0",
+    "node-sass": "^4.11.0",
+    "sass-loader": "^7.1.0",
+    "source-map-explorer": "^1.7.0",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.2.3"
+  },
+  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/freakdev/pipes"
+  },
+  "dependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.4.4"
+  }
+}
