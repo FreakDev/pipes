@@ -30,7 +30,11 @@ module.exports = {
                 test: /\.(scss|sass|css)$/,
                 use: [
                     MiniCssExtractPlugin.loader,
-                    {loader: 'css-loader', options: {url: false, sourceMap: true}},
+                    {loader: 'css-loader', query: {
+                        url: false, sourceMap: true,
+                        modules: true,
+                        localIdentName: '[name]__[local]___[hash:base64:5]'
+                      }},
                     {loader: 'sass-loader', options: {sourceMap: true}}
                 ],
             },

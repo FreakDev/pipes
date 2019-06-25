@@ -1,11 +1,14 @@
 import React from 'react'
+import styled from 'styled-components'
 
 import Pipe from './Pipe'
 
-export default ({ chain }) => {
+import cssClasses from '../../../sass/Editor/MainView.sass'
+
+export default ({ chain, onSelect }) => {
     return (
-        <React.Fragment>
-            { chain.map( pipe => <Pipe {...pipe} />) }
-        </React.Fragment>
+        <div class={ cssClasses.main_view }>
+            { chain.map( (pipe, id) => <Pipe id {...pipe} onSelect={ onSelect } />) }
+        </div>
     )
 }

@@ -2,11 +2,14 @@ import React from 'react'
 
 import DEFINITIONS from '../../pipes-definitions.json'
 
+import PipeForm from './PipeForm'
+
 export default class NewPipeField extends React.Component {
 
     state = {
         fieldValue: "",
-        suggestions: []
+        suggestions: [],
+        loadedSuggestion: null
     }
 
     constructor(props) {
@@ -37,28 +40,36 @@ export default class NewPipeField extends React.Component {
     loadSuggestion(suggestion) {
         this.setState({
             fieldValue: suggestion,
-            suggestions: []
+            suggestions: [],
+            loadedSuggestion: DEFINITIONS[suggestion]
         })
     }
 
     render () {
-        const { fieldValue, suggestions } = this.state
+        const { fieldValue, suggestions, loadedSuggestion } = this.state
         return (
-            <div>
-                <div class="autocomplete">
-                    <ul>
-                    { suggestions.map(suggestion => {
-                        return (
-                            <li onClick={ this.loadSuggestion.bind(this, suggestion) }>
-                                { suggestion }
-                            </li>
-                        )
-                    }) }
-                    </ul>
+            <React.Fragment>
+                <div>
+                    <div class="autocomplete">
+                        <ul>
+                        { suggestions.map(suggestion => {
+                            return (
+                                <li onClick={ this.loadSuggestion.bind(this, suggestion) }>
+                                    { suggestion }
+                                </li>
+                            )
+                        }) }
+                        </ul>
+                    </div>
+                    <input value={ fieldValue } onChange={ this.onChange } />
+                    <input type="button" value="add" onClick={ this.onAdd } />
                 </div>
-                <input value={ fieldValue } onChange={ this.onChange } />
-                <input type="button" value="add" onClick={ this.onAdd } />
-            </div>
+                {
+                    loadedSuggestion ? 
+                        <PipeForm spec={ Object.keys(loadedSuggestion.param) } /> 
+                        : null
+                }
+            </React.Fragment>
         )
     }
 }

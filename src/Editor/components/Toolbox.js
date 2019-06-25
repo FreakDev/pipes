@@ -1,13 +1,18 @@
 import React from 'react'
 
 import NewPipeField from './NewPipeField'
+import PipeForm from './PipeForm'
 
-export default ({ selected, onAddPipe }) => {
-    if (selected) {
-        return 'Not Implemeneted yet'
-    } else {
-        return (
-            <NewPipeField onAddPipe={ onAddPipe } />
-        )
-    }
+import cssClasses from '../../../sass/Editor/Toolbox.sass'
+
+export default ({ selected, onAddPipe, cssClass }) => {
+    return (
+        <div class={ cssClasses.toolbox + ' ' + cssClass }>
+            {
+                !selected ?
+                    <NewPipeField onAddPipe={ onAddPipe } />
+                    : <PipeForm value={ selected } />
+            }
+        </div>
+    )
 }

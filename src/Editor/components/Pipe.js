@@ -1,3 +1,9 @@
 import React from 'react'
 
-export default ({ name }) => (<div class="pipe">{ name }</div>)
+import cssClasses from '../../../sass/Editor/Pipe.sass'
+
+export default ({ id, name, onSelect }) => (
+    <div class={ cssClasses.pipe } onClick={ onSelect.bind(this, id) }>
+        { name }
+    </div>
+)

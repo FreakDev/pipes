@@ -4,6 +4,10 @@ import Menu from './Menu'
 import MainView from './MainView'
 import Toolbox from './Toolbox'
 
+import cssClasses from '../../../sass/Editor/Main.sass'
+
+console.log(cssClasses)
+
 export default class Main extends React.Component {
     
     state = {
@@ -26,6 +30,12 @@ export default class Main extends React.Component {
         })
     }
 
+    onFocus(id) {
+        this.setState({
+            focused: id
+        })
+    }
+
     render() {
         const { name, chain, focused } = this.state
 
@@ -33,8 +43,8 @@ export default class Main extends React.Component {
             <React.Fragment>
                 <Menu />
                 <h1>{ name }</h1>
-                <MainView chain={ chain } />
-                <Toolbox selected={ focused ? chain[focused] : null } onAddPipe={ this.onAddPipe } />
+                <MainView chain={ chain } onSelect={ this.onFocus } />
+                <Toolbox cssClass={ focused ? "open" : "" } selected={ focused ? chain[focused] : null } onAddPipe={ this.onAddPipe } />
             </React.Fragment>
         )
     }

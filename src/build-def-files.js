@@ -23,7 +23,6 @@ fs.readdir(__dirname + '/Pipes/Lib', function(err, items) {
             })
         })
     })).then(function (fileDefs) {
-        console.log(fileDefs);
         var contextElems = []
             , contextName = "";
 
@@ -66,8 +65,25 @@ const parseBlock = function (block) {
     block.split('@Pipe\\').forEach(line => {
         let match = line.trim().match(/^(.*?(?= )) (.*)$/s)
         if (match) {
-            blockDef[match[1]] = match[2]
+            switch (match[1]) {
+                case 'param':
+                    const { paramName, spec } = parseParamLine(match[2])
+                    blockDef[match[1]] = blockDef[match[1]] || {}
+                    blockDef[match[1]][paramName] = spec
+                break;
+                default: 
+                    blockDef[match[1]] = match[2]
+            }
         }
     })
     return blockDef
+}
+
+const parseParamLine = (paramLine) => {
+    let parts = paramLine.split('-')
+
+    return {
+        paramName: parts[0].trim(),
+        spec: parts.slice(1).join('-')
+    }
 }
