@@ -1,9 +1,9 @@
 const fs = require('fs')
 
-var definitions = {}
+var definitions = {__version: fs.readFileSync(__dirname + '/Pipes/version', 'utf8')}
 
 fs.readdir(__dirname + '/Pipes/Lib', function(err, items) {
- 
+
     Promise.all(items.map(function (item) {
         return new Promise((resolve, reject) => {
             fs.readFile(__dirname + '/Pipes/Lib/' + item, 'utf8', function (err, data) {
@@ -13,7 +13,7 @@ fs.readdir(__dirname + '/Pipes/Lib', function(err, items) {
                     let defs = []
                     for (var i=0; i<matchs.length; i++) {
                         var defBlock = matchs[i]
-                        
+
                         defs.push(parseBlock(cleanBlock(defBlock)))
                     }
                     resolve(defs)
@@ -36,7 +36,7 @@ fs.readdir(__dirname + '/Pipes/Lib', function(err, items) {
                     contextName = def.lib
                 } else {
                     definitions[contextName + "." + def.name] = def
-                }    
+                }
             })
         }
 
@@ -47,6 +47,7 @@ fs.readdir(__dirname + '/Pipes/Lib', function(err, items) {
 
 
 const toFile = (path, content) => {
+    let versionAsString = fs.readFileSync(__dirname + '/Pipes/version', 'utf8')
     fs.writeFile(path, content, 'utf8', (err) => { console.log( err ? 'oups :' + err : 'ok') })
 }
 
@@ -71,7 +72,7 @@ const parseBlock = function (block) {
                     blockDef[match[1]] = blockDef[match[1]] || {}
                     blockDef[match[1]][paramName] = spec
                 break;
-                default: 
+                default:
                     blockDef[match[1]] = match[2]
             }
         }
