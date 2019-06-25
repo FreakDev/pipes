@@ -24,7 +24,7 @@ export default class NewPipeField extends React.Component {
         this.setState({
             fieldValue: inputValue,
             suggestions: Object.keys(DEFINITIONS).filter(def => {
-                return def.indexOf(inputValue) !== -1
+                return def !== "__version" && def.indexOf(inputValue) !== -1
             })
         })
     }
@@ -38,6 +38,7 @@ export default class NewPipeField extends React.Component {
     }
 
     loadSuggestion(suggestion) {
+        console.log(DEFINITIONS[suggestion].param);
         this.setState({
             fieldValue: suggestion,
             suggestions: [],
@@ -65,8 +66,8 @@ export default class NewPipeField extends React.Component {
                     <input type="button" value="add" onClick={ this.onAdd } />
                 </div>
                 {
-                    loadedSuggestion ? 
-                        <PipeForm spec={ Object.keys(loadedSuggestion.param) } /> 
+                    loadedSuggestion ?
+                        <PipeForm spec={ loadedSuggestion.param } />
                         : null
                 }
             </React.Fragment>

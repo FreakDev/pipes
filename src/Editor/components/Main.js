@@ -6,10 +6,8 @@ import Toolbox from './Toolbox'
 
 import cssClasses from '../../../sass/Editor/Main.sass'
 
-console.log(cssClasses)
-
 export default class Main extends React.Component {
-    
+
     state = {
         focused: null,
         name: "",
