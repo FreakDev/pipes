@@ -2,3 +2,5 @@ node_modules/
 npm-debug.log
 
 public/dist/
+
+src/pipes-definitions.json
