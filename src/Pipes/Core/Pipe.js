@@ -1,6 +1,6 @@
 export const PIPE_VAR = "pipe-var"
 export const PIPE_FUNC = "pipe-func"
-export const PIPE_ALIAS = "pipe-alias"
+export const PIPE_NATIVE = "pipe-native"
 
 export default class Pipe {
 
@@ -22,7 +22,7 @@ export default class Pipe {
     }
 
     constructor(type, name, value) {
-        if ([PIPE_VAR, PIPE_FUNC, PIPE_ALIAS].indexOf(type) === -1)
+        if ([PIPE_VAR, PIPE_FUNC, PIPE_NATIVE].indexOf(type) === -1)
             throw Error('Invalid type')
 
         if (typeof name !== "string") 

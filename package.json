@@ -11,8 +11,11 @@
     "clear": "rm -rf public/dist/",
     "clear:all": "rm -rf node_modules/ && npm run clear",
     "count": "find src -name '*.js' | xargs wc -l | sort -r",
-    "build": "webpack",
-    "watch": "webpack -w",
+    "build:editor": "webpack --config webpack.config.editor.js",
+    "watch:editor": "webpack --config webpack.config.editor.js -w",
+    "build:runner": "webpack --config webpack.config.runner.js",
+    "watch:runner": "webpack --config webpack.config.runner.js -w",
+    "build": "npm run build:def && npm run build:runner && npm run build:editor",
     "build:def": "node src/build-def-files.js"
   },
   "devDependencies": {
@@ -22,6 +25,8 @@
     "@babel/preset-react": "^7.0.0",
     "babel-loader": "^8.0.5",
     "css-loader": "^2.1.1",
+    "eslint": "^6.0.1",
+    "eslint-plugin-react": "^7.14.2",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
     "mini-css-extract-plugin": "^0.6.0",

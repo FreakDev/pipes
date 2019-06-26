@@ -1,4 +1,4 @@
-import Pipe, { PIPE_VAR, PIPE_FUNC, PIPE_ALIAS } from "./Core/Pipe"
+import Pipe, { PIPE_VAR, PIPE_FUNC, PIPE_NATIVE } from "./Core/Pipe"
 import PipeFunc from "./Core/PipeFunc"
 
 export default class Factory {
@@ -8,7 +8,7 @@ export default class Factory {
             case PIPE_VAR:
                 return new Pipe(json.type, json.name, json.value)
             case PIPE_FUNC:
-            case PIPE_ALIAS:
+            case PIPE_NATIVE:
                 return new PipeFunc(json.type, json.name, json.pipes, { params: json.params, parent}) 
         }
     }

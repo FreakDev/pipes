@@ -1,19 +1,30 @@
-import React from 'react'
+import React from "react"
 
-import Menu from './Menu'
-import MainView from './MainView'
-import Toolbox from './Toolbox'
+import Menu from "./Menu"
+import MainView from "./MainView"
+import Toolbox from "./Toolbox"
+import GenerateButton from "./GenerateButton"
 
-import cssClasses from '../../../sass/Editor/Main.sass'
+import PIPES_DEFINITIONS from "../../pipes-definitions.json"
+
+import cssClasses from "../../../sass/Editor/Main.sass"
+
+export const PIPE_TYPE_FUNC = 'pipe-func'
+export const PIPE_TYPE_NATIVE = 'pipe-native'
+export const PIPE_TYPE_VAR = 'pipe-var'
+
+const INITIAL_PROGRAM = {
+    name: "",
+    type: PIPE_TYPE_FUNC,
+    pipes: []  
+}
 
 export default class Main extends React.Component {
 
     state = {
         focused: null,
-        name: "",
-        chain: [
-
-        ]
+        program: INITIAL_PROGRAM,
+        currentPath: ['pipes']
     }
 
     constructor(props) {
@@ -23,8 +34,10 @@ export default class Main extends React.Component {
     }
 
     onAddPipe(pipe) {
+        let newProgram = { ...this.state.program }
+        newProgram.pipes = [...this.state.program.pipes, pipe]
         this.setState({
-            chain: [...this.state.chain, pipe]
+            program: newProgram
         })
     }
 
@@ -34,15 +47,28 @@ export default class Main extends React.Component {
         })
     }
 
+    resolveCurrentPath() {
+        let base = this.state.program
+        this.state.currentPath.forEach(path => {
+            base = base[path]
+        });
+        return base
+    }
+
     render() {
-        const { name, chain, focused } = this.state
+        const { program, focused } = this.state
 
         return (
             <React.Fragment>
                 <Menu />
-                <h1>{ name }</h1>
-                <MainView chain={ chain } onSelect={ this.onFocus } />
-                <Toolbox cssClass={ focused ? "open" : "" } selected={ focused ? chain[focused] : null } onAddPipe={ this.onAddPipe } />
+                <h1>{ program.name }</h1>
+                <GenerateButton program={ program } />
+                <MainView chain={ this.resolveCurrentPath() } onSelect={ this.onFocus } />
+                <Toolbox 
+                    cssClass={ focused ? "open" : "" } 
+                    selected={ focused ? null : null } 
+                    pipesDefs={ PIPES_DEFINITIONS }
+                    onAddPipe={ this.onAddPipe } />
             </React.Fragment>
         )
     }

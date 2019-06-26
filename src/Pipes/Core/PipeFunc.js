@@ -1,4 +1,4 @@
-import { PIPE_VAR, PIPE_FUNC, PIPE_ALIAS } from "./Pipe"
+import { PIPE_VAR, PIPE_FUNC, PIPE_NATIVE } from "./Pipe"
 
 import stdlib from "../Lib/stdlib"
 import math from "../Lib/math"
@@ -46,8 +46,10 @@ export default class PipeFunc extends Pipe {
         this._parent = context.parent
 
         let pipeFactory = new PipeFactory()
-        if (elems)
-            elems.forEach(e => this.add(pipeFactory.build(e, this), e.type === PIPE_ALIAS))
+        if (elems) {
+                                                            // should (only) check if it has a name (to be indexed)
+            elems.forEach(e => this.add(pipeFactory.build(e, this), e.type === PIPE_NATIVE))            
+        }
     }
 
     start(input) {
@@ -59,6 +61,7 @@ export default class PipeFunc extends Pipe {
         return chain.pipes.map(pipe => {
             let fn = null
             
+            // should be this test pipe.type !== PIPE_NATIVE
             if (pipe.pipes && pipe.pipes.length) {
                 fn = this.find(chain => chain.name === pipe.name)
                 if (fn)
@@ -87,7 +90,6 @@ export default class PipeFunc extends Pipe {
 
         return compiled.reduce((prev, curr) => curr(prev, this), input)
     }
-
 
     find(searchCallback) {
         return this._storage.find(searchCallback) || (this._parent && this._parent.find(searchCallback))

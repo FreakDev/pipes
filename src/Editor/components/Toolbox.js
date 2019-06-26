@@ -1,18 +1,23 @@
-import React from 'react'
+import React from "react"
 
-import NewPipeField from './NewPipeField'
-import PipeForm from './PipeForm'
+import PipeForm from "./PipeForm"
 
-import cssClasses from '../../../sass/Editor/Toolbox.sass'
+import cssClasses from "../../../sass/Editor/Toolbox.sass"
 
-export default ({ selected, onAddPipe, cssClass }) => {
-    return (
-        <div class={ cssClasses.toolbox + ' ' + cssClass }>
-            {
-                !selected ?
-                    <NewPipeField onAddPipe={ onAddPipe } />
-                    : <PipeForm value={ selected } />
-            }
-        </div>
-    )
+export default class Toolbox extends React.Component 
+{
+    constructor(props) {
+        super(props)
+    }
+
+    render () {
+        const { selected, pipesDefs, onAddPipe, cssClass } = this.props
+        return (
+            <div class={ cssClasses.toolbox + " " + cssClass }>
+                {
+                    <PipeForm pipesDefs={ pipesDefs } onSubmit={ onAddPipe } />
+                }
+            </div>
+        )
+    }
 }
