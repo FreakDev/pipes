@@ -1,8 +1,9 @@
 import React from "react"
 
 import Menu from "./Menu"
-import MainView from "./MainView"
+import ChainView from "./ChainView"
 import Toolbox from "./Toolbox"
+import TreeView from "./TreeView"
 import GenerateButton from "./GenerateButton"
 
 import PIPES_DEFINITIONS from "../../pipes-definitions.json"
@@ -59,17 +60,17 @@ export default class Main extends React.Component {
         const { program, focused } = this.state
 
         return (
-            <React.Fragment>
-                <Menu />
-                <h1>{ program.name }</h1>
+            <div class={ cssClasses.main }>
+                {/* <Menu /> */}
                 <GenerateButton program={ program } />
-                <MainView chain={ this.resolveCurrentPath() } onSelect={ this.onFocus } />
+                <TreeView program={ program } />
+                <ChainView chain={ this.resolveCurrentPath() } onSelect={ this.onFocus } />
                 <Toolbox 
                     cssClass={ focused ? "open" : "" } 
                     selected={ focused ? null : null } 
                     pipesDefs={ PIPES_DEFINITIONS }
                     onAddPipe={ this.onAddPipe } />
-            </React.Fragment>
+            </div>
         )
     }
 }

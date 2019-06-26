@@ -78,7 +78,7 @@ export default class PipeForm extends React.Component {
 
         let descriptionParts = pipeSpec[param].split('%s')
 
-        return [descriptionParts[0], <input name={ param } onChange={ this.onFieldChange.bind(this, param) } />, ...descriptionParts.slice(1)]
+        return [descriptionParts[0], <input key={ "pipe_form_ipnut" } name={ param } onChange={ this.onFieldChange.bind(this, param) } />, ...descriptionParts.slice(1)]
     }
 
     render () {
@@ -97,8 +97,8 @@ export default class PipeForm extends React.Component {
                 }
                 {
                     pipeSpec ? 
-                        Object.keys(pipeSpec).map((param) => {
-                            return <div>
+                        Object.keys(pipeSpec).map((param, k) => {
+                            return <div key={ "pipe_form_spec_" + k }>
                                 { this.renderParamSpec(param) }
                             </div>
                         })

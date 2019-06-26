@@ -7,8 +7,8 @@ export default ({ id, name, params, onSelect }) => (
         { name }
         <ul>
             {
-                Object.keys(params).map(paramName => {
-                    return <li>{ paramName } : { params[paramName] }</li>
+                Object.keys(params).map((paramName, k) => {
+                    return <li key={ "pipe_" + k }>{ paramName } : { params[paramName] }</li>
                 })
             }
         </ul>

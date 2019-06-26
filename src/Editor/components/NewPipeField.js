@@ -50,9 +50,9 @@ export default class NewPipeField extends React.Component {
                 <div>
                     <div class="autocomplete">
                         <ul>
-                        { suggestions.map(suggestion => {
+                        { suggestions.map((suggestion, k) => {
                             return (
-                                <li onClick={ this.loadSuggestion.bind(this, suggestion) }>
+                                <li key={ "new_pipe_field_suggestions_" + k } onClick={ this.loadSuggestion.bind(this, suggestion) }>
                                     { suggestion }
                                 </li>
                             )
