@@ -15,6 +15,7 @@ export default class Pipe {
     get name() {
         return this._name
     }
+    
     _value
 
     get value() {

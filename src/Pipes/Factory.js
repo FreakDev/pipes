@@ -1,8 +1,7 @@
 import Pipe, { PIPE_VAR, PIPE_FUNC, PIPE_NATIVE } from "./Core/Pipe"
 import PipeFunc from "./Core/PipeFunc"
 
-export default class Factory {
-
+export default {
     build(json, parent) {
         switch (json.type) {
             case PIPE_VAR:

@@ -1,15 +1,19 @@
-import Factory from "./Pipes/Factory"
+import factory from "./Pipes/factory"
 
 const pipeAsJson = {
     name: "My first Pipes program",
     type: "pipe-func",
-    pipes: [
-        {
-            name: "main",
-            type: "pipe-func",
-            pipes: [{"name":"stdlib.dataEmitter","type":"pipe-native","params":{"value":"ho"}},{"name":"stdlib.log","type":"pipe-native","params":{"prefix":"hey "}}]
-        }
-    ]
+    pipes: 
+    
+    [{"name":"stdlib.dataEmitter","type":"pipe-native","params":{"value":"Hello "}},{"name":"stdlib.log","type":"pipe-native","params":{"after":"World !!!"}}]
+    
+    // [
+    //     {
+    //         name: "main",
+    //         type: "pipe-func",
+    //         pipes: [{"name":"stdlib.dataEmitter","type":"pipe-native","params":{"value":"ho"}},{"name":"stdlib.log","type":"pipe-native","params":{"prefix":"hey "}}]
+    //     }
+    // ]
     
     
     
@@ -30,7 +34,7 @@ const pipeAsJson = {
     //     type: "pipe-func",
     //     pipes: [{
     //         name: "event.listen",
-    //         type: "pipe-alias",
+    //         type: "pipe-native",
     //         params: {
     //             eventName: "input",
     //             invoke: "incValue"
@@ -43,21 +47,21 @@ const pipeAsJson = {
     //     type: "pipe-func",
     //     pipes: [{
     //         name: "stdlib.read",
-    //         type: "pipe-alias",
+    //         type: "pipe-native",
     //         params: {
     //             name: "firstValueToAdd"
     //         } 
     //     },
     //     {
     //         name: "math.add",
-    //         type: "pipe-alias",
+    //         type: "pipe-native",
     //         params: {
     //             valueToAdd: 1
     //         }
     //     },
     //     {
     //         name: "stdlib.write",
-    //         type: "pipe-alias",
+    //         type: "pipe-native",
     //         params: {
     //             name: "firstValueToAdd"
     //         } 
@@ -65,7 +69,7 @@ const pipeAsJson = {
     //     ,
     //     {
     //         name: "stdlib.log",
-    //         type: "pipe-alias",
+    //         type: "pipe-native",
     //         params: {
     //             prefix: "a "
     //         }
@@ -74,14 +78,14 @@ const pipeAsJson = {
 
     //     {
     //         name: "stdlib.read",
-    //         type: "pipe-alias",
+    //         type: "pipe-native",
     //         params: {
     //             name: "firstValueToAdd"
     //         } 
     //     },
     //     {
     //         name: "stdlib.log",
-    //         type: "pipe-alias",
+    //         type: "pipe-native",
     //         params: {
     //             prefix: "b "
     //         }
@@ -89,7 +93,7 @@ const pipeAsJson = {
 
     //     {
     //         name: "stdlib.invoke",
-    //         type: "pipe-alias",
+    //         type: "pipe-native",
     //         params: {
     //             identifier: "addAValue"
     //         } 
@@ -102,19 +106,19 @@ const pipeAsJson = {
     //     type: "pipe-func",
     //     pipes : [{
     //         name: "stdlib.read",
-    //         type: "pipe-alias",
+    //         type: "pipe-native",
     //         params: {
     //             name: "firstValueToAdd"
     //         } 
     //     },
     //     {
     //         name: "math.add",
-    //         type: "pipe-alias",
+    //         type: "pipe-native",
     //         params: {
     //             // valueToAdd: 3
     //             getValueToAdd: { 
     //                 name: "stdlib.read", 
-    //                 type: "pipe-alias",
+    //                 type: "pipe-native",
     //                 params: { 
     //                     name: "valueToAdd" 
     //                 }
@@ -124,29 +128,33 @@ const pipeAsJson = {
     //     ,
     //     {
     //         name: "stdlib.log",
-    //         type: "pipe-alias",
+    //         type: "pipe-native",
     //         params: {
     //             prefix: "c "
     //         }
     //     },
     //     {
     //         name: "stdlib.read",
-    //         type: "pipe-alias",
+    //         type: "pipe-native",
     //         params: {
     //             name: "firstValueToAdd"
     //         } 
     //     },
     //     {
     //         name: "stdlib.log",
-    //         type: "pipe-alias",
+    //         type: "pipe-native",
     //         params: {
     //             prefix: "d "
     //         }
-    //     }
-    // ]
+    //     }]
     // }]
+
+
+
+
+
 }
 
-const program = (new Factory()).build(pipeAsJson)
+const program = factory.build(pipeAsJson)
 
-program.start();
+program.run();

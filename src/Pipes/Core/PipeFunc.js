@@ -1,13 +1,9 @@
-import { PIPE_VAR, PIPE_FUNC, PIPE_NATIVE } from "./Pipe"
+import Pipe, { PIPE_VAR, PIPE_FUNC, PIPE_NATIVE } from "./Pipe"
+import pipeFactory from "../factory"
 
 import stdlib from "../Lib/stdlib"
 import math from "../Lib/math"
 import event from "../Lib/event"
-
-import Pipe from "./Pipe"
-import PipeFactory from "../Factory"
-
-import CacheManager from "./CacheManager"
 
 const LIB = {
     stdlib,
@@ -17,19 +13,6 @@ const LIB = {
 
 export default class PipeFunc extends Pipe {
     _storage = []
-    _index = {}
-
-    _indexProp = "name"
-
-    _cache
-
-    _params
-    _parent
-
-    get params() {
-        return this._params
-    } 
-
     get pipes() {
         return this._storage
     }
@@ -38,57 +21,66 @@ export default class PipeFunc extends Pipe {
         return this._storage.length
     }
 
-    constructor(type, name, elems, context) {
+    _index = {}
+    _indexProp = "name"
+
+    _params
+
+    get params() {
+        return this._params
+    } 
+
+    _parent
+
+    _children
+
+    constructor(type, name, children, context) {
         super(type, name, null)
 
-        this._cache = new CacheManager()
         this._params = context.params
         this._parent = context.parent
-
-        let pipeFactory = new PipeFactory()
-        if (elems) {
-                                                            // should (only) check if it has a name (to be indexed)
-            elems.forEach(e => this.add(pipeFactory.build(e, this), e.type === PIPE_NATIVE))            
-        }
+        this._children = children
     }
 
-    start(input) {
+    run(input) {
+        if (!this.length)
+            this._children.forEach(e => this.add(pipeFactory.build(e, this), e.type !== PIPE_NATIVE))
+
         if (this.has("main"))
             return this.invoke("main", input)
+        else
+            return this._compile(this.pipes).reduce((prev, curr) => curr(prev, this), input)
     }
     
-    _compile(chain) {
-        return chain.pipes.map(pipe => {
+    _compile(pipes) {
+
+        return pipes.map(pipe => {
             let fn = null
             
-            // should be this test pipe.type !== PIPE_NATIVE
-            if (pipe.pipes && pipe.pipes.length) {
+            if (pipe.type !== PIPE_NATIVE) {
                 fn = this.find(chain => chain.name === pipe.name)
                 if (fn)
                     fn = fn.run
             }
             
             if (!fn) {
-                fn = this._resolveNS(pipe.name, LIB).bind(global, pipe.params || {})
+                fn = this._resolveNS(pipe.alias || pipe.name, LIB).bind(global, pipe.params || {})
             }
             
             return fn
         })
     }
 
-    invoke(chainName, input) {
-        let compiled
-        if (typeof chainName === "string") {
-            let chain = this.find(chain => chain.name === chainName)
-            compiled = this._cache.getCacheOrPorcess(
-                "compiled-" + chainName,
-                () => this._compile(chain)
-            )
+    invoke(callable, input) {
+        if (typeof callable === 'string') {
+            let pipe = this.find(pipe => pipe.name === callable)
+            return pipe.run(input)
         } else {
-            compiled = this._compile({pipes:[chainName]})
+            if ([PIPE_NATIVE, PIPE_FUNC].indexOf(callable.type) !== -1)
+                return this._compile([callable]).reduce((prev, curr) => curr(prev, this), input)
+            else 
+                throw Error(`Error : ${ callable } is not callable`)
         }
-
-        return compiled.reduce((prev, curr) => curr(prev, this), input)
     }
 
     find(searchCallback) {
@@ -103,8 +95,8 @@ export default class PipeFunc extends Pipe {
         }
     }
 
-    add(element, noIndex = false) {
-        if (!noIndex) {
+    add(element, index = true) {
+        if (index) {
             let key = element[this._indexProp]
 
             if (Object.keys(this._index).indexOf(key) !== -1) {

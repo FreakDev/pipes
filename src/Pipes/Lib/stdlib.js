@@ -26,7 +26,7 @@ export default {
      */
     write: ({ name }, input, context) => {
         let newValue = new Pipe(PIPE_VAR, name, input)
-        context.has( name ) ? context.set(name, newValue) : context.add({ name, value: newValue })
+        context.has( name ) ? context.set(name, newValue) : context.add(newValue)
         return input
     },
 
@@ -40,7 +40,14 @@ export default {
      * @Pipe\param name - identifier
      */
     read: ({ name }, input, context) => {
-        return context.get(name || input).value
+        let foundVar,
+            searchedName = name || input
+        foundVar = context.find(pipe => pipe.name === searchedName)
+        
+        if (foundVar)
+            return foundVar.value
+        else
+            return null
     },
 
     
@@ -63,10 +70,15 @@ export default {
      * @Pipe\type pipe-native
      * @Pipe\description log to console
      * (should be in a ui or debug package)
-     * @Pipe\param prefix - set a prefix to the logged value (input value)
+     * @Pipe\param before - % will be print before output
+     * @Pipe\param after - % will be print after output
      */
-    log: ({ prefix }, input) => {
-        console.log(prefix + input)
+    log: ({ before, after }, input) => {
+        let params = []
+        before && params.push(before)
+        params.push(input)
+        after && params.push(after)
+        console.log.apply(console, params)
         return input
     }
 }
