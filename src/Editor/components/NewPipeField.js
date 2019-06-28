@@ -26,7 +26,6 @@ export default class NewPipeField extends React.Component {
         const inputValue = e.target.value
         this.setState({
             isAutocomplete: false,
-            fieldValue: inputValue,
             suggestions: this.props.suggestions.filter(def => {
                 return def !== "__version" && def.indexOf(inputValue) !== -1
             })
@@ -44,11 +43,12 @@ export default class NewPipeField extends React.Component {
     }
 
     render () {
-        const { fieldValue, suggestions, loadedSuggestion } = this.state
+        const { suggestions, loadedSuggestion } = this.state
+        const { value } = this.props
         return (
             <React.Fragment>
                 <div>
-                    <div class="autocomplete">
+                    <div className="autocomplete">
                         <ul>
                         { suggestions.map((suggestion, k) => {
                             return (
@@ -59,7 +59,7 @@ export default class NewPipeField extends React.Component {
                         }) }
                         </ul>
                     </div>
-                    <input value={ fieldValue } onChange={ this.onChange } />
+                    <input value={ value } onChange={ this.onChange } />
                 </div>
             </React.Fragment>
         )

@@ -16,7 +16,7 @@ export default class GenerateButton extends React.Component {
 
     render () {
         return (
-            <button class={ cssClasses.generate_button } onClick={ this.generate }>Generate</button>
+            <button className={ cssClasses.generate_button } onClick={ this.generate }>Generate</button>
         )
     }
 }

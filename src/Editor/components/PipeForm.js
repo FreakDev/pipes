@@ -1,5 +1,7 @@
 import React from 'react'
 
+import uuid from "uuid/v4"
+
 import NewPipeField from "./NewPipeField"
 
 export const MODE_CREATE = "mode-create"
@@ -17,7 +19,8 @@ export default class PipeForm extends React.Component {
 
     state = {
         pipeSpec: null,
-        fieldValues: INITIAL_FIELD_VALUES
+        fieldValues: INITIAL_FIELD_VALUES,
+        createConnected: false
     }
 
     static propTypes = {
@@ -37,20 +40,22 @@ export default class PipeForm extends React.Component {
         this.onSubmit = this.onSubmit.bind(this)
         this.onAutocomplete = this.onAutocomplete.bind(this)
         this.onNewFieldChange = this.onNewFieldChange.bind(this)
+        this.onChangeConnectedCheck = this.onChangeConnectedCheck.bind(this)
     }
 
     onAutocomplete(value) {
         this.setState({
             pipeSpec: this.props.pipesDefs[value].param,
-            fieldValues: {...this.state.fieldValues, name: value, type: PIPE_TYPE_NATIVE }
+            fieldValues: { ...INITIAL_FIELD_VALUES, name: value }
         })
     }
 
-    onNewFieldChange() {
+    onNewFieldChange(value) {
         this.setState({
             pipeSpec: null,
-            fieldValues: INITIAL_FIELD_VALUES
+            fieldValues: { ...INITIAL_FIELD_VALUES, name: value }
         })
+
     }
 
     onFieldChange(fieldName, event) {
@@ -61,11 +66,19 @@ export default class PipeForm extends React.Component {
         })
     }
 
+    onChangeConnectedCheck(e) {
+        this.setState({
+            createConnected: e.target.checked
+        })
+    }
+
     onSubmit(e) {
         e.preventDefault()
 
         if (this.isValid()) {
-            this.props.onSubmit(this.state.fieldValues)
+            this.props.onSubmit(this.state.fieldValues, this.state.createConnected)
+
+            this.onNewFieldChange("")
         }
     }
 
@@ -83,13 +96,16 @@ export default class PipeForm extends React.Component {
 
     render () {
         const { values, mode, pipesDefs } = this.props
-        const { pipeSpec } = this.state
+        const { pipeSpec, fieldValues } = this.state
+
+        const connectedCheckId = uuid()
 
         return (
             <form onSubmit={ this.onSubmit }>
                 {
                     mode === MODE_CREATE ?
                         <NewPipeField 
+                            value={ fieldValues.name }
                             suggestions={ Object.keys(pipesDefs) } 
                             onLoadSuggestion={ this.onAutocomplete }
                             onChange={ this.onNewFieldChange } />
@@ -102,6 +118,14 @@ export default class PipeForm extends React.Component {
                                 { this.renderParamSpec(param) }
                             </div>
                         })
+                        : null
+                }
+                {
+                    mode === MODE_CREATE ?
+                        <div>
+                            <input id={ connectedCheckId } onChange={ this.onChangeConnectedCheck } type="checkbox" />
+                            <label htmlFor={ connectedCheckId }>Connecté au pipe actif ?</label>
+                        </div> 
                         : null
                 }
                 <input type="submit" disabled={ !this.isValid() } />

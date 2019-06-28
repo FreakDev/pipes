@@ -1,17 +1,22 @@
-import React from 'react'
+import React from "react"
 
-import cssClasses from '../../../sass/Editor/Pipe.sass'
+import cssClasses from "../../../sass/Editor/Pipe.sass"
 
-export default ({ id, name, params, onSelect }) => (
-    <div class={ cssClasses.pipe } onClick={ onSelect.bind(this, id) }>
+const Pipe = ({ id, name, params }) => (
+    <div className={ cssClasses.pipe }>
         { name }
         <ul>
             {
-                Object.keys(params).map((paramName, k) => {
-                    return <li key={ "pipe_" + k }>{ paramName } : { params[paramName] }</li>
-                })
+                params ? 
+                    Object.keys(params).map((paramName, k) => {
+                        return <li key={ "pipe_" + k }>{ paramName } : { params[paramName] }</li>
+                    })
+                    : null
             }
         </ul>
         
     </div>
 )
+
+
+export default Pipe

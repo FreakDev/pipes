@@ -11,9 +11,9 @@ export default class Toolbox extends React.Component
     }
 
     render () {
-        const { selected, pipesDefs, onAddPipe, cssClass } = this.props
+        const { selected, pipesDefs, onAddPipe } = this.props
         return (
-            <div class={ cssClasses.toolbox + " " + cssClass }>
+            <div className={ cssClasses.toolbox }>
                 {
                     <PipeForm pipesDefs={ pipesDefs } onSubmit={ onAddPipe } />
                 }
