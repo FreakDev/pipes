@@ -5,10 +5,10 @@ export default {
     build(json, parent) {
         switch (json.type) {
             case PIPE_VAR:
-                return new Pipe(json.type, json.name, json.value)
+                return new Pipe(json.type, json.id, json.name, json.value, { previous: json.previous })
             case PIPE_FUNC:
             case PIPE_NATIVE:
-                return new PipeFunc(json.type, json.name, json.pipes, { params: json.params, parent}) 
+                return new PipeFunc(json.type, json.id, json.name, json.pipes, { params: json.params, parent, previous: json.previous }) 
         }
     }
 

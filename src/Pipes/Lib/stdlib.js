@@ -22,12 +22,15 @@ export default {
      * @Pipe\name write
      * @Pipe\type pipe-native
      * @Pipe\description write the input value into a variable
-     * @Pipe\param name - will write the input value into variable named %s 
+     * @Pipe\param name - will write the inputed value in variable named %s 
      */
-    write: ({ name }, input, context) => {
-        let newValue = new Pipe(PIPE_VAR, name, input)
-        context.has( name ) ? context.set(name, newValue) : context.add(newValue)
-        return input
+    write: ({ name }, input, context) => {        
+        try {
+            context.setVarValue(name, input)
+            return input
+        } catch (e) {
+            console.warn (e)
+        }
     },
 
     
@@ -40,14 +43,13 @@ export default {
      * @Pipe\param name - identifier
      */
     read: ({ name }, input, context) => {
-        let foundVar,
-            searchedName = name || input
-        foundVar = context.find(pipe => pipe.name === searchedName)
+        let searchedName = name || input
         
-        if (foundVar)
-            return foundVar.value
-        else
-            return null
+        try {
+            return context.getVarValue(searchedName)
+        } catch (e) {
+            console.warn (e)
+        }
     },
 
     

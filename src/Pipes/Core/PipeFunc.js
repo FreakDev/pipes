@@ -22,7 +22,7 @@ export default class PipeFunc extends Pipe {
     }
 
     _index = {}
-    _indexProp = "name"
+    _indexProp = "id"
 
     _params
 
@@ -32,35 +32,82 @@ export default class PipeFunc extends Pipe {
 
     _parent
 
-    _children
-
-    constructor(type, name, children, context) {
-        super(type, name, null)
+    constructor(type, id, name, children, context) {
+        super(type, id, name, children, context)
 
         this._params = context.params
         this._parent = context.parent
-        this._children = children
     }
 
     run(input) {
         if (!this.length)
-            this._children.forEach(e => this.add(pipeFactory.build(e, this), e.type !== PIPE_NATIVE))
+            this._value.forEach(e => this.add(pipeFactory.build(e, this), e.type !== PIPE_NATIVE))
 
-        if (this.has("main"))
-            return this.invoke("main", input)
-        else
-            return this._compile(this.pipes).reduce((prev, curr) => curr(prev, this), input)
+        let chainHeads = this._filter(p => !p.previous)
+        if (chainHeads.length === 1) {
+            return this._doRun(this._buildAndCompile(chainHeads[0]), input)
+        } else {
+            if (this._find(p => p.name === "main", this, true))
+                return this.invoke("main", input)
+            else
+                throw Error("Invalid Pipe : several chains or pipes and none called \"main\" in \"" + this.name + "\" (" + this.id + ")")
+        }
     }
-    
+
+    invoke(callable, input) {
+        if (typeof callable === 'string') {
+            let pipe = this._find(pipe => pipe.name === callable)
+            return pipe.run(input)
+        } else {
+            if ([PIPE_NATIVE, PIPE_FUNC].indexOf(callable.type) !== -1)
+                return this._compile([callable]).reduce((prev, curr) => curr(prev, this), input)
+            else 
+                throw Error(`Error : ${ callable } is not callable`)
+        }
+    }
+
+    getVarValue(varName) {
+        let targetVar = this._find(p => p.type === PIPE_VAR && p.name === varName)
+        if (targetVar) {
+            return targetVar.value
+        } else {
+            throw Error ('Unknow var ' + varName)
+        }
+    }
+
+    setVarValue(varName, varValue) {
+        let targetVar = this._find(p => p.type === PIPE_VAR && p.name === varName)
+        if (targetVar) {
+            targetVar.value = varValue
+        } else {
+            throw Error ('Unknow var ' + varName)
+        }
+    }
+
+
+
+
+    _buildAndCompile(headPipe) {
+        let chain = [], current = headPipe, next
+        do {
+            chain.push(current)
+            next = this._find(p => p.previous === current.id)
+            current = next
+        } while(next)
+        return this._compile(chain)
+    }
+
+    _doRun(compiled, input) {
+        return compiled.reduce((prev, curr) => curr(prev, this), input)
+    }
+
     _compile(pipes) {
 
         return pipes.map(pipe => {
             let fn = null
             
             if (pipe.type !== PIPE_NATIVE) {
-                fn = this.find(chain => chain.name === pipe.name)
-                if (fn)
-                    fn = fn.run
+                fn = pipe.run.bind(pipe)
             }
             
             if (!fn) {
@@ -71,21 +118,14 @@ export default class PipeFunc extends Pipe {
         })
     }
 
-    invoke(callable, input) {
-        if (typeof callable === 'string') {
-            let pipe = this.find(pipe => pipe.name === callable)
-            return pipe.run(input)
-        } else {
-            if ([PIPE_NATIVE, PIPE_FUNC].indexOf(callable.type) !== -1)
-                return this._compile([callable]).reduce((prev, curr) => curr(prev, this), input)
-            else 
-                throw Error(`Error : ${ callable } is not callable`)
-        }
+    _find(searchCallback, thisArg = this, disableLookUp = false) {
+        return this._storage.find(searchCallback, thisArg) || (!disableLookUp && this._parent && this._parent._find(searchCallback, thisArg))
     }
 
-    find(searchCallback) {
-        return this._storage.find(searchCallback) || (this._parent && this._parent.find(searchCallback))
+    _filter(filterCallback, thisArg = this) {
+        return this._storage.filter(filterCallback, thisArg)
     }
+
 
     has(key, byRef = false) {
         if (!byRef) {

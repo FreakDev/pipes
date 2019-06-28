@@ -1,153 +1,151 @@
 import factory from "./Pipes/factory"
 
 const pipeAsJson = {
-    name: "My first Pipes program",
+    id: "0", name: "My first Pipes program",
     type: "pipe-func",
     pipes: 
     
-    [{"name":"stdlib.dataEmitter","type":"pipe-native","params":{"value":"Hello "}},{"name":"stdlib.log","type":"pipe-native","params":{"after":"World !!!"}}]
+    // [{"id": "azertyupqsdfghjklmwxcvbn", "name":"stdlib.dataEmitter","type":"pipe-native","params":{"value":"Hello "}},{"id": "azrtyuiopqsdfghjklmwxcv", "name":"stdlib.log","type":"pipe-native", "previous": "azertyupqsdfghjklmwxcvbn", "params":{"after":"World !!!"}}]
     
     // [
     //     {
-    //         name: "main",
+    //         id: "a", name: "test",
     //         type: "pipe-func",
-    //         pipes: [{"name":"stdlib.dataEmitter","type":"pipe-native","params":{"value":"ho"}},{"name":"stdlib.log","type":"pipe-native","params":{"prefix":"hey "}}]
+    //         pipes: [{"id": "azertyuiopqfghjklmwxcvbn", "name":"stdlib.dataEmitter","type":"pipe-native","params":{"value":"ho"}},{"id": "azertyupqsdfghjklmwxcvbn", "name":"stdlib.log","type":"pipe-native", "previous": "azertyuiopqfghjklmwxcvbn","params":{"before":"hey "}}]
     //     }
     // ]
     
     
     
     
-    // [{
-    //     name: "valueToAdd",
-    //     type: "pipe-var",
-    //     value: 4
-    // },
-    // {
-    //     name: "firstValueToAdd",
-    //     type: "pipe-var",
-    //     value: 4
-    // },
+    [{
+        id: "1", name: "valueToAdd",
+        type: "pipe-var",
+        value: 4
+    },
+    {
+        id: "2", name: "firstValueToAdd",
+        type: "pipe-var",
+        value: 4
+    },
 
-    // {
-    //     name: "main",
-    //     type: "pipe-func",
-    //     pipes: [{
-    //         name: "event.listen",
-    //         type: "pipe-native",
-    //         params: {
-    //             eventName: "input",
-    //             invoke: "incValue"
-    //         }
-    //     }]
-    // },
+    {
+        id: "3", name: "main",
+        type: "pipe-func",
+        pipes: [{
+            id: "20", name: "event.listen",
+            type: "pipe-native",
+            params: {
+                eventName: "input",
+                invoke: "incValue"
+            }
+        }]
+    },
     
-    // {
-    //     name: "incValue",
-    //     type: "pipe-func",
-    //     pipes: [{
-    //         name: "stdlib.read",
-    //         type: "pipe-native",
-    //         params: {
-    //             name: "firstValueToAdd"
-    //         } 
-    //     },
-    //     {
-    //         name: "math.add",
-    //         type: "pipe-native",
-    //         params: {
-    //             valueToAdd: 1
-    //         }
-    //     },
-    //     {
-    //         name: "stdlib.write",
-    //         type: "pipe-native",
-    //         params: {
-    //             name: "firstValueToAdd"
-    //         } 
-    //     }
-    //     ,
-    //     {
-    //         name: "stdlib.log",
-    //         type: "pipe-native",
-    //         params: {
-    //             prefix: "a "
-    //         }
-    //     }
-    //     ,
+    {
+        id: "4", name: "incValue",
+        type: "pipe-func",
+        pipes: [{
+            id: "5", name: "stdlib.read",
+            type: "pipe-native",
+            params: {
+                id: "21", name: "firstValueToAdd"
+            } 
+        },
+        {
+            id: "6", name: "math.add",
+            type: "pipe-native",
+            params: {
+                valueToAdd: 1
+            }, previous: "5"
+        },
+        {
+            id: "7", name: "stdlib.write",
+            type: "pipe-native",
+            params: {
+                id: "22", name: "firstValueToAdd"
+            }, previous: "6" 
+        }
+        ,
+        {
+            id: "8", name: "stdlib.log",
+            type: "pipe-native",
+            params: {
+                before: "a "
+            }, previous: "7"
+        }
+        ,
+        {
+            id: "9", name: "stdlib.read",
+            type: "pipe-native",
+            params: {
+                name: "firstValueToAdd"
+            }, previous: "8" 
+        },
+        {
+            id: "10", name: "stdlib.log",
+            type: "pipe-native",
+            params: {
+                before: "b "
+            }, previous: "9"
+        },
+        {
+            id: "11", name: "stdlib.invoke",
+            type: "pipe-native",
+            params: {
+                identifier: "addAValue"
+            } , previous: "10"
+        }
+        ]
+    },
 
-    //     {
-    //         name: "stdlib.read",
-    //         type: "pipe-native",
-    //         params: {
-    //             name: "firstValueToAdd"
-    //         } 
-    //     },
-    //     {
-    //         name: "stdlib.log",
-    //         type: "pipe-native",
-    //         params: {
-    //             prefix: "b "
-    //         }
-    //     },
-
-    //     {
-    //         name: "stdlib.invoke",
-    //         type: "pipe-native",
-    //         params: {
-    //             identifier: "addAValue"
-    //         } 
-    //     }
-    //     ]
-    // },
-
-    // {
-    //     name: "addAValue",
-    //     type: "pipe-func",
-    //     pipes : [{
-    //         name: "stdlib.read",
-    //         type: "pipe-native",
-    //         params: {
-    //             name: "firstValueToAdd"
-    //         } 
-    //     },
-    //     {
-    //         name: "math.add",
-    //         type: "pipe-native",
-    //         params: {
-    //             // valueToAdd: 3
-    //             getValueToAdd: { 
-    //                 name: "stdlib.read", 
-    //                 type: "pipe-native",
-    //                 params: { 
-    //                     name: "valueToAdd" 
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     ,
-    //     {
-    //         name: "stdlib.log",
-    //         type: "pipe-native",
-    //         params: {
-    //             prefix: "c "
-    //         }
-    //     },
-    //     {
-    //         name: "stdlib.read",
-    //         type: "pipe-native",
-    //         params: {
-    //             name: "firstValueToAdd"
-    //         } 
-    //     },
-    //     {
-    //         name: "stdlib.log",
-    //         type: "pipe-native",
-    //         params: {
-    //             prefix: "d "
-    //         }
-    //     }]
-    // }]
+    {
+        id: "12", name: "addAValue",
+        type: "pipe-func",
+        pipes : [{
+            id: "13", name: "stdlib.read",
+            type: "pipe-native",
+            params: {
+                id: "24", name: "firstValueToAdd"
+            } 
+        },
+        {
+            id: "14", name: "math.add",
+            type: "pipe-native",
+            params: {
+                // valueToAdd: 3
+                getValueToAdd: { 
+                    id: "15", name: "stdlib.read", 
+                    type: "pipe-native",
+                    params: { 
+                        id: "16", name: "valueToAdd" 
+                    }
+                }
+            }, previous: "13"
+        }
+        ,
+        {
+            id: "17", name: "stdlib.log",
+            type: "pipe-native",
+            params: {
+                before: "c "
+            }, previous: "14"
+        },
+        {
+            id: "18", name: "stdlib.read",
+            type: "pipe-native",
+            params: {
+                id: "25", name: "firstValueToAdd"
+            }, previous: "17" 
+        },
+        {
+            id: "19", name: "stdlib.log",
+            type: "pipe-native",
+            params: {
+                before: "d "
+            }, previous: "18"
+        }]
+    }]
 
 
 
