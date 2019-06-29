@@ -26,7 +26,7 @@ const ChainView = ({ chain, onSelect, active }) => {
                     return (
                         <ul key={ "chain_view_chain_" + k }>
                             { group.map((pipe, id) => 
-                                <li className={ pipe.id === active ? "active" : "" } onClick={ onSelect.bind(this, pipe.id) } key={ "chain_view_item_" + id }>
+                                <li className={ pipe.id === active ? cssClasses.active : "" } onClick={ onSelect.bind(this, pipe.id) } key={ "chain_view_item_" + id }>
                                     <Pipe {...pipe} active={ pipe.id === active } />
                                 </li>) }
                         </ul>

@@ -8,7 +8,12 @@ const TreeView = ({ program, path, onSelect }) => {
         const active = path.slice().pop()
         return context.pipes ? 
             <ul>
-                { context.pipes.map( (pipe, k) => <li className={ active === k ? "active" : "" } onClick={ onSelect.bind(this, k) } key={ "tree_view_" + level + "_" + k }>{ pipe.name} { pipe.pipes ? listChild(pipe.pipes, ++level) : null }</li> ) }
+                { context.pipes.map( 
+                    (pipe, k) => 
+                        <li className={ active === k ? cssClasses.active : "" } onClick={ onSelect.bind(this, k) } key={ "tree_view_" + level + "_" + k }>
+                            { pipe.name} { pipe.pipes ? listChild(pipe, ++level) : null }
+                        </li> 
+                ) }
             </ul>
             : null
     }
