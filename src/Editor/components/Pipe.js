@@ -9,7 +9,7 @@ const Pipe = ({ id, name, params }) => (
             {
                 params ? 
                     Object.keys(params).map((paramName, k) => {
-                        return <li key={ "pipe_" + k }>{ paramName } : { params[paramName] }</li>
+                        return <li key={ "pipe_" + k }>{ paramName } : { JSON.stringify(params[paramName]) }</li>
                     })
                     : null
             }
