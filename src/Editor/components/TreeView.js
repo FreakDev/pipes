@@ -1,12 +1,19 @@
 import React from "react"
 
+import FreeField from "./formFields/FreeField"
+import OneOfField from "./formFields/OneOfField"
+
 import cssClasses from "../../../sass/Editor/TreeView.sass"
 
-const TreeView = ({ program, active, onSelect }) => {
+const TreeView = ({ program, active, onSelect, onChangeProgramName }) => {
 
     const onClick = (id, e) => {
         if (onSelect(id)) 
             e.stopPropagation()
+    }
+
+    const onValidateField = (value) => {
+        onChangeProgramName(["name"], value)
     }
 
     const listChild = (context, path, level = 0) => {
@@ -31,7 +38,8 @@ const TreeView = ({ program, active, onSelect }) => {
 
     return (
         <div className={ cssClasses.tree_view }>
-            { program.name }
+            {/* <FreeField name="program-name" value={ program.name } onValidate={ onValidateField } /> */}
+            <OneOfField name="program-name" value={ program.name } availableValues={ ['a', 'b'] } onValidate={ onValidateField } />
             { listChild(program.pipes, ["pipes"]) }
         </div>
     )

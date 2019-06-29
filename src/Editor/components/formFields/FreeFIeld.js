@@ -36,6 +36,7 @@ const FreeField = ({ name, label, value, placeholder = "saisir une valeur", erro
                         name={ name }                        
                         type="text" 
                         defaultValue={ value } 
+                        placeholder={ placeholder }
                         onChange={ onInputChange } 
                         onKeyUp={ onKeyUp }
                     />
