@@ -16,142 +16,13 @@ export const PIPE_TYPE_FUNC = 'pipe-func'
 export const PIPE_TYPE_NATIVE = 'pipe-native'
 export const PIPE_TYPE_VAR = 'pipe-var'
 
-const INITIAL_PROGRAM = {
-    name: "",
-    type: PIPE_TYPE_FUNC,
-    pipes: //[]  
+// const INITIAL_PROGRAM = {
+//     name: "",
+//     type: PIPE_TYPE_FUNC,
+//     pipes: []  
+// }
 
-    [{
-        id: "1", name: "valueToAdd",
-        type: "pipe-var",
-        value: 4
-    },
-    {
-        id: "2", name: "firstValueToAdd",
-        type: "pipe-var",
-        value: 4
-    },
-
-    {
-        id: "3", name: "main",
-        type: "pipe-func",
-        pipes: [{
-            id: "20", name: "event.listen",
-            type: "pipe-native",
-            params: {
-                eventName: "input",
-                invoke: "incValue"
-            }
-        }]
-    },
-    
-    {
-        id: "4", name: "incValue",
-        type: "pipe-func",
-        pipes: [{
-            id: "5", name: "stdlib.read",
-            type: "pipe-native",
-            params: {
-                id: "21", name: "firstValueToAdd"
-            } 
-        },
-        {
-            id: "6", name: "math.add",
-            type: "pipe-native",
-            params: {
-                valueToAdd: 1
-            }, previous: "5"
-        },
-        {
-            id: "7", name: "stdlib.write",
-            type: "pipe-native",
-            params: {
-                id: "22", name: "firstValueToAdd"
-            }, previous: "6" 
-        }
-        ,
-        {
-            id: "8", name: "stdlib.log",
-            type: "pipe-native",
-            params: {
-                before: "a "
-            }, previous: "7"
-        }
-        ,
-        {
-            id: "9", name: "stdlib.read",
-            type: "pipe-native",
-            params: {
-                name: "firstValueToAdd"
-            }, previous: "8" 
-        },
-        {
-            id: "10", name: "stdlib.log",
-            type: "pipe-native",
-            params: {
-                before: "b "
-            }, previous: "9"
-        },
-        {
-            id: "11", name: "stdlib.invoke",
-            type: "pipe-native",
-            params: {
-                identifier: "addAValue"
-            } , previous: "10"
-        }
-        ]
-    },
-
-    {
-        id: "12", name: "addAValue",
-        type: "pipe-func",
-        pipes : [{
-            id: "13", name: "stdlib.read",
-            type: "pipe-native",
-            params: {
-                id: "24", name: "firstValueToAdd"
-            } 
-        },
-        {
-            id: "14", name: "math.add",
-            type: "pipe-native",
-            params: {
-                // valueToAdd: 3
-                getValueToAdd: { 
-                    id: "15", name: "stdlib.read", 
-                    type: "pipe-native",
-                    params: { 
-                        id: "16", name: "valueToAdd" 
-                    }
-                }
-            }, previous: "13"
-        }
-        ,
-        {
-            id: "17", name: "stdlib.log",
-            type: "pipe-native",
-            params: {
-                before: "c "
-            }, previous: "14"
-        },
-        {
-            id: "18", name: "stdlib.read",
-            type: "pipe-native",
-            params: {
-                id: "25", name: "firstValueToAdd"
-            }, previous: "17" 
-        },
-        {
-            id: "19", name: "stdlib.log",
-            type: "pipe-native",
-            params: {
-                before: "d "
-            }, previous: "18"
-        }]
-    }]
-
-
-}
+import INITIAL_PROGRAM from "../../pipes-source-2.json"
 
 export default class Main extends React.Component {
 
@@ -229,7 +100,7 @@ export default class Main extends React.Component {
                 {/* <Menu /> */}
                 <GenerateButton program={ program } />
                 <TreeView program={ program } path={ currentPath } onSelect={ this.onFocus } />
-                <ChainView chain={ this.resolveCurrentPath(true) } active={ this.resolveCurrentPath().id } onSelect={ this.onFocusById } />
+                <ChainView chain={ this.resolveCurrentPath(true, -1) } active={ this.resolveCurrentPath().id } onSelect={ this.onFocusById } />
                 <Toolbox 
                     selected={ focused ? null : null } 
                     pipesDefs={ PIPES_DEFINITIONS }

@@ -1,0 +1,8 @@
+{
+    "id": "0", "name": "My first Pipes program",
+    "type": "pipe-func",
+    "pipes": 
+    
+    [{"id": "azertyupqsdfghjklmwxcvbn", "name":"stdlib.dataEmitter","type":"pipe-native","params":{"value":"Hello "}},{"id": "azrtyuiopqsdfghjklmwxcv", "name":"stdlib.log","type":"pipe-native", "previous": "azertyupqsdfghjklmwxcvbn", "params":{"after":"World !!!"}}]
+    
+}

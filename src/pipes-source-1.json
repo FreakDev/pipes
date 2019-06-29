@@ -1,0 +1,13 @@
+{
+    "id": "0", "name": "My second Pipes program",
+    "type": "pipe-func",
+    "pipes": 
+    
+    [
+        {
+            "id": "a", "name": "test",
+            "type": "pipe-func",
+            "pipes": [{"id": "azertyuiopqfghjklmwxcvbn", "name":"stdlib.dataEmitter","type":"pipe-native","params":{"value":"ho"}},{"id": "azertyupqsdfghjklmwxcvbn", "name":"stdlib.log","type":"pipe-native", "previous": "azertyuiopqfghjklmwxcvbn","params":{"before":"hey "}}]
+        }
+    ]
+}
