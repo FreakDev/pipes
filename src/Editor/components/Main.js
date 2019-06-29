@@ -53,6 +53,8 @@ export default class Main extends React.Component {
         this.onAddPipe = this.onAddPipe.bind(this)
         this.onFocus = this.onFocus.bind(this)
         this.navigateTo = this.navigateTo.bind(this)
+        this.navigateUp = this.navigateUp.bind(this)
+
     }
 
     onAddPipe(pipe, connected) {
@@ -96,9 +98,22 @@ export default class Main extends React.Component {
         }
     }
 
+    navigateUp() {
+        let newPath = this.state.currentPath.slice()
+
+        while(typeof newPath[newPath.length -1] !== "string") newPath.pop()
+
+        newPath.pop()
+
+        this.navigateTo(newPath)
+    }
+
     navigateTo(path) {
         let newPath
         if (Array.isArray(path)) {
+            if (!path.length)
+                return false
+
             newPath = path
         } else { 
             newPath = this.state.currentPath.slice()
@@ -106,6 +121,9 @@ export default class Main extends React.Component {
             if (typeof path === "string" && path.indexOf("/") !== -1) {
                 return path.split("/").map(e => this.navigateTo(JSON.parse(e))).reduce((p, c) => p && c, true)
             }
+
+            if (typeof path === "string" && path === "")
+                return false
 
             newPath.push(path)
         }
@@ -139,7 +157,11 @@ export default class Main extends React.Component {
                 {/* <Menu /> */}
                 <GenerateButton program={ program } />
                 <TreeView program={ program } active={ this.resolveCurrentPath().id } onSelect={ this.navigateTo } />
-                <ChainView chain={ this.resolveCurrentPath(true, -1) } active={ this.resolveCurrentPath().id } onSelect={ this.onFocus } />
+                <ChainView 
+                    chain={ this.resolveCurrentPath(true, -1) } 
+                    active={ this.resolveCurrentPath().id } 
+                    onSelectOne={ this.onFocus } 
+                    onDblClickElseWhere={ this.navigateUp }/>
                 <Toolbox 
                     selected={ focused ? null : null } 
                     pipesDefs={ PIPES_DEFINITIONS }
