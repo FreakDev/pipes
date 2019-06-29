@@ -1,8 +1,18 @@
 import React, { useState } from "react"
 import uuid from "uuid/v4"
 
-const OneOfField = ({ name, label, value, placeholder = "choisir une valeur", availableValues, onChange, onValidate }) => {
-    const [editMode, setEditMode] = useState(false)
+const OneOfField = ({ 
+    name, 
+    label, 
+    value, 
+    edit,
+    placeholder = "choisir une valeur", 
+    availableValues, 
+    onChange, 
+    onValidate, 
+    onCancel 
+}) => {
+    const [editMode, setEditMode] = useState(edit)
 
     const fieldId = name + "_" + uuid()
 
@@ -15,6 +25,7 @@ const OneOfField = ({ name, label, value, placeholder = "choisir une valeur", av
             (!onValidate || onValidate(e.target.value) !== false) && setEditMode(false)
         } else if (e.keyCode === 27) {
             setEditMode(false)
+            onCancel && onCancel()
         }
     }
 

@@ -2,7 +2,7 @@ import React from "react"
 
 import cssClasses from "../../../sass/Editor/Pipe.sass"
 
-const Pipe = ({ id, name, params }) => (
+const Pipe = ({ name, params }) => (
     <div data-name={ name } className={ cssClasses.pipe }>
         { name }
         <ul>

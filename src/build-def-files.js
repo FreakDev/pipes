@@ -68,9 +68,9 @@ const parseBlock = function (block) {
         if (match) {
             switch (match[1]) {
                 case 'param':
-                    const { paramName, spec } = parseParamLine(match[2])
-                    blockDef[match[1]] = blockDef[match[1]] || {}
-                    blockDef[match[1]][paramName] = spec
+                    const { name, ...param } = parseParamLine(match[2])
+                    blockDef.params = blockDef.params || {}
+                    blockDef.params[name] = param
                 break;
                 default:
                     blockDef[match[1]] = match[2]
@@ -83,8 +83,25 @@ const parseBlock = function (block) {
 const parseParamLine = (paramLine) => {
     let parts = paramLine.split('-')
 
+    let name = parts[0].trim()
+    let type = "free"
+    let optional = false
+
+    nameMatch = name.match(/((\[(.*)\])|(.*))\s+\{(.*)\}/)
+    if (nameMatch) {
+        if (nameMatch[3])
+            name = nameMatch[3]
+        else {
+            name = nameMatch[1]
+        }
+        optional = !!nameMatch[3]
+        type = nameMatch[3]
+    }
+
     return {
-        paramName: parts[0].trim(),
-        spec: parts.slice(1).join('-')
+        name,
+        type,
+        optional,
+        description: parts.slice(1).join('-').trim()
     }
 }

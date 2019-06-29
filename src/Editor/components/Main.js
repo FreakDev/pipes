@@ -4,7 +4,7 @@ import uuid from "uuid/v4"
 
 import Menu from "./Menu"
 import ChainView from "./ChainView"
-import Toolbox from "./Toolbox"
+import PipeInspector from "./PipeInspector"
 import TreeView from "./TreeView"
 import GenerateButton from "./GenerateButton"
 
@@ -60,6 +60,7 @@ export default class Main extends React.Component {
         this.focus = this.focus.bind(this)
         this.navigateTo = this.navigateTo.bind(this)
         this.navigateUp = this.navigateUp.bind(this)
+        this.updateProgram = this.updateProgram.bind(this)
 
     }
 
@@ -72,6 +73,8 @@ export default class Main extends React.Component {
             let currentPipe = this.resolveCurrentPath()
             if (currentPipe.id)
                 pipe.previous = currentPipe.id
+
+            // @todo : look if it nedd to be inserted into a previous chain
         }
 
         let currentContainer = __dir(this.state.currentPath).slice()
@@ -83,11 +86,30 @@ export default class Main extends React.Component {
             program: newProgram,
         })
 
-        this.onFocus(newProgram.pipes[newProgram.pipes.length -1].id)
+        this.focus(newProgram.pipes[newProgram.pipes.length -1].id)
     }
 
-    savePipe(pipe) {
+    savePipe(old, newProps) {
+        let newProgram = { ...this.state.program }
+
+        let context = __resolvePath(newProgram, __dir(this.state.currentPath))
+        let currentPathPos = context.findIndex(e => e.id === this.state.currentPath[this.state.currentPath.length - 1].id)
+
+        if (context[currentPathPos].id === old.id) {
+            let newPipe = {
+                ...old,
+                params: {
+                    ...old.params,
+                    ...newProps
+                }
+            }
+
+            context[currentPathPos] = newPipe
+        }
         
+        this.setState({
+            program: newProgram,
+        })
     }
 
     focus(id) {
@@ -144,6 +166,16 @@ export default class Main extends React.Component {
         return true;
     }
 
+    updateProgram(path, value) {
+        const newProgram = { ...this.state.program }
+
+        newProgram[path] = value
+
+        this.setState({
+            program: newProgram
+        })
+    }
+
     resolveCurrentPath(digUntilLastFolder = false) {
         let path = this.state.currentPath.slice()
         if (digUntilLastFolder) {
@@ -167,18 +199,19 @@ export default class Main extends React.Component {
                 <TreeView 
                     program={ program } 
                     active={ currentActiveId } 
-                    onSelect={ this.navigateTo } />
+                    onSelect={ this.navigateTo }
+                    onChangeProgramName={ this.updateProgram } />
                 <ChainView 
                     chain={ this.resolveCurrentPath(true) } 
                     active={ currentActiveId } 
                     onSelectOne={ this.focus } 
                     onClickElseWhere={ this.navigateTo.bind(this,__dir(currentPath)) }
                     onDblClickElseWhere={ this.navigateUp }/>
-                <Toolbox 
+                <PipeInspector 
                     active={ !Array.isArray(currentActive) ? currentActive : null } 
                     pipesDefs={ PIPES_DEFINITIONS }
-                    onAddPipe={ this.addPipe } 
-                    onSavePipe={ this.savePipe } 
+                    onCreate={ this.addPipe } 
+                    onSave={ this.savePipe } 
                     />
             </div>
         )

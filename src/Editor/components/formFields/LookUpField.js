@@ -7,18 +7,22 @@ const LookUpField = ({
     value, 
     placeholder = "saisir une valeur", 
     error, 
+    edit,
+    resetOnValidate = false,
     forceSuggestedValue = true, 
     availableValues = [], 
     autocompleteCallback = (value, suggestion) => {
         return suggestion.indexOf(value) !== -1
     },
+    renderSuggestion = (suggestion) => ( suggestion ),
     onAutocomplete, 
     onChange, 
-    onValidate 
+    onValidate,
+    onCancel
 }) => {
     const [dirty, setDirty] = useState(false)
     const [inputValue, setInputValue] = useState(value)    
-    const [editMode, setEditMode] = useState(false)
+    const [editMode, setEditMode] = useState(edit)
     const [isAutocomplete, setIsAutocomplete] = useState(false)
     const [suggestions, setSuggestions] = useState([])
 
@@ -35,10 +39,17 @@ const LookUpField = ({
     const onKeyUp = (e) => {
         if (e.keyCode === 13) { // pressed enter
             if (!forceSuggestedValue || isAutocomplete)
-                (!onValidate || onValidate(e.target.value) !== false) && setEditMode(false)
+                if (!onValidate || onValidate(e.target.value) !== false) {
+                    setEditMode(false)
+
+                    if (resetOnValidate) {
+                        setInputValue("")
+                    }
+                }
         } else if (e.keyCode === 27) {
-            setInputValue("")
+            setInputValue(value || "")
             setEditMode(false)
+            onCancel && onCancel()
         }
     }
 
@@ -46,11 +57,14 @@ const LookUpField = ({
         !editMode && setEditMode(true)
     }
 
+    let ref
+
     const onClickSuggestion = (suggestion) => {
         setIsAutocomplete(true) 
         setInputValue(suggestion)
         setSuggestions([])
         onAutocomplete && onAutocomplete(suggestion)
+        ref.focus()
     }
 
     return (
@@ -64,13 +78,14 @@ const LookUpField = ({
                             { suggestions.map((suggestion, k) => {
                                 return (
                                     <li key={ "lookup_" + fieldId + "_suggestions_" + k } onClick={ () => { onClickSuggestion(suggestion) } }>
-                                        { suggestion }
+                                        { renderSuggestion(suggestion) }
                                     </li>
                                 )
                             }) }
                         </ul>
                     </div>                    
                     <input 
+                        ref={ r => ref = r }
                         autoFocus 
                         id={ fieldId } 
                         name={ name }

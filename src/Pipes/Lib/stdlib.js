@@ -72,8 +72,8 @@ export default {
      * @Pipe\type pipe-native
      * @Pipe\description log to console
      * (should be in a ui or debug package)
-     * @Pipe\param before - % will be print before output
-     * @Pipe\param after - % will be print after output
+     * @Pipe\param [before] {free} - %s will be print before output
+     * @Pipe\param after - %s will be print after output
      */
     log: ({ before, after }, input) => {
         let params = []
