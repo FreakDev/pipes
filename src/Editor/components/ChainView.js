@@ -4,7 +4,7 @@ import Pipe from "./Pipe"
 
 import cssClasses from "../../../sass/Editor/ChainView.sass"
 
-const ChainView = ({ chain, active, onSelectOne, onDblClickElseWhere }) => {
+const ChainView = ({ chain, active, onSelectOne, onClickElseWhere, onDblClickElseWhere }) => {
     let groups
     
     groups = chain.filter((e) => !e.previous).map(head => {
@@ -20,7 +20,7 @@ const ChainView = ({ chain, active, onSelectOne, onDblClickElseWhere }) => {
     })
         
     return (
-        <div className={ cssClasses.chain_view } onDoubleClick={ onDblClickElseWhere }>
+        <div className={ cssClasses.chain_view } onClick={ onClickElseWhere } onDoubleClick={ onDblClickElseWhere }>
             { 
                 groups.map( (group, k) => {
                     return (
@@ -28,7 +28,7 @@ const ChainView = ({ chain, active, onSelectOne, onDblClickElseWhere }) => {
                             { group.map((pipe, id) => 
                                 <li 
                                     className={ pipe.id === active ? cssClasses.active : "" } 
-                                    onClick={ onSelectOne.bind(this, pipe.id) } 
+                                    onClick={ (e) => { e.stopPropagation(); onSelectOne(pipe.id) } } 
                                     key={ "chain_view_item_" + id }>
                                     <Pipe 
                                         {...pipe} 

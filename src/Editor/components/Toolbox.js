@@ -1,6 +1,6 @@
 import React from "react"
 
-import PipeForm from "./PipeForm"
+import PipeInspector, { MODE_CREATE, MODE_EDIT } from "./PipeInspector"
 
 import cssClasses from "../../../sass/Editor/Toolbox.sass"
 
@@ -11,11 +11,15 @@ export default class Toolbox extends React.Component
     }
 
     render () {
-        const { selected, pipesDefs, onAddPipe } = this.props
+        const { active, pipesDefs, onAddPipe } = this.props
         return (
             <div className={ cssClasses.toolbox }>
                 {
-                    <PipeForm pipesDefs={ pipesDefs } onSubmit={ onAddPipe } />
+                    <PipeInspector 
+                        pipesDefs={ pipesDefs }
+                        value={ active }
+                        mode={ active ? MODE_EDIT : MODE_CREATE }
+                        onSubmit={ onAddPipe } />
                 }
             </div>
         )

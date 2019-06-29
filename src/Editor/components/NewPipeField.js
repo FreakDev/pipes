@@ -1,7 +1,5 @@
 import React from 'react'
 
-import PipeForm from './PipeForm'
-
 export default class NewPipeField extends React.Component {
 
     state = {

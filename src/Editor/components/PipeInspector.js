@@ -25,7 +25,7 @@ export default class PipeForm extends React.Component {
 
     static propTypes = {
         onSubmit: "",
-        values: "", 
+        value: "", 
         pipesDefs: "object", 
         mode: ""
     }
@@ -95,7 +95,7 @@ export default class PipeForm extends React.Component {
     }
 
     render () {
-        const { values, mode, pipesDefs } = this.props
+        const { value, mode, pipesDefs } = this.props
         const { pipeSpec, fieldValues } = this.state
 
         const connectedCheckId = uuid()
@@ -109,7 +109,7 @@ export default class PipeForm extends React.Component {
                             suggestions={ Object.keys(pipesDefs) } 
                             onLoadSuggestion={ this.onAutocomplete }
                             onChange={ this.onNewFieldChange } />
-                        : values.name
+                        : value.name
                 }
                 {
                     pipeSpec ? 

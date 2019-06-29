@@ -24,8 +24,13 @@ export const PIPE_TYPE_VAR = 'pipe-var'
 
 import INITIAL_PROGRAM from "../../pipes-source-2.json"
 
+const __dir = (path) => {
+    let newPath = path.slice()
+    while(typeof newPath[newPath.length - 1] !== "string") newPath.pop()
+    return newPath
+}
 
-const resolvePath = (context, path) => {
+const __resolvePath = (context, path) => {
     let base = context
     for(let idx = 0, len = path.length; idx < len; idx++) {
         let curPath = path[idx]
@@ -50,14 +55,15 @@ export default class Main extends React.Component {
     constructor(props) {
         super(props)
 
-        this.onAddPipe = this.onAddPipe.bind(this)
-        this.onFocus = this.onFocus.bind(this)
+        this.addPipe = this.addPipe.bind(this)
+        this.savePipe = this.savePipe.bind(this)
+        this.focus = this.focus.bind(this)
         this.navigateTo = this.navigateTo.bind(this)
         this.navigateUp = this.navigateUp.bind(this)
 
     }
 
-    onAddPipe(pipe, connected) {
+    addPipe(pipe, connected) {
         let newProgram = { ...this.state.program }
 
         pipe.id = uuid()
@@ -68,10 +74,9 @@ export default class Main extends React.Component {
                 pipe.previous = currentPipe.id
         }
 
-        let currentContainer = this.state.currentPath.slice()
-        while(typeof currentContainer[currentContainer.length -1] !== "string") currentContainer.pop()
+        let currentContainer = __dir(this.state.currentPath).slice()
 
-        let base = resolvePath(newProgram, currentContainer)
+        let base = __resolvePath(newProgram, currentContainer)
         base.push(pipe)
 
         this.setState({
@@ -81,7 +86,11 @@ export default class Main extends React.Component {
         this.onFocus(newProgram.pipes[newProgram.pipes.length -1].id)
     }
 
-    onFocus(id) {
+    savePipe(pipe) {
+        
+    }
+
+    focus(id) {
         const currentActive = this.resolveCurrentPath()
         if (id === currentActive.id) {
             return this.navigateTo('pipes')
@@ -99,12 +108,8 @@ export default class Main extends React.Component {
     }
 
     navigateUp() {
-        let newPath = this.state.currentPath.slice()
-
-        while(typeof newPath[newPath.length -1] !== "string") newPath.pop()
-
+        let newPath = __dir(this.state.currentPath)
         newPath.pop()
-
         this.navigateTo(newPath)
     }
 
@@ -129,7 +134,7 @@ export default class Main extends React.Component {
         }
 
         // check path
-        if (resolvePath(this.state.program, newPath) === undefined) {
+        if (__resolvePath(this.state.program, newPath) === undefined) {
             return false
         }
 
@@ -146,26 +151,35 @@ export default class Main extends React.Component {
                 path.pop()
             }
         }
-        return resolvePath(this.state.program, path)
+        return __resolvePath(this.state.program, path)
     }
 
     render() {
-        const { program, focused, currentPath } = this.state
+        const { program, currentPath } = this.state
+
+        let currentActive = this.resolveCurrentPath(),
+            currentActiveId = typeof currentActive === "object" ? currentActive.id : null
 
         return (
             <div className={ cssClasses.main }>
                 {/* <Menu /> */}
                 <GenerateButton program={ program } />
-                <TreeView program={ program } active={ this.resolveCurrentPath().id } onSelect={ this.navigateTo } />
+                <TreeView 
+                    program={ program } 
+                    active={ currentActiveId } 
+                    onSelect={ this.navigateTo } />
                 <ChainView 
-                    chain={ this.resolveCurrentPath(true, -1) } 
-                    active={ this.resolveCurrentPath().id } 
-                    onSelectOne={ this.onFocus } 
+                    chain={ this.resolveCurrentPath(true) } 
+                    active={ currentActiveId } 
+                    onSelectOne={ this.focus } 
+                    onClickElseWhere={ this.navigateTo.bind(this,__dir(currentPath)) }
                     onDblClickElseWhere={ this.navigateUp }/>
                 <Toolbox 
-                    selected={ focused ? null : null } 
+                    active={ !Array.isArray(currentActive) ? currentActive : null } 
                     pipesDefs={ PIPES_DEFINITIONS }
-                    onAddPipe={ this.onAddPipe } />
+                    onAddPipe={ this.addPipe } 
+                    onSavePipe={ this.savePipe } 
+                    />
             </div>
         )
     }
