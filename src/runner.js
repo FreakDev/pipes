@@ -37,7 +37,7 @@ const pipeAsJson = {
             type: "pipe-native",
             params: {
                 eventName: "input",
-                invoke: "incValue"
+                forward: "incValue"
             }
         }]
     },
@@ -66,37 +66,36 @@ const pipeAsJson = {
                 id: "22", name: "firstValueToAdd"
             }, previous: "6" 
         }
-        ,
-        {
-            id: "8", name: "stdlib.log",
-            type: "pipe-native",
-            params: {
-                before: "a "
-            }, previous: "7"
-        }
-        ,
-        {
-            id: "9", name: "stdlib.read",
-            type: "pipe-native",
-            params: {
-                name: "firstValueToAdd"
-            }, previous: "8" 
-        },
-        {
-            id: "10", name: "stdlib.log",
-            type: "pipe-native",
-            params: {
-                before: "b "
-            }, previous: "9"
-        },
-        {
-            id: "11", name: "stdlib.invoke",
-            type: "pipe-native",
-            params: {
-                identifier: "addAValue"
-            } , previous: "10"
-        }
         ]
+    },
+    {
+        id: "8", name: "stdlib.log",
+        type: "pipe-native",
+        params: {
+            before: "a "
+        }, previous: "4"
+    }
+    ,
+    {
+        id: "9", name: "stdlib.read",
+        type: "pipe-native",
+        params: {
+            name: "firstValueToAdd"
+        }, previous: "8" 
+    },
+    {
+        id: "10", name: "stdlib.log",
+        type: "pipe-native",
+        params: {
+            before: "b "
+        }, previous: "9"
+    },
+    {
+        id: "11", name: "stdlib.forward",
+        type: "pipe-native",
+        params: {
+            identifier: "addAValue"
+        } , previous: "10"
     },
 
     {

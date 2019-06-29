@@ -57,7 +57,7 @@ export default class PipeFunc extends Pipe {
     invoke(callable, input) {
         if (typeof callable === 'string') {
             let pipe = this._find(pipe => pipe.name === callable)
-            return pipe.run(input)
+            return this._doRun(this._buildAndCompile(pipe), input)
         } else {
             if ([PIPE_NATIVE, PIPE_FUNC].indexOf(callable.type) !== -1)
                 return this._compile([callable]).reduce((prev, curr) => curr(prev, this), input)

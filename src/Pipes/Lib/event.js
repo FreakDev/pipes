@@ -1,7 +1,7 @@
 export default {
-    listen: ({ eventName, invoke }, input, context) => {
+    listen: ({ eventName, forward }, input, context) => {
         window.setTimeout(function () {
-            context.invoke(invoke)
+            context.invoke(forward)
         }, 1000)
     }
 }

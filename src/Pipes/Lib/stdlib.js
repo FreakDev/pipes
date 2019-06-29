@@ -55,13 +55,13 @@ export default {
     
     /**
      * @PipeDEF
-     * @Pipe\name invoke
+     * @Pipe\name forward
      * @Pipe\type pipe-native
      * @Pipe\description invoke a function
      * the invoked function identifier can be provided either as a parameter or as the input value
      * @Pipe\param identifier - function to invoke identifier
      */
-    invoke: ({ identifier }, input, context) => {
+    forward: ({ identifier }, input, context) => {
         return context.invoke(identifier || input)
     },
 
