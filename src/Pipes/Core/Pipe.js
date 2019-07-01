@@ -35,8 +35,12 @@ export default class Pipe {
     }
 
     set value(val) {
+        const oldValue = this._value
         this._value = val
+        this._valueChangeListener.forEach(listener => listener.call(this, this._value, oldValue))
     }
+
+    _valueChangeListener = []
 
     constructor(type, id, name, value, context) {
         if ([PIPE_VAR, PIPE_FUNC, PIPE_NATIVE].indexOf(type) === -1)
@@ -55,9 +59,17 @@ export default class Pipe {
         this._previous = context.previous
     }
 
-    run () {
-        if (this._type === PIPE_FUNC) {
-            this.pipes.run()
-        }
+    addListener (callback) {
+        this._valueChangeListener.push(callback)
     }
+
+    removeListener (callback) {
+        const listenerIndex = this._valueChangeListener.indexOf(callback)
+        if (listenerIndex !== -1) {
+            this._valueChangeListener.splice(listenerIndex, 1)
+            return true
+        }
+        return false
+    }
+
 }

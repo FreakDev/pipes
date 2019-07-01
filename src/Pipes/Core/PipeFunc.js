@@ -1,5 +1,5 @@
 import Pipe, { PIPE_VAR, PIPE_FUNC, PIPE_NATIVE } from "./Pipe"
-import pipeFactory from "../factory"
+import pipeFactory from "./factory"
 
 import stdlib from "../Lib/stdlib"
 import math from "../Lib/math"
@@ -40,7 +40,13 @@ export default class PipeFunc extends Pipe {
         this._params = context.params
         this._parent = context.parent
 
-        this._context = { invoke: this._invoke.bind(this), getVarValue: this._getVarValue.bind(this), setVarValue: this._setVarValue.bind(this) }
+        this._context = { 
+            invoke: this._invoke.bind(this), 
+            getVarValue: this._getVarValue.bind(this), 
+            setVarValue: this._setVarValue.bind(this),
+            addVarListener: this._addVarListener.bind(this),
+            removeVarListener: this._removeVarListener.bind(this)
+        }
 
     }
 
@@ -89,6 +95,25 @@ export default class PipeFunc extends Pipe {
         } else {
             throw Error ('Unknow var ' + varName)
         }
+    }
+
+    _addVarListener(varName, callback) {
+        const pipeVar = this._find(p => p.type === PIPE_VAR && p.name === varName)
+
+        if (pipeVar) {
+            pipeVar.addListener(callback)
+            return true
+        }
+        return false
+    }
+
+    _removeVarListener(varName, callback) {
+        const pipeVar = this._find(p => p.type === PIPE_VAR && p.name === varName)
+
+        if (pipeVar) {
+            return pipeVar.removeListener(callback)
+        }
+        return false
     }
 
     _buildAndCompile(headPipe) {

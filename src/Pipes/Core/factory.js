@@ -1,5 +1,5 @@
-import Pipe, { PIPE_VAR, PIPE_FUNC, PIPE_NATIVE } from "./Core/Pipe"
-import PipeFunc from "./Core/PipeFunc"
+import Pipe, { PIPE_VAR, PIPE_FUNC, PIPE_NATIVE } from "./Pipe"
+import PipeFunc from "./PipeFunc"
 
 export default {
     build(json, parent) {
