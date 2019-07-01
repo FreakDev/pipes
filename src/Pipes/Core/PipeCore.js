@@ -52,42 +52,18 @@ export default class PipeCore
         return compiled.reduce((prev, curr) => prev.then(curr), Promise.resolve(input))
     }
 
-    _compile(pipes, context) {
-
-        return pipes.map(pipe => {
-            let fn = null
+    _compilePipe(context, debug = false, pipe) {
+        let fn = null
             
-            if (pipe.type !== PIPE_NATIVE) {
-                fn = pipe.run.bind(pipe)
-            }
-            
-            if (!fn) {
-                fn = this._resolveNS(pipe.alias || pipe.name, LIB).bind(global, pipe.params || {})
-            }
-            
-            return this._makeRunnable(fn, false, context)
-        })
-    }
-
-    _compileWithDebug(pipes, context) {
-
-        return pipes.map(pipe => {
-            let fn = null
-            
-            if (pipe.type !== PIPE_NATIVE) {
-                fn = pipe.run.bind(pipe)
-            }
-            
-            if (!fn) {
-                fn = this._resolveNS(pipe.alias || pipe.name, LIB).bind(global, pipe.params || {})
-            }
-            
-            return this._makeRunnable(fn, true, context, { pipe })
-        })
-    }
-
-    _makeRunnable(fn, withDebug, context, { pipe }) {
-        return !withDebug ? 
+        if (pipe.type !== PIPE_NATIVE) {
+            fn = pipe.run.bind(pipe)
+        }
+        
+        if (!fn) {
+            fn = this._resolveNS(pipe.alias || pipe.name, LIB).bind(global, pipe.params || {})
+        }
+        
+        return !debug ? 
             (input) => {
                 return fn(input, context)
             }
@@ -96,6 +72,14 @@ export default class PipeCore
                 this._debugger.pipe_called({ pipe, input })
                 return fn(input, context)
             }).bind(this)
+    }
+
+    _compile(pipes, context, debugOption = false) {
+        return pipes.map(pipe => this._compilePipe.bind(this, context, false))
+    }
+
+    _compileWithDebug(pipes, context) {
+        return pipes.map(pipe => this._compilePipe.bind(this, context, true))
     }
 
     _resolveNS = (ns, ctxt) => {
