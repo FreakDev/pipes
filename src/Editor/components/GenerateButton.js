@@ -1,4 +1,5 @@
 import React from "react"
+import RunPanel from "./RunPanel"
 
 import cssClasses from "../../../sass/Editor/GenerateButton.sass"
 
@@ -18,7 +19,7 @@ export default class GenerateButton extends React.Component {
         return (
             <div className={ cssClasses.generate_button }>
                 <button onClick={ this.generate }>Generate</button>
-                <button onClick={ this.props.onClickRun }>Run</button>
+                <RunPanel program={ this.props.program } />
             </div>
         )
     }

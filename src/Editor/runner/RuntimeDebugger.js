@@ -1,49 +1,78 @@
 import PipeCore, { MODE_DEBUG } from "../../Pipes/Core/PipeCore"
 
-export const MESSAGE_PIPE_CALLED = "pipe-called"
-export const MESSAGE_EXECUTION_STOPPED = "execution-stopped"
-export const MESSAGE_EXECUTION_STARTED = "execution-started"
-export const MESSAGE_EXECUTION_IDLE = "execution-idle"
+export const RUNTIME_PIPE_CALLED = "pipe-called"
+export const RUNTIME_EXECUTION_STOPPED = "execution-stopped"
+export const RUNTIME_EXECUTION_STARTED = "execution-started"
+export const RUNTIME_EXECUTION_IDLE = "execution-idle"
+
+export const MESSAGE_LOAD = "MessageLoad"
+export const MESSAGE_START = "MessageStart"
+export const MESSAGE_PAUSE = "MessagePause"
 
 export default class RuntimeDebugger {
 
     _core
 
-    constructor() {
-        this._core = new PipeCore(MODE_DEBUG, this)
+    _messageEventEmitter
 
-        window.addEventListener("message", (e) => {
-            this._core
-                .loadJSON(JSON.parse(e.data))
-                .run()
+    _messageEventPoster
+
+    constructor(messageEventEmitter, messageEventPoster) {
+        this._core = new PipeCore(MODE_DEBUG, {
+            pipe_called: this.__pipe_called.bind(this),
+            program_started: this.__program_started.bind(this),
+            program_stopped: this.__program_stopped.bind(this),
+            program_turned_idle: this.__program_turned_idle.bind(this),
+        })
+
+        this._messageEventEmitter = messageEventEmitter
+        this._messageEventPoster = messageEventPoster
+    }
+
+    start() {
+        this._messageEventEmitter.addEventListener("message", (e) => {
+            const message = JSON.parse(e.data)
+            let listenerName = "on" + message.name
+            if (this[listenerName])
+                this[listenerName].call(this, message.payload)
         })
     }
 
     emit(name, payload) {
-        window.parent.postMessage(JSON.stringify({
+        this._messageEventPoster.postMessage(JSON.stringify({
             name,
             payload
         }), "*")
     }
 
-    pipe_called(payload) {
+    onMessageLoad({ program }) {
+        this._core
+            .loadJSON(program)
+    }
 
-        this.emit(MESSAGE_PIPE_CALLED, {
+    onMessageStart() {
+        this._core
+            .run()
+    }
+
+    __pipe_called(payload) {
+
+        this.emit(RUNTIME_PIPE_CALLED, {
             ...payload,
             pipe: { id: payload.pipe.id, name: payload.pipe.name, params: payload.pipe.params }
         })
-        
+
     }
 
-    program_started() {
-        this.emit(MESSAGE_EXECUTION_STARTED)
+    __program_started() {
+        this.emit(RUNTIME_EXECUTION_STARTED)
     }
 
-    program_stopped() {
-        this.emit(MESSAGE_EXECUTION_STOPPED)
+    __program_stopped() {
+        this.emit(RUNTIME_EXECUTION_STOPPED)
     }
 
-    program_turned_idle() {
-        this.emit(MESSAGE_EXECUTION_IDLE)
+    __program_turned_idle() {
+        this.emit(RUNTIME_EXECUTION_IDLE)
     }
 }

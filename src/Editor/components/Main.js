@@ -2,7 +2,6 @@ import React from "react"
 
 import uuid from "uuid/v4"
 
-import RunPanel from "./RunPanel"
 import ChainView from "./ChainView"
 import PipeInspector from "./PipeInspector"
 import TreeView from "./TreeView"
@@ -253,21 +252,6 @@ export default class Main extends React.Component {
         this.setState({
             isRunning: true
         })
-        const onMessage = (msg) => {
-            event = JSON.parse(msg.data)
-            switch(event.name) {
-                case "execution-stopped":
-                    this.setState({
-                        isRunning: false
-                    })  
-                    break;  
-                case "pipe-called":
-                    console.log(event.payload)
-                    break;
-            }
-        }
-        window.addEventListener("message", onMessage, false)
-        this.iframe.contentWindow.postMessage(JSON.stringify(this.state.program), '*');
     }
 
     resolveCurrentPath(digUntilLastFolder = false) {
@@ -289,7 +273,7 @@ export default class Main extends React.Component {
         return (
             <div className={ cssClasses.main }>
                 {/* <Menu /> */}
-                <GenerateButton program={ program } onClickRun={ this.run } />
+                <GenerateButton program={ program } />
                 <TreeView 
                     program={ program } 
                     active={ currentActiveId } 
@@ -303,7 +287,6 @@ export default class Main extends React.Component {
                     onSelectOne={ this.focus } 
                     onClickElseWhere={ this.navigateTo.bind(this,__dir(currentPath)) }
                     onDblClickElseWhere={ this.navigateUp }/>
-                <RunPanel show={ isRunning } getRef={ ref => this.iframe = ref } />
                 <PipeInspector 
                     active={ !Array.isArray(currentActive) ? currentActive : null } 
                     pipesDefs={ defs }

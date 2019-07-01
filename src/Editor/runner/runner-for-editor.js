@@ -1,5 +1,5 @@
 
 import RuntimeDebugger from "./RuntimeDebugger"
 
-new RuntimeDebugger()
+new RuntimeDebugger(window, window.opener).start()
 
