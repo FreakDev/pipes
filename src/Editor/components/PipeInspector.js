@@ -7,7 +7,7 @@ import cssClasses from "../../../sass/Editor/PipeInspector.sass"
 export const MODE_CREATE = "mode-create"
 export const MODE_EDIT = "mode-edit"
 
-const PipeInspector = ({ active, pipesDefs, onCreate, onSave }) => {
+const PipeInspector = ({ active, pipesDefs, onCreate, onSave, onRemove }) => {
 
     return <div className={ cssClasses.pipe_inspector }>
         { 
@@ -17,6 +17,7 @@ const PipeInspector = ({ active, pipesDefs, onCreate, onSave }) => {
                     value={ active }
                     pipesDefs={ pipesDefs }
                     onSubmit={ onSave.bind(this, active) }
+                    onRemove={ onRemove.bind(this, active) }
                 />
                 : null
         }

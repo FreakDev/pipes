@@ -57,6 +57,7 @@ export default class Main extends React.Component {
 
         this.addPipe = this.addPipe.bind(this)
         this.savePipe = this.savePipe.bind(this)
+        this.onRemove = this.onRemove.bind(this)
         this.focus = this.focus.bind(this)
         this.navigateTo = this.navigateTo.bind(this)
         this.navigateUp = this.navigateUp.bind(this)
@@ -115,6 +116,26 @@ export default class Main extends React.Component {
             program: newProgram,
         })
     }
+
+    onRemove(pipe) {
+        let newProgram = { ...this.state.program }
+
+        let context = __resolvePath(newProgram, __dir(this.state.currentPath))
+        let currentPathPos = context.findIndex(e => e.id === this.state.currentPath[this.state.currentPath.length - 1].id)
+
+        if (context[currentPathPos].id === pipe.id) {
+            context.splice(currentPathPos, 1)
+        }
+        
+        let previouslyConnectedIndex = context.findIndex(p => p.previous === pipe.id)
+        if (previouslyConnectedIndex !== -1) {
+            context[previouslyConnectedIndex].previous = pipe.previous
+        }
+
+        this.setState({
+            program: newProgram,
+        })
+    }    
 
     focus(id) {
         const currentActive = this.resolveCurrentPath()
@@ -215,7 +236,8 @@ export default class Main extends React.Component {
                     active={ !Array.isArray(currentActive) ? currentActive : null } 
                     pipesDefs={ PIPES_DEFINITIONS }
                     onCreate={ this.addPipe } 
-                    onSave={ this.savePipe } 
+                    onSave={ this.savePipe }
+                    onRemove={ this.onRemove }
                     />
             </div>
         )

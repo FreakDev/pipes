@@ -27,6 +27,7 @@ export default class PipeForm extends React.Component {
 
     static propTypes = {
         onSubmit: "",
+        onRemove: "",
         value: "", 
         pipesDefs: "object", 
     }
@@ -136,7 +137,7 @@ export default class PipeForm extends React.Component {
     }
 
     render () {
-        const { value, mode, pipesDefs, label } = this.props
+        const { value, mode, pipesDefs, label, onRemove } = this.props
         const { pipeSpec, fieldValues } = this.state
 
         const connectedCheckId = "connected_checkbox_" + uuid()
@@ -175,7 +176,7 @@ export default class PipeForm extends React.Component {
                         </div> ,
                         <input type="submit" onClick={ this.onSubmit } disabled={ !this.isValid() } />
                     ]
-                        : null
+                        : <input type="button" onClick={ onRemove } value="Remove" />
                 }
             </fieldset>
         )
