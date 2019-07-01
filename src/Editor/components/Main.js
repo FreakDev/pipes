@@ -44,6 +44,8 @@ const PIPE_VAR_DEF = {
     }
 }
 
+const KEY_SHIFT = 16
+
 // const INITIAL_PROGRAM = {
 //     name: "",
 //     type: PIPE_TYPE_FUNC,
@@ -73,12 +75,54 @@ const __resolvePath = (context, path) => {
     return base
 }
 
+const __findAfterInChain = (needleId, chain, from) => {
+    let found = false,
+        path = [],
+        curr = from
+    
+    while (!found) {
+        const next = chain.find(e => e.previous === curr.id)
+        if (!next)
+            break
+
+        path.push(next.id)
+        if (next.id === needleId)
+            found = true
+
+        curr = next
+    }
+
+    return [found, path]
+}
+
+const __findBeforeInChain = (needleId, chain, from) => {
+    let found = false,
+        path = [],
+        curr = from
+    
+    while (!found) {
+        const next = chain.find(e => e.id === curr.previous)
+        if (!next)
+            break
+
+        path.push(next.id)
+        if (next.id === needleId)
+            found = true
+
+        curr = next
+    }
+
+    return [found, path]
+}
+
+
 export default class Main extends React.Component {
 
     state = {
         program: INITIAL_PROGRAM,
         currentPath: ['pipes'],
-        isRunning: false
+        selected: [],
+        keysDown: []
     }
 
     constructor(props) {
@@ -88,11 +132,13 @@ export default class Main extends React.Component {
         this.savePipe = this.savePipe.bind(this)
         this.onRemove = this.onRemove.bind(this)
         this.focus = this.focus.bind(this)
+        this.unFocus = this.unFocus.bind(this)
         this.navigateTo = this.navigateTo.bind(this)
         this.navigateUp = this.navigateUp.bind(this)
         this.navigateDown = this.navigateDown.bind(this)
         this.updateProgram = this.updateProgram.bind(this)
-        this.run = this.run.bind(this)
+        this.onKeyDown = this.onKeyDown.bind(this)
+        this.onKeyUp = this.onKeyUp.bind(this)
 
     }
 
@@ -182,17 +228,68 @@ export default class Main extends React.Component {
     focus(id) {
         const currentActive = this.resolveCurrentPath()
         if (id === currentActive.id) {
-            return this.navigateTo('pipes')
+            if (this.navigateTo('pipes')) {
+                this.setState({
+                    selected: []
+                })
+                return true
+            }
         } else {
             let newPath = this.state.currentPath.slice()
             let lastPath = newPath.pop()
-
-            if (typeof lastPath === "string")
+            if (typeof lastPath === "string") {
                 newPath.push(lastPath)
+            }
 
             newPath.push({id})
 
-            return this.navigateTo(newPath)
+            if (this.navigateTo(newPath)) {
+                if (!this.state.selected.length) {
+                    this.setState({
+                        selected: [id]
+                    })
+                } else {
+                    if (this.state.keysDown.indexOf(KEY_SHIFT) !== -1) {
+
+                        const chain = this.resolveCurrentPath(true),
+                            [foundAfter, pathAfter] = __findAfterInChain(id, chain, chain.find(e => e.id === this.state.selected[0])),
+                            [foundBefore, pathBefore] = __findBeforeInChain(id, chain, chain.find(e => e.id === this.state.selected[0]))
+                        
+                        let newSelected = []
+                        if (foundAfter) {
+                            newSelected = [...this.state.selected, ...pathAfter, id]
+                            newSelected = newSelected.sort().filter((e,index) => !(newSelected.indexOf(e) < index))
+                        } else if (foundBefore) {
+                            newSelected = [...this.state.selected, ...pathBefore, id]
+                            newSelected = newSelected.sort().filter((e,index) => !(newSelected.indexOf(e) < index))
+                        }
+
+                        if (!newSelected.length) {
+                            newSelected = [id]
+                        }
+
+                        this.setState({
+                            selected: newSelected
+                        })
+
+                    } else if (this.state.selected.indexOf(id) === -1) {
+                        this.setState({
+                            selected: [id]
+                        })
+                    }
+                }
+    
+                return true
+            }
+        }
+        return false
+    }
+
+    unFocus() {
+        if (this.navigateTo(__dir(this.state.currentPath))) {
+            this.setState({
+                selected: []
+            })
         }
     }
 
@@ -248,9 +345,21 @@ export default class Main extends React.Component {
         })
     }
 
-    run() {
+    onKeyDown(e) {
+        const keysDown = this.state.keysDown
+        const key = e.keyCode
         this.setState({
-            isRunning: true
+            keysDown: [...keysDown, key]
+        })
+    }
+
+    onKeyUp(e) {
+        const keysDown = this.state.keysDown
+        const key = e.keyCode
+
+        let index = keysDown.indexOf(key)
+        index !== -1 && this.setState({
+            keysDown: [...keysDown.slice(0, index), ...keysDown.slice(index + 1)]
         })
     }
 
@@ -263,7 +372,7 @@ export default class Main extends React.Component {
     }
 
     render() {
-        const { program, currentPath, isRunning } = this.state
+        const { program, currentPath, selected } = this.state
 
         let currentActive = this.resolveCurrentPath(),
             currentActiveId = typeof currentActive === "object" ? currentActive.id : null
@@ -271,7 +380,7 @@ export default class Main extends React.Component {
         const defs = { ...PIPES_DEFINITIONS, pipe: PIPE_FUNC_DEF, var: PIPE_VAR_DEF }
 
         return (
-            <div className={ cssClasses.main }>
+            <div className={ cssClasses.main } onKeyDown={ this.onKeyDown } onKeyUp={ this.onKeyUp } tabIndex="0">
                 {/* <Menu /> */}
                 <GenerateButton program={ program } />
                 <TreeView 
@@ -284,8 +393,9 @@ export default class Main extends React.Component {
                 <ChainView 
                     chain={ this.resolveCurrentPath(true) } 
                     active={ currentActiveId } 
+                    selected={ selected }
                     onSelectOne={ this.focus } 
-                    onClickElseWhere={ this.navigateTo.bind(this,__dir(currentPath)) }
+                    onClickElseWhere={ this.unFocus }
                     onDblClickElseWhere={ this.navigateUp }/>
                 <PipeInspector 
                     active={ !Array.isArray(currentActive) ? currentActive : null } 
