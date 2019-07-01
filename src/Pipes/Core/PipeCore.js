@@ -40,7 +40,11 @@ export default class PipeCore
     }
 
     run() {
+        this._debugger && this._debugger.program_started()
         return this._program.run()
+            .then(() => {
+                this._debugger && this._debugger.program_stopped() 
+            })
     }
 
 
@@ -89,13 +93,7 @@ export default class PipeCore
             }
             :
             ((input) => {
-                this._debugger.emit({
-                    name: "pipe call",
-                    payload: {
-                        pipe,
-                        input
-                    }
-                })
+                this._debugger.pipe_called({ pipe, input })
                 return fn(input, context)
             }).bind(this)
     }

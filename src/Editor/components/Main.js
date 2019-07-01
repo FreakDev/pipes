@@ -254,10 +254,16 @@ export default class Main extends React.Component {
             isRunning: true
         })
         const onMessage = (msg) => {
-            if (msg.data === "execution-stopped") {
-                this.setState({
-                    isRunning: false
-                })    
+            event = JSON.parse(msg.data)
+            switch(event.name) {
+                case "execution-stopped":
+                    this.setState({
+                        isRunning: false
+                    })  
+                    break;  
+                case "pipe-called":
+                    console.log(event.payload)
+                    break;
             }
         }
         window.addEventListener("message", onMessage, false)

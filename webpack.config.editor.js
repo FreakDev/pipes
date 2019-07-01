@@ -30,10 +30,12 @@ config.module.rules.push({
 config.plugins.push(
     new HtmlWebPackPlugin({
         template: "./src/index.html",
+        inject: false,
         filename: "./index.html"
     }),
     new HtmlWebPackPlugin({
         template: "./src/Editor/runner/index.html",
+        inject: false,
         filename: "./runner-for-editor.html"
     })
 )
