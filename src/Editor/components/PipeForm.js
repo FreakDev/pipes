@@ -49,7 +49,7 @@ export default class PipeForm extends React.Component {
     onNameFieldChange(value) {
         this.setState({
             pipeSpec: this.props.pipesDefs[value].params,
-            fieldValues: { ...INITIAL_FIELD_VALUES, name: value }
+            fieldValues: { ...INITIAL_FIELD_VALUES, name: value, type: this.props.pipesDefs[value].type }
 
         })
     }
@@ -141,7 +141,7 @@ export default class PipeForm extends React.Component {
         const { pipeSpec, fieldValues } = this.state
 
         const connectedCheckId = "connected_checkbox_" + uuid()
-        const specToDisplay = value ? pipesDefs[value.name].params : pipeSpec
+        const specToDisplay = value ? pipesDefs[value.name] ? pipesDefs[value.name].params : pipeSpec : pipeSpec
 
         return (
             <fieldset>

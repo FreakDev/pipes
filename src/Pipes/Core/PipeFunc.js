@@ -32,41 +32,48 @@ export default class PipeFunc extends Pipe {
 
     _parent
 
+    _context
+
     constructor(type, id, name, children, context) {
         super(type, id, name, children, context)
 
         this._params = context.params
         this._parent = context.parent
+
+        this._context = { invoke: this._invoke.bind(this), getVarValue: this._getVarValue.bind(this), setVarValue: this._setVarValue.bind(this) }
+
     }
 
     run(input) {
         if (!this.length)
-            this._value.forEach(e => this.add(pipeFactory.build(e, this), e.type !== PIPE_NATIVE))
+            this._value.forEach(e => this._add(pipeFactory.build(e, this), e.type !== PIPE_NATIVE))
 
         let chainHeads = this._filter(p => !p.previous)
         if (chainHeads.length === 1) {
             return this._doRun(this._buildAndCompile(chainHeads[0]), input)
         } else {
             if (this._find(p => p.name === "main", this, true))
-                return this.invoke("main", input)
+                return this._invoke("main", input)
             else
                 throw Error("Invalid Pipe : several chains or pipes and none called \"main\" in \"" + this.name + "\" (" + this.id + ")")
         }
     }
 
-    invoke(callable, input) {
+    _invoke(callable, input) {
         if (typeof callable === 'string') {
             let pipe = this._find(pipe => pipe.name === callable)
             return this._doRun(this._buildAndCompile(pipe), input)
         } else {
-            if ([PIPE_NATIVE, PIPE_FUNC].indexOf(callable.type) !== -1)
-                return this._compile([callable]).reduce((prev, curr) => curr(prev, this), input)
-            else 
+            if ([PIPE_NATIVE, PIPE_FUNC].indexOf(callable.type) !== -1) {
+                return this._doRun(this._compile([callable]), input)
+            }
+            else {
                 throw Error(`Error : ${ callable } is not callable`)
+            }
         }
     }
 
-    getVarValue(varName) {
+    _getVarValue(varName) {
         let targetVar = this._find(p => p.type === PIPE_VAR && p.name === varName)
         if (targetVar) {
             return targetVar.value
@@ -75,7 +82,7 @@ export default class PipeFunc extends Pipe {
         }
     }
 
-    setVarValue(varName, varValue) {
+    _setVarValue(varName, varValue) {
         let targetVar = this._find(p => p.type === PIPE_VAR && p.name === varName)
         if (targetVar) {
             targetVar.value = varValue
@@ -83,9 +90,6 @@ export default class PipeFunc extends Pipe {
             throw Error ('Unknow var ' + varName)
         }
     }
-
-
-
 
     _buildAndCompile(headPipe) {
         let chain = [], current = headPipe, next
@@ -98,7 +102,7 @@ export default class PipeFunc extends Pipe {
     }
 
     _doRun(compiled, input) {
-        return compiled.reduce((prev, curr) => curr(prev, this), input)
+        return compiled.reduce((prev, curr) => curr(prev, this._context), input)
     }
 
     _compile(pipes) {
@@ -126,16 +130,15 @@ export default class PipeFunc extends Pipe {
         return this._storage.filter(filterCallback, thisArg)
     }
 
-
-    has(key, byRef = false) {
-        if (!byRef) {
-            return Object.keys(this._index).indexOf(key) !== -1
-        } else {
-            throw "not supported yet"
-        }
+    _resolveNS = (ns, ctxt) => {
+        let ref = ctxt
+        ns.split('.').forEach(ns => {
+            ref = ref[ns]
+        });
+        return ref
     }
 
-    add(element, index = true) {
+    _add(element, index = true) {
         if (index) {
             let key = element[this._indexProp]
 
@@ -148,7 +151,18 @@ export default class PipeFunc extends Pipe {
         this._storage.push(element)
     }
 
-    remove(key, byRef = false) {
+
+    // unused code
+
+    _has(key, byRef = false) {
+        if (!byRef) {
+            return Object.keys(this._index).indexOf(key) !== -1
+        } else {
+            throw "not supported yet"
+        }
+    }
+
+    _remove(key, byRef = false) {
         let storagePos, indexKey
         if (!byRef) {
             storagePos = this._index[key]
@@ -168,19 +182,12 @@ export default class PipeFunc extends Pipe {
         })
     }
 
-    get(key) {
+    _get(key) {
         return this._storage[this._index[key]]
     }
 
-    set(key, value) {
+    _set(key, value) {
         this._storage[this._index[key]] = value
     }
 
-    _resolveNS = (ns, ctxt) => {
-        let ref = ctxt
-        ns.split('.').forEach(ns => {
-            ref = ref[ns]
-        });
-        return ref
-    }
 }

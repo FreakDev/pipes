@@ -16,6 +16,35 @@ export const PIPE_TYPE_FUNC = 'pipe-func'
 export const PIPE_TYPE_NATIVE = 'pipe-native'
 export const PIPE_TYPE_VAR = 'pipe-var'
 
+const PIPE_FUNC_DEF = {
+    "type":PIPE_TYPE_FUNC,
+    "description":"a pipe",
+    "params":{
+        "name":{
+            "type":"free",
+            "optional":false,
+            "description":"You may reference to this pipe with \'%s\' (choose it wisely)"
+        }
+    }
+}
+
+const PIPE_VAR_DEF = {
+    "type":PIPE_TYPE_VAR,
+    "description":"a variable",
+    "params":{
+        "name":{
+            "type":"free",
+            "optional":false,
+            "description":"You may reference to this variable with \'%s\' (choose it wisely)"
+        },
+        "value":{
+            "type":"free",
+            "optional":true,
+            "description":"At startup your variable will contain \'%s\'"
+        }
+    }
+}
+
 // const INITIAL_PROGRAM = {
 //     name: "",
 //     type: PIPE_TYPE_FUNC,
@@ -70,8 +99,19 @@ export default class Main extends React.Component {
         let currentContainer = __dir(this.state.currentPath)
         let base = __resolvePath(newProgram, currentContainer)
 
-        pipe.id = uuid()
+        if (pipe.type === PIPE_TYPE_FUNC || pipe.type === PIPE_TYPE_VAR) {
+            let params = pipe.params
+            delete pipe.params
+            pipe = {
+                ...pipe,
+                ...params,
+            }
+            if (pipe.type === PIPE_TYPE_FUNC) {
+                pipe.pipes = []
+            }
+        }
 
+        pipe.id = uuid()
 
         if (connected) {
             let currentPipe = this.resolveCurrentPath()
@@ -217,6 +257,8 @@ export default class Main extends React.Component {
         let currentActive = this.resolveCurrentPath(),
             currentActiveId = typeof currentActive === "object" ? currentActive.id : null
 
+        const defs = { ...PIPES_DEFINITIONS, pipe: PIPE_FUNC_DEF, var: PIPE_VAR_DEF }
+
         return (
             <div className={ cssClasses.main }>
                 {/* <Menu /> */}
@@ -234,7 +276,7 @@ export default class Main extends React.Component {
                     onDblClickElseWhere={ this.navigateUp }/>
                 <PipeInspector 
                     active={ !Array.isArray(currentActive) ? currentActive : null } 
-                    pipesDefs={ PIPES_DEFINITIONS }
+                    pipesDefs={ defs }
                     onCreate={ this.addPipe } 
                     onSave={ this.savePipe }
                     onRemove={ this.onRemove }

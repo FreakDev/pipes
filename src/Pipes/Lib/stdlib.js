@@ -1,4 +1,3 @@
-import Pipe, { PIPE_VAR } from "../Core/Pipe"
 
 /**
  * @PipeDEF
