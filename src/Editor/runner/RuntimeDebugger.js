@@ -22,6 +22,8 @@ export default class RuntimeDebugger {
 
     _paused = true
 
+    _onUnPauseListener = []
+
     _mode = MODE_NORMAL
 
     constructor(messageEventEmitter, messageEventPoster) {
@@ -66,11 +68,23 @@ export default class RuntimeDebugger {
             .run()
     }
 
+    onMessagePause(paused) {
+        if (this._paused && !paused) {
+            let listener
+            while (listener = this._onUnPauseListener.pop()) listener.call(global)
+        }
+        this._paused = paused
+    }
+
+    _onUnPause(callback) {
+        this._onUnPauseListener.push(callback)
+    }
+
     __holdRuntime() {
         return new Promise((resolve, reject) => {
             if (this._paused) {
+                this._onUnPause(resolve)
                 return
-                // @todo implement on unpause listener
             }
 
             if (this._mode === MODE_TURTLE) {
