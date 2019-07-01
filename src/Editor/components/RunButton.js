@@ -2,7 +2,7 @@ import React from "react"
 
 import cssClasses from "../../../sass/Editor/GenerateButton.sass"
 
-export default class GenerateButton extends React.Component {
+export default class RunButton extends React.Component {
 
     constructor(props) {
         super(props)
@@ -16,10 +16,7 @@ export default class GenerateButton extends React.Component {
 
     render () {
         return (
-            <div className={ cssClasses.generate_button }>
-                <button onClick={ this.generate }>Generate</button>
-                <button onClick={ this.props.onClickRun }>Run</button>
-            </div>
+            <button className={ cssClasses.generate_button } onClick={ this.generate }>Generate</button>
         )
     }
 }

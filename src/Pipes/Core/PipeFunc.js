@@ -74,7 +74,7 @@ export default class PipeFunc extends Pipe {
                 return this._doRun(this._buildAndCompile(pipe), input)
             }
         } else if ([PIPE_NATIVE, PIPE_FUNC].indexOf(callable.type) !== -1) {
-                return this._doRun(this._compile([callable]), input)
+            return this._doRun(this._compile([callable]), input)
         }
         throw Error(`Error : ${ callable } is not callable`)
     }

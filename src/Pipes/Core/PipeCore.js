@@ -10,7 +10,7 @@ export default class PipeCore
     }
 
     run() {
-        this._program.run()
+        return this._program.run()
     }
 
 }

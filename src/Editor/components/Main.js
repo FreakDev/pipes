@@ -2,7 +2,7 @@ import React from "react"
 
 import uuid from "uuid/v4"
 
-import Menu from "./Menu"
+import RunPanel from "./RunPanel"
 import ChainView from "./ChainView"
 import PipeInspector from "./PipeInspector"
 import TreeView from "./TreeView"
@@ -78,7 +78,8 @@ export default class Main extends React.Component {
 
     state = {
         program: INITIAL_PROGRAM,
-        currentPath: ['pipes']
+        currentPath: ['pipes'],
+        isRunning: false
     }
 
     constructor(props) {
@@ -92,6 +93,7 @@ export default class Main extends React.Component {
         this.navigateUp = this.navigateUp.bind(this)
         this.navigateDown = this.navigateDown.bind(this)
         this.updateProgram = this.updateProgram.bind(this)
+        this.run = this.run.bind(this)
 
     }
 
@@ -247,6 +249,21 @@ export default class Main extends React.Component {
         })
     }
 
+    run() {
+        this.setState({
+            isRunning: true
+        })
+        const onMessage = (msg) => {
+            if (msg.data === "execution-stopped") {
+                this.setState({
+                    isRunning: false
+                })    
+            }
+        }
+        window.addEventListener("message", onMessage, false)
+        this.iframe.contentWindow.postMessage(JSON.stringify(this.state.program), '*');
+    }
+
     resolveCurrentPath(digUntilLastFolder = false) {
         let path = this.state.currentPath.slice()
         if (digUntilLastFolder) {
@@ -256,7 +273,7 @@ export default class Main extends React.Component {
     }
 
     render() {
-        const { program, currentPath } = this.state
+        const { program, currentPath, isRunning } = this.state
 
         let currentActive = this.resolveCurrentPath(),
             currentActiveId = typeof currentActive === "object" ? currentActive.id : null
@@ -266,7 +283,7 @@ export default class Main extends React.Component {
         return (
             <div className={ cssClasses.main }>
                 {/* <Menu /> */}
-                <GenerateButton program={ program } />
+                <GenerateButton program={ program } onClickRun={ this.run } />
                 <TreeView 
                     program={ program } 
                     active={ currentActiveId } 
@@ -280,6 +297,7 @@ export default class Main extends React.Component {
                     onSelectOne={ this.focus } 
                     onClickElseWhere={ this.navigateTo.bind(this,__dir(currentPath)) }
                     onDblClickElseWhere={ this.navigateUp }/>
+                <RunPanel show={ isRunning } getRef={ ref => this.iframe = ref } />
                 <PipeInspector 
                     active={ !Array.isArray(currentActive) ? currentActive : null } 
                     pipesDefs={ defs }

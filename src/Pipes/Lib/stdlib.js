@@ -45,7 +45,11 @@ export default {
         let searchedName = name || input
         
         try {
-            return context.getVarValue(searchedName)
+            return new Promise((r) => {
+                setTimeout(() => {
+                    r(context.getVarValue(searchedName))
+                }, 1000)
+            })
         } catch (e) {
             console.warn (e)
         }
