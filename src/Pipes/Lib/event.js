@@ -1,7 +1,9 @@
 export default {
     listen: ({ eventName, forward }, input, context) => {
-        window.setTimeout(function () {
-            context.invoke(forward)
-        }, 1000)
+        return new Promise((resolve => {
+            window.setTimeout(function () {
+                resolve(context.invoke(forward))
+            }, 1000)    
+        }))
     }
 }
