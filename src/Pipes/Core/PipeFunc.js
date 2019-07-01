@@ -1,15 +1,4 @@
 import Pipe, { PIPE_VAR, PIPE_FUNC, PIPE_NATIVE } from "./Pipe"
-import pipeFactory from "./factory"
-
-import stdlib from "../Lib/stdlib"
-import math from "../Lib/math"
-import event from "../Lib/event"
-
-const LIB = {
-    stdlib,
-    math,
-    event
-}
 
 export default class PipeFunc extends Pipe {
 
@@ -35,11 +24,17 @@ export default class PipeFunc extends Pipe {
 
     _context
 
+    _runner
+
+    _pipeFactory
+
     constructor(type, id, name, children, context) {
         super(type, id, name, children, context)
 
         this._params = context.params
         this._parent = context.parent
+        this._runner = context.runner
+        this._pipeFactory = context.factory
 
         this._context = { 
             invoke: this._invoke.bind(this), 
@@ -53,7 +48,7 @@ export default class PipeFunc extends Pipe {
 
     run(input) {
         if (!this.length)
-            this._value.forEach(e => this._add(pipeFactory.build(e, this), e.type !== PIPE_NATIVE))
+            this._value.forEach(e => this._add(this._pipeFactory.build(e, this, this._runner), e.type !== PIPE_NATIVE))
         let main = "main"
         const chainHeads = this._filter(p => !p.previous)
         if (chainHeads.length === 1) {
@@ -127,26 +122,11 @@ export default class PipeFunc extends Pipe {
     }
 
     _doRun(compiled, input) {
-        return compiled.reduce((prev, curr) => prev.then(curr), Promise.resolve(input))
+        return this._runner.doRun(compiled, input)
     }
 
     _compile(pipes) {
-
-        return pipes.map(pipe => {
-            let fn = null
-            
-            if (pipe.type !== PIPE_NATIVE) {
-                fn = pipe.run.bind(pipe)
-            }
-            
-            if (!fn) {
-                fn = this._resolveNS(pipe.alias || pipe.name, LIB).bind(global, pipe.params || {})
-            }
-            
-            return (input) => {
-                return fn(input, this._context)
-            }
-        })
+        return this._runner.compile(pipes, this._context)
     }
 
     _find(searchCallback, thisArg = this, disableLookUp = false) {
@@ -155,14 +135,6 @@ export default class PipeFunc extends Pipe {
 
     _filter(filterCallback, thisArg = this) {
         return this._storage.filter(filterCallback, thisArg)
-    }
-
-    _resolveNS = (ns, ctxt) => {
-        let ref = ctxt
-        ns.split('.').forEach(ns => {
-            ref = ref[ns]
-        });
-        return ref
     }
 
     _add(element, index = true) {
