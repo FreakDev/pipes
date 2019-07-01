@@ -90,6 +90,7 @@ export default class Main extends React.Component {
         this.focus = this.focus.bind(this)
         this.navigateTo = this.navigateTo.bind(this)
         this.navigateUp = this.navigateUp.bind(this)
+        this.navigateDown = this.navigateDown.bind(this)
         this.updateProgram = this.updateProgram.bind(this)
 
     }
@@ -197,7 +198,12 @@ export default class Main extends React.Component {
     navigateUp() {
         let newPath = __dir(this.state.currentPath)
         newPath.pop()
-        this.navigateTo(newPath)
+        return this.navigateTo(newPath)
+    }
+
+    navigateDown() {
+        if (this.resolveCurrentPath().pipes)
+            return this.navigateTo('pipes')
     }
 
     navigateTo(path) {
@@ -244,9 +250,7 @@ export default class Main extends React.Component {
     resolveCurrentPath(digUntilLastFolder = false) {
         let path = this.state.currentPath.slice()
         if (digUntilLastFolder) {
-            while(typeof path[path.length - 1] !== "string") {
-                path.pop()
-            }
+            path = __dir(path)
         }
         return __resolvePath(this.state.program, path)
     }
@@ -266,7 +270,9 @@ export default class Main extends React.Component {
                 <TreeView 
                     program={ program } 
                     active={ currentActiveId } 
+                    activePath={ currentPath }
                     onSelect={ this.navigateTo }
+                    onNavigateDown={ this.navigateDown }
                     onChangeProgramName={ this.updateProgram } />
                 <ChainView 
                     chain={ this.resolveCurrentPath(true) } 
