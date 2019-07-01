@@ -8,9 +8,12 @@ export const RUNTIME_EXECUTION_IDLE = "execution-idle"
 export const MESSAGE_LOAD = "MessageLoad"
 export const MESSAGE_START = "MessageStart"
 export const MESSAGE_PAUSE = "MessagePause"
+export const MESSAGE_RUN_ONE = "MessageRunOne"
+export const MESSAGE_RUN = "MessageRun"
 
 export const MODE_NORMAL = "normal"
 export const MODE_TURTLE = "turtle"
+export const MODE_STEP = "step"
 
 export default class RuntimeDebugger {
 
@@ -20,7 +23,17 @@ export default class RuntimeDebugger {
 
     _messageEventPoster
 
+    _running = false
+
     _paused = true
+
+    set paused (value) {
+        if (this._paused && !value) {
+            let listener
+            while (listener = this._onUnPauseListener.pop()) listener.call(global)
+        }
+        this._paused = value
+    }
 
     _onUnPauseListener = []
 
@@ -62,18 +75,28 @@ export default class RuntimeDebugger {
     }
 
     onMessageStart({ mode }) {
-        this._paused = false
+        this.paused = false
         this._mode = mode || MODE_NORMAL
         this._core
             .run()
     }
 
-    onMessagePause(paused) {
-        if (this._paused && !paused) {
-            let listener
-            while (listener = this._onUnPauseListener.pop()) listener.call(global)
+    onMessageRun({ mode }) {
+        this.paused = false
+        this._mode = mode
+    }
+
+    onMessageRunOne() {
+        if(!this._running)
+            this.onMessageStart({ mode: MODE_STEP })
+        else {
+            this.paused = false
+            this._mode = MODE_STEP
         }
-        this._paused = paused
+    }
+
+    onMessagePause(paused) {
+        this.paused = paused
     }
 
     _onUnPause(callback) {
@@ -100,6 +123,10 @@ export default class RuntimeDebugger {
 
     __pipe_called(payload) {
 
+        if (this._mode === MODE_STEP) {
+            this._paused = true
+        }
+
         this.emit(RUNTIME_PIPE_CALLED, {
             ...payload,
             pipe: { id: payload.pipe.id, name: payload.pipe.name, params: payload.pipe.params }
@@ -108,10 +135,12 @@ export default class RuntimeDebugger {
     }
 
     __program_started() {
+        this._running = true
         this.emit(RUNTIME_EXECUTION_STARTED)
     }
 
     __program_stopped() {
+        this._running = false
         this.emit(RUNTIME_EXECUTION_STOPPED)
     }
 
