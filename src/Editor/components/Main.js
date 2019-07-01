@@ -66,20 +66,24 @@ export default class Main extends React.Component {
 
     addPipe(pipe, connected) {
         let newProgram = { ...this.state.program }
+        let currentContainer = __dir(this.state.currentPath)
+        let base = __resolvePath(newProgram, currentContainer)
 
         pipe.id = uuid()
 
+
         if (connected) {
             let currentPipe = this.resolveCurrentPath()
-            if (currentPipe.id)
+            if (currentPipe.id) {
                 pipe.previous = currentPipe.id
-
-            // @todo : look if it nedd to be inserted into a previous chain
+            }
+            
+            let previouslyConnectedIndex = base.findIndex(p => p.previous === currentPipe.id)
+            if (previouslyConnectedIndex !== -1) {
+                base[previouslyConnectedIndex].previous = pipe.id
+            }
         }
 
-        let currentContainer = __dir(this.state.currentPath).slice()
-
-        let base = __resolvePath(newProgram, currentContainer)
         base.push(pipe)
 
         this.setState({
