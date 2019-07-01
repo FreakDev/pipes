@@ -1,5 +1,10 @@
 import React from "react"
-import { MESSAGE_LOAD, MESSAGE_START } from "../runner/RuntimeDebugger"
+import { 
+    MESSAGE_LOAD, 
+    MESSAGE_START, 
+    MODE_NORMAL,
+    MODE_TURTLE
+} from "../runner/RuntimeDebugger"
 
 const sendMessageTo = (dest, name, payload) => {
     dest.postMessage(JSON.stringify({
@@ -26,7 +31,10 @@ const RunPanel = ({ program }) => {
     let runnerWindow = null
     
     const runProgramInDebugger = (turtleMode = false) => {
-        const runProgram = () => { sendMessageTo(runnerWindow, MESSAGE_LOAD, { program }); sendMessageTo(runnerWindow, MESSAGE_START) }
+        const runProgram = () => { 
+            sendMessageTo(runnerWindow, MESSAGE_LOAD, { program })
+            sendMessageTo(runnerWindow, MESSAGE_START, { mode: (turtleMode ? MODE_TURTLE : MODE_NORMAL) })
+        }
         if (!runnerWindow) {
             runnerWindow = window.open("runner-for-editor.html", "Pipe Runner", "height=150,width=200")
             runnerWindow.onload = runProgram
@@ -36,8 +44,8 @@ const RunPanel = ({ program }) => {
 
     return (
         <div>
-            <button onClick={ runProgramInDebugger }>Play</button>
-            <button onClick={ runProgramInDebugger.bind(this, true) }>Play (Turtle mode)</button>
+            <button onClick={ () => runProgramInDebugger() }>Play</button>
+            <button onClick={ () => runProgramInDebugger(true) }>Play (Turtle mode)</button>
         </div>
     )
 }

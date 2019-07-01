@@ -70,16 +70,19 @@ export default class PipeCore
             :
             ((input) => {
                 this._debugger.pipe_called({ pipe, input })
-                return fn(input, context)
+                return this._debugger.hold()
+                    .then(() => {
+                        return fn(input, context)
+                    })
             }).bind(this)
     }
 
     _compile(pipes, context, debugOption = false) {
-        return pipes.map(pipe => this._compilePipe.bind(this, context, false))
+        return pipes.map(this._compilePipe.bind(this, context, false))
     }
 
     _compileWithDebug(pipes, context) {
-        return pipes.map(pipe => this._compilePipe.bind(this, context, true))
+        return pipes.map(this._compilePipe.bind(this, context, true))
     }
 
     _resolveNS = (ns, ctxt) => {

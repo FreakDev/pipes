@@ -9,6 +9,9 @@ export const MESSAGE_LOAD = "MessageLoad"
 export const MESSAGE_START = "MessageStart"
 export const MESSAGE_PAUSE = "MessagePause"
 
+export const MODE_NORMAL = "normal"
+export const MODE_TURTLE = "turtle"
+
 export default class RuntimeDebugger {
 
     _core
@@ -17,12 +20,18 @@ export default class RuntimeDebugger {
 
     _messageEventPoster
 
+    _paused = true
+
+    _mode = MODE_NORMAL
+
     constructor(messageEventEmitter, messageEventPoster) {
         this._core = new PipeCore(MODE_DEBUG, {
             pipe_called: this.__pipe_called.bind(this),
             program_started: this.__program_started.bind(this),
             program_stopped: this.__program_stopped.bind(this),
             program_turned_idle: this.__program_turned_idle.bind(this),
+
+            hold: this.__holdRuntime.bind(this)
         })
 
         this._messageEventEmitter = messageEventEmitter
@@ -50,9 +59,29 @@ export default class RuntimeDebugger {
             .loadJSON(program)
     }
 
-    onMessageStart() {
+    onMessageStart({ mode }) {
+        this._paused = false
+        this._mode = mode || MODE_NORMAL
         this._core
             .run()
+    }
+
+    __holdRuntime() {
+        return new Promise((resolve, reject) => {
+            if (this._paused) {
+                return
+                // @todo implement on unpause listener
+            }
+
+            if (this._mode === MODE_TURTLE) {
+                setTimeout(() => {
+                    resolve()        
+                }, 1000);
+                return
+            }
+
+            resolve()
+        })
     }
 
     __pipe_called(payload) {
