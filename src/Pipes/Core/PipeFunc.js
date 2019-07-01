@@ -12,6 +12,7 @@ const LIB = {
 }
 
 export default class PipeFunc extends Pipe {
+
     _storage = []
     get pipes() {
         return this._storage
@@ -53,30 +54,29 @@ export default class PipeFunc extends Pipe {
     run(input) {
         if (!this.length)
             this._value.forEach(e => this._add(pipeFactory.build(e, this), e.type !== PIPE_NATIVE))
-
-        let chainHeads = this._filter(p => !p.previous)
+        let main = "main"
+        const chainHeads = this._filter(p => !p.previous)
         if (chainHeads.length === 1) {
-            return this._doRun(this._buildAndCompile(chainHeads[0]), input)
-        } else {
-            if (this._find(p => p.name === "main", this, true))
-                return this._invoke("main", input)
-            else
-                throw Error("Invalid Pipe : several chains or pipes and none called \"main\" in \"" + this.name + "\" (" + this.id + ")")
+            main = chainHeads[0].name
+        }
+
+        try {
+            return this._invoke(main, input)
+        } catch (e) {
+            throw Error("Invalid Pipe : several chains or pipes and none called \"main\" in \"" + this.name + "\" (" + this.id + ") run failed with message " + e)   
         }
     }
 
     _invoke(callable, input) {
         if (typeof callable === 'string') {
             let pipe = this._find(pipe => pipe.name === callable)
-            return this._doRun(this._buildAndCompile(pipe), input)
-        } else {
-            if ([PIPE_NATIVE, PIPE_FUNC].indexOf(callable.type) !== -1) {
+            if (pipe) {
+                return this._doRun(this._buildAndCompile(pipe), input)
+            }
+        } else if ([PIPE_NATIVE, PIPE_FUNC].indexOf(callable.type) !== -1) {
                 return this._doRun(this._compile([callable]), input)
-            }
-            else {
-                throw Error(`Error : ${ callable } is not callable`)
-            }
         }
+        throw Error(`Error : ${ callable } is not callable`)
     }
 
     _getVarValue(varName) {
@@ -127,7 +127,7 @@ export default class PipeFunc extends Pipe {
     }
 
     _doRun(compiled, input) {
-        return compiled.reduce((prev, curr) => curr(prev, this._context), input)
+        return compiled.reduce((prev, curr) => prev.then(curr), Promise.resolve(input))
     }
 
     _compile(pipes) {
@@ -143,7 +143,9 @@ export default class PipeFunc extends Pipe {
                 fn = this._resolveNS(pipe.alias || pipe.name, LIB).bind(global, pipe.params || {})
             }
             
-            return fn
+            return (input) => {
+                return fn(input, this._context)
+            }
         })
     }
 
