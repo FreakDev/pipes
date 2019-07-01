@@ -1,10 +1,15 @@
+
 export default {
     add: ({valueToAdd, getValueToAdd}, input, context) => {
-        if (typeof valueToAdd === "number") {
-            return input + valueToAdd
-        }
-        else {
-            return context.invoke(getValueToAdd) + input
-        }
+        return new Promise((resolve) => {
+            if (typeof valueToAdd === "number") {
+                resolve(input + valueToAdd)
+            }
+            else {
+                context.invoke(getValueToAdd).then((valueToAdd) => {
+                    resolve(valueToAdd + input)
+                })
+            }    
+        })
     }
 }
