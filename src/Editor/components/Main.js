@@ -53,7 +53,7 @@ const KEY_X = 88
 // const INITIAL_PROGRAM = {
 //     name: "",
 //     type: PIPE_TYPE_FUNC,
-//     pipes: []  
+//     pipes: []
 // }
 
 import INITIAL_PROGRAM from "../../pipes-source-2.json"
@@ -92,7 +92,7 @@ const __findAfterInChain = (needleId, chain, from) => {
     let found = false,
         path = [],
         curr = from
-    
+
     while (!found) {
         const next = chain.find(e => e.previous === curr.id)
         if (!next)
@@ -112,7 +112,7 @@ const __findBeforeInChain = (needleId, chain, from) => {
     let found = false,
         path = [],
         curr = from
-    
+
     while (!found) {
         const next = chain.find(e => e.id === curr.previous)
         if (!next)
@@ -189,12 +189,27 @@ const __addPipe = (base, pipe, connectedToId = null) => {
             if (previouslyConnectedIndex !== -1) {
                 base[previouslyConnectedIndex].previous = pipe.id
             }
-        }        
+        }
     } else {
         delete pipe.previous
     }
 
     base.push(pipe)
+
+    return base
+}
+
+const __removePipe = (base, pipe) => {
+    let currentPathPos = base.findIndex(e => e.id === pipe.id)
+
+    if (base[currentPathPos].id === pipe.id) {
+        base = [...base.slice(0, currentPathPos), ...base.slice(currentPathPos + 1)]
+    }
+
+    let previouslyConnectedIndex = base.findIndex(p => p.previous === pipe.id)
+    if (previouslyConnectedIndex !== -1) {
+        base[previouslyConnectedIndex].previous = pipe.previous
+    }
 
     return base
 }
@@ -260,7 +275,7 @@ export default class Main extends React.Component {
         let newProgram = { ...this.state.program },
             currentActive = this.resolveCurrentPath(),
             currentContainer = __dir(this.state.currentPath)
-    
+
         let base = __resolvePath(newProgram, currentContainer)
         let connectedToId = connected ? (connectedTo ? connectedTo : (currentActive && currentActive.id)) : null
         __addPipe(base, pipe, connectedToId)
@@ -289,7 +304,7 @@ export default class Main extends React.Component {
 
             context[currentPathPos] = newPipe
         }
-        
+
         this.setState({
             program: newProgram,
         })
@@ -298,22 +313,13 @@ export default class Main extends React.Component {
     onRemove(pipe) {
         let newProgram = { ...this.state.program }
 
-        let context = __resolvePath(newProgram, __dir(this.state.currentPath))
-        let currentPathPos = context.findIndex(e => e.id === this.state.currentPath[this.state.currentPath.length - 1].id)
-
-        if (context[currentPathPos].id === pipe.id) {
-            context.splice(currentPathPos, 1)
-        }
-        
-        let previouslyConnectedIndex = context.findIndex(p => p.previous === pipe.id)
-        if (previouslyConnectedIndex !== -1) {
-            context[previouslyConnectedIndex].previous = pipe.previous
-        }
+        let context = __resolvePath(newProgram, __dir(this.state.currentPath).slice(0, -1))
+        context.pipes = __removePipe(context.pipes, pipe)
 
         this.setState({
             program: newProgram,
         })
-    }    
+    }
 
     focus(id) {
         const currentActive = this.resolveCurrentPath()
@@ -338,7 +344,7 @@ export default class Main extends React.Component {
 
                         const chain = this.resolveCurrentPath(true),
                             [found, path] = __findInChain(id, chain, chain.find(e => e.id === this.state.selected[0]))
-                        
+
                         let newSelected = []
                         if (found) {
                             newSelected = [...this.state.selected, ...path, id]
@@ -359,7 +365,7 @@ export default class Main extends React.Component {
                         })
                     }
                 }
-    
+
                 return true
             }
         }
@@ -392,7 +398,7 @@ export default class Main extends React.Component {
                 return false
 
             newPath = path
-        } else { 
+        } else {
             newPath = this.state.currentPath.slice()
 
             if (typeof path === "string" && path.indexOf("/") !== -1) {
@@ -465,7 +471,16 @@ export default class Main extends React.Component {
                         clipboard: __copyTreeStructure(this.state.program, this.state.selected)
                     })
                     if (keyCombo.indexOf(KEY_X) === 1) {
+                        const activePipe = this.resolveCurrentPath(true)
+                        const newProgram = { ...this.state.program },
+                            base = __resolvePath(newProgram, __dir(this.state.currentPath).slice(0, -1))
+                        this.state.selected.forEach(s => {
+                            const p = base.pipes.find(p => p.id === s)
+                            p && (base.pipes = __removePipe(base.pipes, p))
+                        })
                         this.setState({
+                            program: newProgram,
+                            selected: [],
                             clipboard: __copyTreeStructure(this.state.program, this.state.selected)
                         })
                     }
@@ -483,7 +498,7 @@ export default class Main extends React.Component {
             this.setState({
                 keysDown: [...keysDown.slice(0, index), ...keysDown.slice(index + 1)]
             })
-        } 
+        }
     }
 
     resolveCurrentPath(digUntilLastFolder = false) {
@@ -506,24 +521,24 @@ export default class Main extends React.Component {
             <div className={ cssClasses.main } onKeyDown={ this.onKeyDown } onKeyUp={ this.onKeyUp } tabIndex="0">
                 {/* <Menu /> */}
                 <GenerateButton program={ program } />
-                <TreeView 
-                    program={ program } 
-                    active={ currentActiveId } 
+                <TreeView
+                    program={ program }
+                    active={ currentActiveId }
                     activePath={ currentPath }
                     onSelect={ this.navigateTo }
                     onNavigateDown={ this.navigateDown }
                     onChangeProgramName={ this.updateProgram } />
-                <ChainView 
-                    chain={ this.resolveCurrentPath(true) } 
-                    active={ currentActiveId } 
+                <ChainView
+                    chain={ this.resolveCurrentPath(true) }
+                    active={ currentActiveId }
                     selected={ selected }
-                    onSelectOne={ this.focus } 
+                    onSelectOne={ this.focus }
                     onClickElseWhere={ this.unFocus }
                     onDblClickElseWhere={ this.navigateUp }/>
-                <PipeInspector 
-                    active={ !Array.isArray(currentActive) ? currentActive : null } 
+                <PipeInspector
+                    active={ !Array.isArray(currentActive) ? currentActive : null }
                     pipesDefs={ defs }
-                    onCreate={ this.addPipe } 
+                    onCreate={ this.addPipe }
                     onSave={ this.savePipe }
                     onRemove={ this.onRemove }
                     />
