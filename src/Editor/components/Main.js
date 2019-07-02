@@ -48,6 +48,7 @@ const KEY_SHIFT = 16
 const KEY_CTRL = 17
 const KEY_C = 67
 const KEY_V = 86
+const KEY_X = 88
 
 // const INITIAL_PROGRAM = {
 //     name: "",
@@ -76,6 +77,15 @@ const __resolvePath = (context, path) => {
             return undefined
     }
     return base
+}
+
+const __findInChain = (needleId, chain, from) => {
+    let [found, path] = __findAfterInChain(needleId, chain, from)
+
+    if (!found)
+        [found, path] = __findBeforeInChain(needleId, chain, from)
+
+    return [found, path]
 }
 
 const __findAfterInChain = (needleId, chain, from) => {
@@ -120,7 +130,8 @@ const __findBeforeInChain = (needleId, chain, from) => {
 
 const KEY_COMPO = [
     [KEY_CTRL, KEY_C],
-    [KEY_CTRL, KEY_V]
+    [KEY_CTRL, KEY_V],
+    [KEY_CTRL, KEY_X]
 ]
 
 const __checkPressedKeys = (currentKeyDown) => {
@@ -137,13 +148,94 @@ const __checkPressedKeys = (currentKeyDown) => {
     })
 }
 
+const __findInTree = (tree, needleId) => {
+    const flattenTree = (tree, base = []) => {
+        tree.pipes.forEach(p => base.push(p) && p.pipes && flattenTree(p, base))
+        return base
+    }
+
+    return flattenTree(tree).find(e => e.id === needleId)
+}
+
+const __copyTreeStructure = (treeSrc, ids) => {
+    return JSON.parse(JSON.stringify(ids.map(__findInTree.bind(this, treeSrc))))
+}
+
+const __addPipe = (base, pipe, connectedToId = null) => {
+
+    if (pipe.type === PIPE_TYPE_FUNC || pipe.type === PIPE_TYPE_VAR) {
+        let params = pipe.params
+        delete pipe.params
+        pipe = {
+            ...pipe,
+            ...params,
+        }
+        if (pipe.type === PIPE_TYPE_FUNC) {
+            pipe.pipes = pipe.pipes || []
+        }
+    }
+
+    if (pipe.pipes)
+        pipe.__dirty = true
+
+    pipe.id = uuid()
+
+    if (connectedToId) {
+        let currentPipe = base.find(p => p.id === connectedToId)
+        if (currentPipe.id) {
+            pipe.previous = currentPipe.id
+
+            let previouslyConnectedIndex = base.findIndex(p => p.previous === currentPipe.id)
+            if (previouslyConnectedIndex !== -1) {
+                base[previouslyConnectedIndex].previous = pipe.id
+            }
+        }        
+    } else {
+        delete pipe.previous
+    }
+
+    base.push(pipe)
+
+    return base
+}
+
+const __sortInChainOrder = (pipes) => {
+    let chains = pipes.filter(p => {
+        return pipes.find(e => e.id === p.previous) === undefined
+    }).map(headPipe => {
+        let chain = [],
+            cur = headPipe
+        do {
+            chain.push(cur)
+            cur = pipes.find(p => p.previous === cur.id)
+        } while(cur)
+        return chain
+    })
+    return chains.reduce((p, c) => [...p, ...c], [])
+}
+
+const __cleanTree = (tree) => {
+    const dirtyTree = tree.pipes,
+        idsMap = {}
+    tree.pipes = []
+
+    __sortInChainOrder(dirtyTree).forEach(p => {
+        let previousId = p.id
+        tree.pipes = __addPipe(tree.pipes, p, (p.previous ? idsMap[p.previous] : null))
+        idsMap[previousId] = p.id
+    })
+
+    delete tree.__dirty
+}
+
 export default class Main extends React.Component {
 
     state = {
         program: INITIAL_PROGRAM,
         currentPath: ['pipes'],
         selected: [],
-        keysDown: []
+        keysDown: [],
+        clipboard: []
     }
 
     constructor(props) {
@@ -163,38 +255,15 @@ export default class Main extends React.Component {
 
     }
 
-    addPipe(pipe, connected) {
-        let newProgram = { ...this.state.program }
-        let currentContainer = __dir(this.state.currentPath)
+    addPipe(pipe, connected, connectedTo = null) {
+
+        let newProgram = { ...this.state.program },
+            currentActive = this.resolveCurrentPath(),
+            currentContainer = __dir(this.state.currentPath)
+    
         let base = __resolvePath(newProgram, currentContainer)
-
-        if (pipe.type === PIPE_TYPE_FUNC || pipe.type === PIPE_TYPE_VAR) {
-            let params = pipe.params
-            delete pipe.params
-            pipe = {
-                ...pipe,
-                ...params,
-            }
-            if (pipe.type === PIPE_TYPE_FUNC) {
-                pipe.pipes = []
-            }
-        }
-
-        pipe.id = uuid()
-
-        if (connected) {
-            let currentPipe = this.resolveCurrentPath()
-            if (currentPipe.id) {
-                pipe.previous = currentPipe.id
-            }
-            
-            let previouslyConnectedIndex = base.findIndex(p => p.previous === currentPipe.id)
-            if (previouslyConnectedIndex !== -1) {
-                base[previouslyConnectedIndex].previous = pipe.id
-            }
-        }
-
-        base.push(pipe)
+        let connectedToId = connected ? (connectedTo ? connectedTo : (currentActive && currentActive.id)) : null
+        __addPipe(base, pipe, connectedToId)
 
         this.setState({
             program: newProgram,
@@ -249,12 +318,7 @@ export default class Main extends React.Component {
     focus(id) {
         const currentActive = this.resolveCurrentPath()
         if (id === currentActive.id) {
-            if (this.navigateTo('pipes')) {
-                this.setState({
-                    selected: []
-                })
-                return true
-            }
+            return this.navigateTo('pipes')
         } else {
             let newPath = this.state.currentPath.slice()
             let lastPath = newPath.pop()
@@ -273,15 +337,11 @@ export default class Main extends React.Component {
                     if (this.state.keysDown.indexOf(KEY_SHIFT) !== -1) {
 
                         const chain = this.resolveCurrentPath(true),
-                            [foundAfter, pathAfter] = __findAfterInChain(id, chain, chain.find(e => e.id === this.state.selected[0])),
-                            [foundBefore, pathBefore] = __findBeforeInChain(id, chain, chain.find(e => e.id === this.state.selected[0]))
+                            [found, path] = __findInChain(id, chain, chain.find(e => e.id === this.state.selected[0]))
                         
                         let newSelected = []
-                        if (foundAfter) {
-                            newSelected = [...this.state.selected, ...pathAfter, id]
-                            newSelected = newSelected.sort().filter((e,index) => !(newSelected.indexOf(e) < index))
-                        } else if (foundBefore) {
-                            newSelected = [...this.state.selected, ...pathBefore, id]
+                        if (found) {
+                            newSelected = [...this.state.selected, ...path, id]
                             newSelected = newSelected.sort().filter((e,index) => !(newSelected.indexOf(e) < index))
                         }
 
@@ -346,8 +406,24 @@ export default class Main extends React.Component {
         }
 
         // check path
-        if (__resolvePath(this.state.program, newPath) === undefined) {
+        const newActive = __resolvePath(this.state.program, newPath)
+        if (newActive === undefined) {
             return false
+        }
+
+        if (newActive.pipes && newActive.__dirty) {
+            const newProgram = { ...this.state.program },
+                newActive = __resolvePath(newProgram, newPath)
+            __cleanTree(newActive)
+            this.setState({
+                program: newProgram
+            })
+        }
+
+        if (newActive.pipes) {
+            this.setState({
+                selected: []
+            })
         }
 
         this.setState({
@@ -384,10 +460,24 @@ export default class Main extends React.Component {
             const keyCombo = __checkPressedKeys(keysDown)
 
             if (keyCombo)
-                if (keyCombo.indexOf(KEY_C) === 1) {
-                    console.log("copy")
+                if (keyCombo.indexOf(KEY_C) === 1 || keyCombo.indexOf(KEY_X) === 1) {
+                    this.setState({
+                        clipboard: __copyTreeStructure(this.state.program, this.state.selected)
+                    })
+                    if (keyCombo.indexOf(KEY_X) === 1) {
+                        this.setState({
+                            clipboard: __copyTreeStructure(this.state.program, this.state.selected)
+                        })
+                    }
                 } else if (keyCombo.indexOf(KEY_V) === 1) {
-                    console.log("paste")
+                    let prev = null
+                    __sortInChainOrder(this.state.clipboard).forEach(p => {
+                        this.addPipe(p, true, prev ? prev : null)
+                        prev = p.id
+                    })
+                    this.setState({
+                        clipboard: []
+                    })
                 }
 
             this.setState({

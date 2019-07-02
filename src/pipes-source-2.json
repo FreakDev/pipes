@@ -30,6 +30,7 @@
     {
         "id": "4", "name": "incValue",
         "type": "pipe-func",
+        "__dirty": true,
         "pipes": [{
             "id": "5", "name": "stdlib.read",
             "type": "pipe-native",
