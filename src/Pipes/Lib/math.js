@@ -29,10 +29,10 @@ export default {
      * @PipeDEF
      * @Pipe\name operation
      * @Pipe\type pipe-native
-     * @Pipe\description returns the result of a simple two term math operation
-     * @Pipe\param operator {OneOf[+,-,*,/,%]} - input %s
-     * @Pipe\param value - %s or
-     * @Pipe\param variable - use the value of the %s variable
+     * @Pipe\description returns the result of a simple two terms math operation
+     * @Pipe\param operator {OneOf[+,-,*,/,%]} - output will be the result of A %s B, with input value as A
+     * @Pipe\param value - and %s as B or (if left empty)
+     * @Pipe\param variable - the value from box labelled %s
      */
     operation: ({ operator, value, variable }, input, context) => {
         let result
@@ -61,11 +61,11 @@ export default {
      * @Pipe\name compare
      * @Pipe\type pipe-native
      * @Pipe\description perform comparison between input and a given parameter
-     * @Pipe\param operator {OneOf[=,>,<,>=,<=,!=]} - is the input %s to/than
-     * @Pipe\param value - %s or
-     * @Pipe\param variable - the value of the %s variable
-     * @Pipe\param outputTrue - the data flow will be forwarded if the comparison result is true
-     * @Pipe\param outputFalse - the data flow will be forwarded if the comparison result is false
+     * @Pipe\param operator {OneOf[=,>,<,>=,<=,!=]} - if the input value is %s to/than
+     * @Pipe\param value - %s or (if left empty)
+     * @Pipe\param variable - the value in the %s box.
+     * @Pipe\param outputTrue {Pipe|func} - Then data flow will be forwarded to %s if the comparison result is true
+     * @Pipe\param outputFalse {Pipe|func} - or to %s if the comparison result is false (if left empty data flow will stop)
      */
     compare: ({ operator, value, variable, outputTrue, outputFalse }, input, context) => {
         let result
@@ -89,7 +89,7 @@ export default {
             result = input != (value || context.getVarValue(variable))
             break
         }
-        return result ? context.invoke(outputTrue) : context.invoke(outputFalse)
+        return result ? context.invoke(outputTrue, input) : context.invoke(outputFalse, input)
     }
 
 }

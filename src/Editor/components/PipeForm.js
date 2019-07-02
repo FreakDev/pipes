@@ -108,11 +108,11 @@ export default class PipeForm extends React.Component {
     renderParamField(param, spec, value) {
         let descriptionParts = spec[param].description.split('%s')
 
-        const buildField = (type, props) => {
+        const buildField = (type, spec, props) => {
             if (type.indexOf("Free") === 0) {
                 return <FreeField key={ "pipe_form_ipnut" } { ...props } placeholder={ "[" + param + "]" } />
             } else if (type.indexOf("OneOf") === 0) {
-                const availableChoices = type.slice("OneOf".length + 1, -1).split(",").map(s => s.trim())
+                const availableChoices = spec.choices
                 return <OneOfField key={ "pipe_form_ipnut" } { ...props } availableValues={ availableChoices } placeholder={ "[" + param + "]" }  />
             }
             // case "free":
@@ -123,6 +123,7 @@ export default class PipeForm extends React.Component {
             descriptionParts[0], " ",
             buildField(
                 spec[param].type,
+                spec[param],
                 {
                     value: this.state.fieldValues.params[param] || value || "",
                     edit: value ? false : true,
@@ -170,9 +171,9 @@ export default class PipeForm extends React.Component {
                     !value ? [
                         <div>
                             <input id={ connectedCheckId } onChange={ this.onChangeConnectedCheck } type="checkbox" />
-                            <label htmlFor={ connectedCheckId }>Connecté au pipe actif ?</label>
+                            <label htmlFor={ connectedCheckId }>Connect to focued pipe ?</label>
                         </div> ,
-                        <input type="submit" onClick={ this.onSubmit } disabled={ !this.isValid() } />
+                        <input type="submit" onClick={ this.onSubmit } disabled={ !this.isValid() } value="Create" />
                     ]
                         : <input type="button" onClick={ onRemove } value="Remove" />
                 }

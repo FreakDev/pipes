@@ -85,6 +85,7 @@ const parseParamLine = (paramLine) => {
     let type = "Free"
     let optional = false
     let description
+    let optionalParams = {}
 
     paramSpec = paramLine.match(/^(([^ ]*)|(\[[^\]]*\]))\s+({[^}]*})?\s*-\s+(.*)/)
     if (paramSpec) {
@@ -93,8 +94,17 @@ const parseParamLine = (paramLine) => {
             name = name.slice(1, -1)
             optional = true
         }
-        if (paramSpec[4])
+        if (paramSpec[4]) {
             type = paramSpec[4].slice(1, -1)
+            if (type.indexOf("OneOf") === 0) {
+                optionalParams.choices = type.slice("OneOf".length + 1, -1).split(",").map(s => s.trim())
+                type = "OneOf"
+            }
+            if (type.indexOf("Pipe") === 0 && type.indexOf("|") !== -1) {
+                optionalParams.pipe_type = type.split("|")[1]
+                type = "Pipe"
+            }
+        }
         description = paramSpec[5]
     }
 
@@ -102,6 +112,7 @@ const parseParamLine = (paramLine) => {
         name,
         type,
         optional,
+        ...optionalParams,
         description
     }
 
