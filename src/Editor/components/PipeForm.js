@@ -110,10 +110,10 @@ export default class PipeForm extends React.Component {
 
         const buildField = (type, props) => {
             if (type.indexOf("Free") === 0) {
-                return <FreeField key={ "pipe_form_ipnut" } { ...props } />
+                return <FreeField key={ "pipe_form_ipnut" } { ...props } placeholder={ "[" + param + "]" } />
             } else if (type.indexOf("OneOf") === 0) {
                 const availableChoices = type.slice("OneOf".length + 1, -1).split(",").map(s => s.trim())
-                return <OneOfField key={ "pipe_form_ipnut" } { ...props } availableValues={ availableChoices } />
+                return <OneOfField key={ "pipe_form_ipnut" } { ...props } availableValues={ availableChoices } placeholder={ "[" + param + "]" }  />
             }
             // case "free":
                 // return <LookUpField key={ "pipe_form_ipnut" } { ...props } />
