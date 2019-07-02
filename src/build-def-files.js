@@ -80,27 +80,29 @@ const parseBlock = function (block) {
 }
 
 const parseParamLine = (paramLine) => {
-    let parts = paramLine.split('-')
 
-    let name = parts[0].trim()
-    let type = "free"
+    let name = ""
+    let type = "Free"
     let optional = false
+    let description
 
-    nameMatch = name.match(/((\[(.*)\])|(.*))\s+\{(.*)\}/)
-    if (nameMatch) {
-        if (nameMatch[3])
-            name = nameMatch[3]
-        else {
-            name = nameMatch[1]
+    paramSpec = paramLine.match(/^(([^ ]*)|(\[[^\]]*\]))\s+({[^}]*})?\s*-\s+(.*)/)
+    if (paramSpec) {
+        name = paramSpec[1]
+        if (name.slice(0, 1) === "[" && name.slice(-1) === "]") {
+            name = name.slice(1, -1)
+            optional = true
         }
-        optional = !!nameMatch[3]
-        type = nameMatch[3]
+        if (paramSpec[4])
+            type = paramSpec[4].slice(1, -1)
+        description = paramSpec[5]
     }
 
     return {
         name,
         type,
         optional,
-        description: parts.slice(1).join('-').trim()
+        description
     }
+
 }

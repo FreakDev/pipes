@@ -1,16 +1,16 @@
 import React, { useState } from "react"
 import uuid from "uuid/v4"
 
-const OneOfField = ({ 
-    name, 
-    label, 
-    value, 
+const OneOfField = ({
+    name,
+    label,
+    value,
     edit,
-    placeholder = "choisir une valeur", 
-    availableValues, 
-    onChange, 
-    onValidate, 
-    onCancel 
+    placeholder = "choisir une valeur",
+    availableValues,
+    onChange,
+    onValidate,
+    onCancel
 }) => {
     const [editMode, setEditMode] = useState(edit)
 
@@ -35,20 +35,20 @@ const OneOfField = ({
 
     return (
         <span onClick={ onClick }>
-            { !editMode ? 
+            { !editMode ?
                 ( value || placeholder )
                 : <React.Fragment>
                     { label ? <label for={ fieldId }>{ label }</label> : null }
-                    <select 
+                    <select
                         id={ fieldId }
                         autoFocus
                         name={ name }
-                        onChange={ onInputChange } 
+                        onChange={ onInputChange }
                         onKeyUp={ onKeyUp }
                     >
                         {
-                            availableValues.map(val => (
-                                <option selected={ value === val }>{ val }</option>
+                            availableValues.map((val, id) => (
+                                <option key={ "onefield_opt_" + id } defaultValue={ value === val }>{ val }</option>
                             ))
                         }
                     </select>
