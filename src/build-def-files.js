@@ -1,6 +1,6 @@
 const fs = require('fs')
 
-var definitions = {__version: fs.readFileSync(__dirname + '/Pipes/version', 'utf8')}
+var definitions = {__version: fs.readFileSync(__dirname + '/Pipes/Lib/version', 'utf8')}
 
 fs.readdir(__dirname + '/Pipes/Lib', function(err, items) {
 
@@ -47,7 +47,6 @@ fs.readdir(__dirname + '/Pipes/Lib', function(err, items) {
 
 
 const toFile = (path, content) => {
-    let versionAsString = fs.readFileSync(__dirname + '/Pipes/Lib/version', 'utf8')
     fs.writeFile(path, content, 'utf8', (err) => { console.log( err ? 'oups :' + err : 'ok') })
 }
 
