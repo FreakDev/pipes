@@ -45,6 +45,9 @@ const PIPE_VAR_DEF = {
 }
 
 const KEY_SHIFT = 16
+const KEY_CTRL = 17
+const KEY_C = 67
+const KEY_V = 86
 
 // const INITIAL_PROGRAM = {
 //     name: "",
@@ -115,6 +118,24 @@ const __findBeforeInChain = (needleId, chain, from) => {
     return [found, path]
 }
 
+const KEY_COMPO = [
+    [KEY_CTRL, KEY_C],
+    [KEY_CTRL, KEY_V]
+]
+
+const __checkPressedKeys = (currentKeyDown) => {
+    return KEY_COMPO.find(keyCompo => {
+        let found,
+            i = 0,
+            len = keyCompo.length
+        do {
+            found = currentKeyDown.indexOf(keyCompo[i]) !== -1
+            i++
+        } while(found && i < len)
+
+        return found
+    })
+}
 
 export default class Main extends React.Component {
 
@@ -348,9 +369,10 @@ export default class Main extends React.Component {
     onKeyDown(e) {
         const keysDown = this.state.keysDown
         const key = e.keyCode
-        this.setState({
-            keysDown: [...keysDown, key]
-        })
+        if (keysDown.indexOf(key) === -1)
+            this.setState({
+                keysDown: [...keysDown, key]
+            })
     }
 
     onKeyUp(e) {
@@ -358,9 +380,20 @@ export default class Main extends React.Component {
         const key = e.keyCode
 
         let index = keysDown.indexOf(key)
-        index !== -1 && this.setState({
-            keysDown: [...keysDown.slice(0, index), ...keysDown.slice(index + 1)]
-        })
+        if (index !== -1) {
+            const keyCombo = __checkPressedKeys(keysDown)
+
+            if (keyCombo)
+                if (keyCombo.indexOf(KEY_C) === 1) {
+                    console.log("copy")
+                } else if (keyCombo.indexOf(KEY_V) === 1) {
+                    console.log("paste")
+                }
+
+            this.setState({
+                keysDown: [...keysDown.slice(0, index), ...keysDown.slice(index + 1)]
+            })
+        } 
     }
 
     resolveCurrentPath(digUntilLastFolder = false) {
