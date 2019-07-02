@@ -115,8 +115,8 @@ export default class PipeForm extends React.Component {
                 const availableChoices = spec.choices
                 return <OneOfField key={ "pipe_form_ipnut" } { ...props } availableValues={ availableChoices } placeholder={ "[" + param + "]" }  />
             } else if (type.indexOf("Pipe") === 0) {
-                return <LookUpField 
-                    key={ "pipe_form_ipnut" } 
+                return <LookUpField
+                    key={ "pipe_form_ipnut" }
                     { ...props }
                     availableValues={ this.props.pipesInScope }
                     autocompleteCallback={(value, suggestion) => {
@@ -125,7 +125,7 @@ export default class PipeForm extends React.Component {
                     renderSuggestion={ suggestion => {
                         return suggestion.name
                     } }
-                    placeholder={ "[" + param + "]" } 
+                    placeholder={ "[" + param + "]" }
                 />
             }
         }
@@ -180,11 +180,11 @@ export default class PipeForm extends React.Component {
                 }
                 {
                     !value ? [
-                        <div>
+                        <div key={ "pipeform_button_1" } >
                             <input id={ connectedCheckId } onChange={ this.onChangeConnectedCheck } type="checkbox" />
                             <label htmlFor={ connectedCheckId }>Connect to focued pipe ?</label>
                         </div> ,
-                        <input type="submit" onClick={ this.onSubmit } disabled={ !this.isValid() } value="Create" />
+                        <input key={ "pipeform_button_2" } type="submit" onClick={ this.onSubmit } disabled={ !this.isValid() } value="Create" />
                     ]
                         : <input type="button" onClick={ onRemove } value="Remove" />
                 }
