@@ -542,7 +542,7 @@ export default class Main extends React.Component {
             <div className={ cssClasses.main } onKeyDown={ this.onKeyDown } onKeyUp={ this.onKeyUp } tabIndex="0">
                 <div className={ cssClasses.row_top }>
                     <GenerateButton program={ program } />
-                    <Menu onLoadProgram={ this.onLoadProgram } />
+                    <Menu onLoadProgram={ this.onLoadProgram } program={ program } />
                 </div>
                 <div className={ cssClasses.left_col }>
                     <TreeView
