@@ -32,6 +32,4 @@ config.plugins.push(
     })
 )
 
-console.log(config.module)
-
 module.exports = config

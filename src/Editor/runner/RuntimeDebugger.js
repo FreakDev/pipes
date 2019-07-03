@@ -5,7 +5,7 @@ export const RUNTIME_EXECUTION_STOPPED = "execution-stopped"
 export const RUNTIME_EXECUTION_STARTED = "execution-started"
 export const RUNTIME_EXECUTION_IDLE = "execution-idle"
 
-export const MESSAGE_READY = "MessageReady"
+export const MESSAGE_RUNNER_READY = "MessageRunnerReady"
 
 export const MESSAGE_LOAD = "MessageLoad"
 export const MESSAGE_START = "MessageStart"
@@ -22,10 +22,7 @@ export default class RuntimeDebugger {
     _core
 
     _getMessageManager
-
-    _messageEventEmitter
-
-    _messageEventPoster
+    _postMessage
 
     _running = false
 
@@ -58,13 +55,10 @@ export default class RuntimeDebugger {
 
     start() {
         this._getMessageManager()
-            .then(({ messageEventEmitter, messageEventPoster }) => {
-                this._messageEventEmitter = messageEventEmitter
-                this._messageEventPoster = messageEventPoster
+            .then(({ addEventListener, postMessage }) => {
+                this._postMessage = postMessage
 
-                this.emit(MESSAGE_READY)
-
-                this._messageEventEmitter.addEventListener((e) => {
+                addEventListener((e) => {
                     const message = JSON.parse(e.data)
                     let listenerName = "on" + message.name
                     if (this[listenerName])
@@ -74,7 +68,7 @@ export default class RuntimeDebugger {
     }
 
     emit(name, payload) {
-        this._messageEventPoster.postMessage(JSON.stringify({
+        this._postMessage(JSON.stringify({
             name,
             payload
         }))

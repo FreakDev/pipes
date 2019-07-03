@@ -11,6 +11,7 @@ config.node = { __dirname: false }
 
 config.entry = {
     "node-runner": path.resolve('./src/node-runner.js'),
+    "node-runner-for-editor": path.resolve('./src/Editor/runner/node-runner-for-editor.js'),
 }
 
 config.output = {
