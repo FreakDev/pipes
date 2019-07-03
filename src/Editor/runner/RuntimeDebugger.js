@@ -5,6 +5,8 @@ export const RUNTIME_EXECUTION_STOPPED = "execution-stopped"
 export const RUNTIME_EXECUTION_STARTED = "execution-started"
 export const RUNTIME_EXECUTION_IDLE = "execution-idle"
 
+export const MESSAGE_READY = "MessageReady"
+
 export const MESSAGE_LOAD = "MessageLoad"
 export const MESSAGE_START = "MessageStart"
 export const MESSAGE_PAUSE = "MessagePause"
@@ -18,6 +20,8 @@ export const MODE_STEP = "step"
 export default class RuntimeDebugger {
 
     _core
+
+    _getMessageManager
 
     _messageEventEmitter
 
@@ -39,7 +43,7 @@ export default class RuntimeDebugger {
 
     _mode = MODE_NORMAL
 
-    constructor(messageEventEmitter, messageEventPoster) {
+    constructor(getMessageManager) {
         this._core = new PipeCore(MODE_DEBUG, {
             pipe_called: this.__pipe_called.bind(this),
             program_started: this.__program_started.bind(this),
@@ -49,24 +53,31 @@ export default class RuntimeDebugger {
             hold: this.__holdRuntime.bind(this)
         })
 
-        this._messageEventEmitter = messageEventEmitter
-        this._messageEventPoster = messageEventPoster
+        this._getMessageManager = getMessageManager
     }
 
     start() {
-        this._messageEventEmitter.addEventListener("message", (e) => {
-            const message = JSON.parse(e.data)
-            let listenerName = "on" + message.name
-            if (this[listenerName])
-                this[listenerName].call(this, message.payload)
-        })
+        this._getMessageManager()
+            .then(({ messageEventEmitter, messageEventPoster }) => {
+                this._messageEventEmitter = messageEventEmitter
+                this._messageEventPoster = messageEventPoster
+
+                this.emit(MESSAGE_READY)
+
+                this._messageEventEmitter.addEventListener((e) => {
+                    const message = JSON.parse(e.data)
+                    let listenerName = "on" + message.name
+                    if (this[listenerName])
+                        this[listenerName].call(this, message.payload)
+                })
+            })
     }
 
     emit(name, payload) {
         this._messageEventPoster.postMessage(JSON.stringify({
             name,
             payload
-        }), "*")
+        }))
     }
 
     onMessageLoad({ program }) {
@@ -114,7 +125,7 @@ export default class RuntimeDebugger {
 
             if (this._mode === MODE_TURTLE) {
                 setTimeout(() => {
-                    resolve()        
+                    resolve()
                 }, 1000);
                 return
             }
