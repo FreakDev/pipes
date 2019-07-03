@@ -3,7 +3,7 @@
 const path = require('path');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 
-const base = require('./webpack.config.common')
+const base = require('./webpack.config.common').web
 
 const config = Object.assign({}, base)
 
