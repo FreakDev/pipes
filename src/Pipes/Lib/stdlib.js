@@ -21,7 +21,7 @@ export default {
      * @Pipe\name write
      * @Pipe\type pipe-native
      * @Pipe\description write the input value into a variable
-     * @Pipe\param name - will write the inputed value in variable named %s 
+     * @Pipe\param name {Pipe|pipe-var} - will write the input value into box %s, and output the same value as input
      */
     write: ({ name }, input, context) => {        
         try {
@@ -38,8 +38,7 @@ export default {
      * @Pipe\name read
      * @Pipe\type pipe-native
      * @Pipe\description read a variable value
-     * name of the variable couls be either a given identifier (as paramter) or the input value (as indentifier)
-     * @Pipe\param name - identifier
+     * @Pipe\param name {Pipe|pipe-var} - will output the content of the box named %s or (if left empty) the inputed name
      */
     read: ({ name }, input, context) => {
         let searchedName = name || input
@@ -56,23 +55,32 @@ export default {
      * @PipeDEF
      * @Pipe\name forward
      * @Pipe\type pipe-native
-     * @Pipe\description invoke a function
-     * the invoked function identifier can be provided either as a parameter or as the input value
-     * @Pipe\param identifier - function to invoke identifier
+     * @Pipe\description forward to a another pipe (data feed is broken)
+     * @Pipe\param identifier {Pipe|pipe-func} - the next pipe to be executed will be %s or will be the inputed one
      */
     forward: ({ identifier }, input, context) => {
         return context.invoke(identifier || input)
     },
 
-    
+    /**
+     * @PipeDEF
+     * @Pipe\name invoke
+     * @Pipe\type pipe-native
+     * @Pipe\description invoke a function (data feed is preserved)
+     * @Pipe\param identifier {Pipe|pipe-func} - will output to %s the value recieved as input
+     */
+    invoke: ({ identifier }, input, context) => {
+        return context.invoke(identifier, input)
+    },
+
+
     /**
      * @PipeDEF
      * @Pipe\name log
      * @Pipe\type pipe-native
      * @Pipe\description log to console
-     * (should be in a ui or debug package)
-     * @Pipe\param [before] {free} - %s will be print before output
-     * @Pipe\param after - %s will be print after output
+     * @Pipe\param [before] {Free} - will print %s before input 
+     * @Pipe\param [after] {Free} - then %s after. will output the same as inputed
      */
     log: ({ before, after }, input) => {
         let params = []

@@ -1,3 +1,4 @@
+import { randomBytes } from "crypto";
 
 /**
  * @PipeDEF
@@ -90,6 +91,33 @@ export default {
             break
         }
         return result ? context.invoke(outputTrue, input) : context.invoke(outputFalse, input)
+    },
+
+    /**
+     * @PipeDEF
+     * @Pipe\name random
+     * @Pipe\type pipe-native
+     * @Pipe\param [from] {Free} - a
+     * @Pipe\param [to] {Free} - a
+     * @Pipe\param [inputAsMax] {Free} - (default false)
+     */
+    random: ({ from = 0, to = 1, inputAsMax = false }, input) => {
+        return (Math.random() * (inputAsMax ? parseFloat(input) : parseFloat(to))) + from
+    },
+
+    /**
+     * @PipeDEF
+     * @Pipe\name round
+     * @Pipe\type pipe-native
+     * @Pipe\param [mode] {OneOf[round,up,down]} - a
+     */
+    round: ({ mode = "round" }, input) => {
+        const modeMap = {
+            "round": "round",
+            "up": "ceil",
+            "down": "floor"
+        }
+        return Math[modeMap[mode]](parseFloat(input))
     }
 
 }

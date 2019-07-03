@@ -106,7 +106,7 @@ export default class PipeForm extends React.Component {
     }
 
     renderParamField(param, spec, value) {
-        let descriptionParts = spec[param].description.split('%s')
+        let descriptionParts = spec[param].description ? spec[param].description.split('%s') : []
 
         const buildField = (type, spec, props) => {
             if (type.indexOf("Free") === 0) {

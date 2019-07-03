@@ -84,6 +84,8 @@ export default class RuntimeDebugger {
     onMessageRun({ mode }) {
         this.paused = false
         this._mode = mode
+        if(!this._running)
+            this.onMessageStart({ mode })
     }
 
     onMessageRunOne() {

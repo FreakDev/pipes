@@ -21,7 +21,7 @@ const PIPE_FUNC_DEF = {
     "description":"a pipe",
     "params":{
         "name":{
-            "type":"free",
+            "type":"Free",
             "optional":false,
             "description":"You may reference to this pipe with \'%s\' (choose it wisely)"
         }
@@ -33,12 +33,12 @@ const PIPE_VAR_DEF = {
     "description":"a variable",
     "params":{
         "name":{
-            "type":"free",
+            "type":"Free",
             "optional":false,
             "description":"You may reference to this variable with \'%s\' (choose it wisely)"
         },
         "value":{
-            "type":"free",
+            "type":"Free",
             "optional":true,
             "description":"At startup your variable will contain \'%s\'"
         }
@@ -52,6 +52,7 @@ const KEY_V = 86
 const KEY_X = 88
 
 const INITIAL_PROGRAM = {
+    id: uuid(),
     name: "",
     type: PIPE_TYPE_FUNC,
     pipes: []

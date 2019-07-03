@@ -5,11 +5,13 @@ import { PIPE_NATIVE } from "./Pipe"
 import stdlib from "../Lib/stdlib"
 import math from "../Lib/math"
 import event from "../Lib/event"
+import string from "../Lib/string"
 
 const LIB = {
     stdlib,
     math,
-    event
+    event,
+    string
 }
 
 export const MODE_DEBUG = "debug"
