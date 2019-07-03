@@ -1,6 +1,6 @@
 import React from "react"
 
-import cssClasses from "../../../sass/Editor/Pipe.sass"
+import cssClasses from "./Pipe.sass"
 
 const Pipe = ({ name, params }) => (
     <div data-name={ name } className={ cssClasses.pipe }>

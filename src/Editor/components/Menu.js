@@ -1,21 +1,15 @@
-import React from 'react'
+import React from "react"
 
-export default class Menu extends React.Component {
-    constructor(props) {
-        super(props)
-    }
+import cssClasses from "./Menu.sass"
 
-    componentWillMount() {
-    }
-
-    render() {
-        return  (
-            <div>
-                {/* <h2>Menu</h2>
-                <div class="menu_trigger">
-                    Menu
-                </div> */}
-            </div>
-        )
-    }
+const Menu = () => {
+    return  (
+        <div className={ cssClasses.menu }>
+            <button>Load File</button>
+            <button>Save File</button>
+            <h1>PIPES</h1>
+        </div>
+    )
 }
+
+export default Menu

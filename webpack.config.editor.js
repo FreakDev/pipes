@@ -9,7 +9,7 @@ const config = Object.assign({}, base)
 
 
 config.entry = {
-    editor: path.resolve('./src/editor.js'),
+    editor: path.resolve('./src/Editor/index.js'),
     'runner-for-editor': path.resolve('./src/Editor/runner/runner-for-editor.js'),
 }
 
@@ -29,7 +29,7 @@ config.module.rules.push({
 
 config.plugins.push(
     new HtmlWebPackPlugin({
-        template: "./src/index.html",
+        template: "./src/Editor/index.html",
         inject: false,
         filename: "./index.html"
     }),

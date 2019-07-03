@@ -4,12 +4,13 @@ import uuid from "uuid/v4"
 
 import ChainView from "./ChainView"
 import PipeInspector from "./PipeInspector"
+import Menu from "./Menu"
 import TreeView from "./TreeView"
 import GenerateButton from "./GenerateButton"
 
 import PIPES_DEFINITIONS from "../../pipes-definitions.json"
 
-import cssClasses from "../../../sass/Editor/Main.sass"
+import cssClasses from "./Main.sass"
 
 export const PIPE_TYPE_FUNC = 'pipe-func'
 export const PIPE_TYPE_NATIVE = 'pipe-native'
@@ -534,30 +535,36 @@ export default class Main extends React.Component {
 
         return (
             <div className={ cssClasses.main } onKeyDown={ this.onKeyDown } onKeyUp={ this.onKeyUp } tabIndex="0">
-                {/* <Menu /> */}
-                <GenerateButton program={ program } />
-                <TreeView
-                    program={ program }
-                    active={ currentActiveId }
-                    activePath={ currentPath }
-                    onSelect={ this.navigateTo }
-                    onNavigateDown={ this.navigateDown }
-                    onChangeProgramName={ this.updateProgram } />
-                <ChainView
-                    chain={ this.resolveCurrentPath(true) }
-                    active={ currentActiveId }
-                    selected={ selected }
-                    onSelectOne={ this.focus }
-                    onClickElseWhere={ this.unFocus }
-                    onDblClickElseWhere={ this.navigateUp }/>
-                <PipeInspector
-                    active={ !Array.isArray(currentActive) ? currentActive : null }
-                    pipesInScope={ buildPipeInScope() }
-                    pipesDefs={ defs }
-                    onCreate={ this.addPipe }
-                    onSave={ this.savePipe }
-                    onRemove={ this.onRemove }
-                    />
+                <div className={ cssClasses.row_top }>
+                    <GenerateButton program={ program } />
+                    <Menu />
+                </div>
+                <div className={ cssClasses.left_col }>
+                    <TreeView
+                        program={ program }
+                        active={ currentActiveId }
+                        activePath={ currentPath }
+                        onSelect={ this.navigateTo }
+                        onNavigateDown={ this.navigateDown }
+                        onChangeProgramName={ this.updateProgram } />
+                </div>
+                <div  className={ cssClasses.col_main }>
+                    <ChainView
+                        chain={ this.resolveCurrentPath(true) }
+                        active={ currentActiveId }
+                        selected={ selected }
+                        onSelectOne={ this.focus }
+                        onClickElseWhere={ this.unFocus }
+                        onDblClickElseWhere={ this.navigateUp }/>
+                    <PipeInspector
+                        active={ !Array.isArray(currentActive) ? currentActive : null }
+                        pipesInScope={ buildPipeInScope() }
+                        pipesDefs={ defs }
+                        onCreate={ this.addPipe }
+                        onSave={ this.savePipe }
+                        onRemove={ this.onRemove }
+                        />
+                </div>
             </div>
         )
     }

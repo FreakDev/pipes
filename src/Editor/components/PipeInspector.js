@@ -2,7 +2,7 @@ import React from 'react'
 
 import PipeForm from "./PipeForm"
 
-import cssClasses from "../../../sass/Editor/PipeInspector.sass"
+import cssClasses from "./PipeInspector.sass"
 
 export const MODE_CREATE = "mode-create"
 export const MODE_EDIT = "mode-edit"

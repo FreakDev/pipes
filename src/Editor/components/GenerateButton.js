@@ -1,7 +1,7 @@
 import React from "react"
 import RunPanel from "./RunPanel"
 
-import cssClasses from "../../../sass/Editor/GenerateButton.sass"
+import cssClasses from "./GenerateButton.sass"
 
 export default class GenerateButton extends React.Component {
 

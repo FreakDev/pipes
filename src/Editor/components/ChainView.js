@@ -2,7 +2,7 @@ import React from "react"
 
 import Pipe from "./Pipe"
 
-import cssClasses from "../../../sass/Editor/ChainView.sass"
+import cssClasses from "./ChainView.sass"
 
 const ChainView = ({ chain, active, selected, onSelectOne, onClickElseWhere, onDblClickElseWhere }) => {
     let groups

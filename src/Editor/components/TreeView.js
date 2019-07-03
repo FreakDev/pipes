@@ -2,7 +2,7 @@ import React, { useState } from "react"
 
 import FreeField from "./formFields/FreeField"
 
-import cssClasses from "../../../sass/Editor/TreeView.sass"
+import cssClasses from "./TreeView.sass"
 
 const TreeView = ({ 
     program, 
