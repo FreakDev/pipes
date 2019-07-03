@@ -64,8 +64,8 @@ export default {
      * @Pipe\param operator {OneOf[=,>,<,>=,<=,!=]} - if the input value is %s to/than
      * @Pipe\param value - %s or (if left empty)
      * @Pipe\param variable - the value in the %s box.
-     * @Pipe\param outputTrue {Pipe|func} - Then data flow will be forwarded to %s if the comparison result is true
-     * @Pipe\param outputFalse {Pipe|func} - or to %s if the comparison result is false (if left empty data flow will stop)
+     * @Pipe\param outputTrue {Pipe|pipe-func} - Then data flow will be forwarded to %s if the comparison result is true
+     * @Pipe\param outputFalse {Pipe|pipe-func} - or to %s if the comparison result is false (if left empty data flow will stop)
      */
     compare: ({ operator, value, variable, outputTrue, outputFalse }, input, context) => {
         let result

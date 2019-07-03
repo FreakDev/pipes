@@ -114,9 +114,20 @@ export default class PipeForm extends React.Component {
             } else if (type.indexOf("OneOf") === 0) {
                 const availableChoices = spec.choices
                 return <OneOfField key={ "pipe_form_ipnut" } { ...props } availableValues={ availableChoices } placeholder={ "[" + param + "]" }  />
+            } else if (type.indexOf("Pipe") === 0) {
+                return <LookUpField 
+                    key={ "pipe_form_ipnut" } 
+                    { ...props }
+                    availableValues={ this.props.pipesInScope }
+                    autocompleteCallback={(value, suggestion) => {
+                        return suggestion.type === spec.pipe_type && suggestion.name.indexOf(value) !== -1
+                    }}
+                    renderSuggestion={ suggestion => {
+                        return suggestion.name
+                    } }
+                    placeholder={ "[" + param + "]" } 
+                />
             }
-            // case "free":
-                // return <LookUpField key={ "pipe_form_ipnut" } { ...props } />
         }
 
         return [

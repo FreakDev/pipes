@@ -517,6 +517,21 @@ export default class Main extends React.Component {
 
         const defs = { ...PIPES_DEFINITIONS, pipe: PIPE_FUNC_DEF, var: PIPE_VAR_DEF }
 
+        const buildPipeInScope = () => {
+            const pipesInScope = []
+            let path = currentPath
+
+            path.push("removed immediatly")
+            do {
+                path.pop()
+                path = __dir(path)
+                let currentDir = __resolvePath(program, path)
+                pipesInScope.push(...currentDir.filter(p => [PIPE_TYPE_FUNC, PIPE_TYPE_VAR].indexOf(p.type) !== -1))
+            } while ( path.length > 1)
+
+            return pipesInScope  
+        }
+
         return (
             <div className={ cssClasses.main } onKeyDown={ this.onKeyDown } onKeyUp={ this.onKeyUp } tabIndex="0">
                 {/* <Menu /> */}
@@ -537,6 +552,7 @@ export default class Main extends React.Component {
                     onDblClickElseWhere={ this.navigateUp }/>
                 <PipeInspector
                     active={ !Array.isArray(currentActive) ? currentActive : null }
+                    pipesInScope={ buildPipeInScope() }
                     pipesDefs={ defs }
                     onCreate={ this.addPipe }
                     onSave={ this.savePipe }
