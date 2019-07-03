@@ -51,13 +51,11 @@ const KEY_C = 67
 const KEY_V = 86
 const KEY_X = 88
 
-// const INITIAL_PROGRAM = {
-//     name: "",
-//     type: PIPE_TYPE_FUNC,
-//     pipes: []
-// }
-
-import INITIAL_PROGRAM from "../../pipes-source-2.json"
+const INITIAL_PROGRAM = {
+    name: "",
+    type: PIPE_TYPE_FUNC,
+    pipes: []
+}
 
 const __dir = (path) => {
     let newPath = path.slice()
@@ -268,7 +266,14 @@ export default class Main extends React.Component {
         this.updateProgram = this.updateProgram.bind(this)
         this.onKeyDown = this.onKeyDown.bind(this)
         this.onKeyUp = this.onKeyUp.bind(this)
+        this.onLoadProgram = this.onLoadProgram.bind(this)
 
+    }
+
+    onLoadProgram(program) {
+        this.setState({
+            program
+        })
     }
 
     addPipe(pipe, connected, connectedTo = null) {
@@ -537,7 +542,7 @@ export default class Main extends React.Component {
             <div className={ cssClasses.main } onKeyDown={ this.onKeyDown } onKeyUp={ this.onKeyUp } tabIndex="0">
                 <div className={ cssClasses.row_top }>
                     <GenerateButton program={ program } />
-                    <Menu />
+                    <Menu onLoadProgram={ this.onLoadProgram } />
                 </div>
                 <div className={ cssClasses.left_col }>
                     <TreeView
