@@ -17,7 +17,7 @@ export default class MessageManager {
     _mode = MODE_WEB
 
     get isRunning() {
-        return !!(this._runnerWindow || (this._wsClient && this._wsClient.connected))
+        return !!(this._runnerWindow || this._wsClient)
     }
 
     constructor() {
@@ -27,16 +27,31 @@ export default class MessageManager {
     setMode(value) {
         this._unset()
         this._mode = value
-        
-        return this._setup()
+        this._setup()
     }
 
-    start(mode) {
-        return this.setMode(mode)
+    get mode() {
+        return this._mode
+    }
+
+    start() {
+        return new Promise((resolve) => {
+            if (this.mode === MODE_WEB) {
+                if (!this._runnerWindow)
+                    this._createChildWindow().then(resolve)
+            } else {
+                if (!this._wsClient)
+                    this._createWebSocketClient().then(resolve)
+            }
+        })
     }
 
     postMessage(d) {
-        this._runnerWindow && this._runnerWindow.postMessage(d, "*")
+        if (this.mode === MODE_WEB) {
+            this._runnerWindow && this._runnerWindow.postMessage(d, "*")
+        } else {
+            this._wsClient && this._wsClient.postMessage(d)
+        }
     }
 
     _unset() {
@@ -48,20 +63,22 @@ export default class MessageManager {
     }
 
     _setup() {
-        if (this._mode === MODE_WEB) {
-            if (!this._runnerWindow)
-                return this._createChildWindow()
+        if (this._mode === MODE_NODE) {
+            if (this._wsClient)
+                this._wsClient.addEventListener(this._onMessage)
         } else {
-            if (!this._wsClient)
-                return this._createWebSocketClient()
+            if (this._runnerWindow)
+                window.addEventListener("message", this._onMessage)
         }
     }
 
     _createChildWindow(width = 500, height = 350) {
         return new Promise(resolve => {
             this._runnerWindow = window.open("runner-for-editor.html", "Pipe Runner", "height=" + height + ",width=" + width)
-            this._runnerWindow.onload = resolve
-            window.addEventListener('message', this._onMessage, false)
+            this._runnerWindow.onload = () => {
+                this._setup()
+                resolve()
+            }
         })
     }
 
@@ -69,11 +86,10 @@ export default class MessageManager {
         return new Promise (resolve => {
             this._wsClient = new WebsocketClient(I_AM_EDITOR)
             this._wsClient.connect(/* same url as served page */).then(() => {
-                this._wsClient.addEventListener(this._onMessage)
+                this._setup()
                 resolve()
             })
         })
-        
     }
 
     _onMessage(e) {

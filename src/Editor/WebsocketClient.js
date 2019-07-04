@@ -7,47 +7,60 @@ export default class WebsocketClient {
 
     _iAm
 
-    socket
+    _socket
 
     _eventListener = []
+
+    _connected = false
+    _connectedToServer = false
+
+    get connected() {
+        return this._connected
+    }
 
     constructor(WhatIAm) {
         this._iAm = WhatIAm
     }
 
     connect(server) {
-        this.socket = io(server)
-
-        this.socket.on('message', this.onMessage.bind(this))
-        this.socket.on('disconnect', this.onDisconnect.bind(this))
-
         return new Promise((resolve) => {
-            this.socket.on('connect', this.onConnect.bind(this))
-            resolve(0)
-        })
-    }
+            this._socket = io(server)
 
-    onConnect() {
-        this.postMessage({
-            name: "IAm" + this._iAm
+            this._socket.on('message', this.onMessage.bind(this))
+            this._socket.on('disconnect', () => {
+                this._connectedToServer = false
+                this._connected = false
+            })
+
+            this._socket.on('connect', () => {
+                this.postMessage({
+                    name: "IAm" + this._iAm
+                })
+                this._connectedToServer = true
+                resolve()
+            })
         })
     }
 
     onMessage(e) {
         this._eventListener.forEach(listener => {
+            this._connected = true
             listener.call(this, e)
         });
     }
 
-    onDisconnect() {
-
-    }
-
     postMessage(d) {
-        this.socket.emit("message", d)
+        this._socket.emit("message", d)
     }
 
     addEventListener(callback) {
         this._eventListener.push(callback)
+    }
+
+    removeEventListener(callback) {
+        const idx = this._eventListener.indexOf(callback)
+        if (idx !== -1) {
+            this._eventListener.splice(idx, 1)
+        }
     }
 }

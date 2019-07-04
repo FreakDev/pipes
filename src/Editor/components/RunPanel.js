@@ -15,7 +15,6 @@ import MessageManager, { MODE_WEB, MODE_NODE } from "../MessageManager"
 class RunPanel extends React.Component {
 
     state = {
-        mode: MODE_WEB,
         paused: false
     }
 
@@ -65,7 +64,7 @@ class RunPanel extends React.Component {
         }).bind(this)
 
         if (!this.msgManager.isRunning) {
-            this.msgManager.start(this.state.mode).then(runProgram)
+            this.msgManager.start().then(runProgram)
         } else {
             this.sendMessage(MESSAGE_RUN, { mode })
         }
@@ -104,11 +103,11 @@ class RunPanel extends React.Component {
     }
 
     render() {
-        const { paused, mode } = this.state
+        const { paused } = this.state
     
         return (
             <div>
-                <input type="checkbox" name="mode" onChange={ this.toggleMode } /> { mode } 
+                <input type="checkbox" name="mode" onChange={ this.toggleMode } /> { this.msgManager.mode } 
                 <button onClick={ () => this.clickPlay() }>Play</button>
                 <button onClick={ () => this.clickPlay(MODE_TURTLE) }>Play (Turtle mode)</button>
                 { this.msgManager.isRunning ? <button onClick={ this.togglePause }>{ paused ? "Resume" : "Pause"}</button> : null }
