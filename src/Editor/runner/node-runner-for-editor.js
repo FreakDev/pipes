@@ -1,4 +1,4 @@
-import WebsocketClient from "./WebsocketClient"
+import WebsocketClient, { I_AM_RUNNER } from "../WebsocketClient"
 import NodeRuntimeDebugger from "./NodeRuntimeDebugger"
 import argv from "argv"
 
@@ -13,7 +13,7 @@ argv.option({
 const args = argv.run()
 
 new NodeRuntimeDebugger(() => new Promise(resolve => {
-    const wsClient = new WebsocketClient()
+    const wsClient = new WebsocketClient(I_AM_RUNNER)
     console.log("Trying to connect with : " + args.options.server)
     wsClient.connect(args.options.server)
         .then(() => {

@@ -1,14 +1,19 @@
 import io from "socket.io-client"
 
-const MESSAGE_I_AM_A_RUNNER = {
-    name: "IAmRunner"
-}
+export const I_AM_RUNNER = "Runner"
+export const I_AM_EDITOR = "Editor"
 
 export default class WebsocketClient {
+
+    _iAm
 
     socket
 
     _eventListener = []
+
+    constructor(WhatIAm) {
+        this._iAm = WhatIAm
+    }
 
     connect(server) {
         this.socket = io(server)
@@ -23,7 +28,9 @@ export default class WebsocketClient {
     }
 
     onConnect() {
-        this.postMessage(MESSAGE_I_AM_A_RUNNER)
+        this.postMessage({
+            name: "IAm" + this._iAm
+        })
     }
 
     onMessage(e) {
