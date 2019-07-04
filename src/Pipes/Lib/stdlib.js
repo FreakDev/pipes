@@ -73,6 +73,19 @@ export default {
         return context.invoke(identifier, input)
     },
 
+    /**
+     * @PipeDEF
+     * @Pipe\name hold
+     * @Pipe\type pipe-native
+     * @Pipe\description hold the data feed for a given amount of time
+     * @Pipe\param [timeValue] {Free} - The data flow will be hold during %s ms 
+     * @Pipe\param [varValue] {Free} - if previous field left empty, waiting time will be the number store in the box %s
+     */
+    hold: ({ timeValue, varValue }, input, context) => {
+        return new Promise(resolve => {
+            setTimeout(() => resolve(input), timeValue || context.getVarValue(varValue))
+        })
+    },
 
     /**
      * @PipeDEF

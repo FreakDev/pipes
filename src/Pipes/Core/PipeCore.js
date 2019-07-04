@@ -6,9 +6,11 @@ import stdlib from "../Lib/stdlib"
 import math from "../Lib/math"
 import event from "../Lib/event"
 import string from "../Lib/string"
+// import cli from "../Lib/cli"
 
 const LIB = {
     stdlib,
+    // cli,
     math,
     event,
     string
