@@ -10,20 +10,27 @@ import {
     MODE_TURTLE
 } from "../runner/RuntimeDebugger"
 
+import MessageManager, { MODE_WEB, MODE_NODE } from "../MessageManager"
+
 class RunPanel extends React.Component {
 
     state = {
-        runnerWindow: null,
+        mode: MODE_WEB,
         paused: false
     }
 
     constructor(props) {
         super(props)
 
+        this.msgManager = new MessageManager()
+        this.msgManager.messageCallback = this.onMessage.bind(this)
+
         this.onMessage = this.onMessage.bind(this)
         this.clickPlay = this.clickPlay.bind(this)
         this.togglePause = this.togglePause.bind(this)
         this.runOnePipe = this.runOnePipe.bind(this)
+        this.toggleMode = this.toggleMode.bind(this)
+
     }
 
     onMessage = (msg) => {
@@ -41,10 +48,10 @@ class RunPanel extends React.Component {
     }
     
     sendMessage(name, payload) {
-        this.state.runnerWindow && this.state.runnerWindow.postMessage(JSON.stringify({
+        this.msgManager.postMessage({
             name,
             payload
-        }), "*")
+        })
     }
 
 
@@ -56,12 +63,9 @@ class RunPanel extends React.Component {
                 paused: false
             })
         }).bind(this)
-        if (!this.state.runnerWindow) {
-            const runnerWindow = window.open("runner-for-editor.html", "Pipe Runner", "height=150,width=200")
-            this.setState({
-                runnerWindow
-            })
-            runnerWindow.onload = runProgram
+
+        if (!this.msgManager.isRunning) {
+            this.msgManager.start(this.state.mode).then(runProgram)
         } else {
             this.sendMessage(MESSAGE_RUN, { mode })
         }
@@ -73,6 +77,14 @@ class RunPanel extends React.Component {
         this.setState({
             paused: !this.state.paused
         })
+    }
+
+    toggleMode(e) {
+        if(e.target.checked) {
+            this.msgManager.setMode(MODE_NODE)
+        } else {
+            this.msgManager.setMode(MODE_WEB)
+        }
     }
 
     runOnePipe() {
@@ -92,13 +104,14 @@ class RunPanel extends React.Component {
     }
 
     render() {
-        const { paused, runnerWindow } = this.state
+        const { paused, mode } = this.state
     
         return (
             <div>
+                <input type="checkbox" name="mode" onChange={ this.toggleMode } /> { mode } 
                 <button onClick={ () => this.clickPlay() }>Play</button>
                 <button onClick={ () => this.clickPlay(MODE_TURTLE) }>Play (Turtle mode)</button>
-                { runnerWindow ? <button onClick={ this.togglePause }>{ paused ? "Resume" : "Pause"}</button> : null }
+                { this.msgManager.isRunning ? <button onClick={ this.togglePause }>{ paused ? "Resume" : "Pause"}</button> : null }
                 <button onClick={ this.runOnePipe }>Step by step</button>
             </div>
         )

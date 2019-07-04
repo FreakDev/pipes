@@ -4,7 +4,7 @@ import RuntimeDebugger from "./RuntimeDebugger"
 new RuntimeDebugger(() => {
     return new Promise((resolve) => {
         resolve( {
-            addEventListener: window.addEventListener.bind(window, "message"),
+            addEventListener: cb => { window.addEventListener("message", (e) => { cb(e.data) }) },
             postMessage: (msg) => window.opener.postMessage(msg, "*")
         } )
     })

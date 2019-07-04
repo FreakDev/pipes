@@ -59,7 +59,7 @@ export default class RuntimeDebugger {
                 this._postMessage = postMessage
 
                 addEventListener((e) => {
-                    const message = JSON.parse(e.data)
+                    const message = e
                     let listenerName = "on" + message.name
                     if (this[listenerName])
                         this[listenerName].call(this, message.payload)
