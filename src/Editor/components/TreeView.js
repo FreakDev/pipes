@@ -69,7 +69,7 @@ const TreeView = ({
 
     return (
         <div className={ cssClasses.tree_view }>
-            <FreeField name="program-name" value={ program.name } onValidate={ onValidateField } />
+            <FreeField name="program-name" value={ program.name } placeholder="[ Nom de Votre projet ]" onValidate={ onValidateField } />
             { listChild(program.pipes, ["pipes"]) }
         </div>
     )

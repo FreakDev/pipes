@@ -181,7 +181,7 @@ export default class PipeForm extends React.Component {
                     !value ? [
                         <div key={ "pipeform_button_1" } >
                             <input id={ connectedCheckId } onChange={ this.onChangeConnectedCheck } type="checkbox" />
-                            <label htmlFor={ connectedCheckId }>Connect to focued pipe ?</label>
+                            <label htmlFor={ connectedCheckId }>Connect to focused pipe ?</label>
                         </div> ,
                         <input key={ "pipeform_button_2" } type="submit" onClick={ this.onSubmit } disabled={ !this.isValid() } value="Create" />
                     ]
