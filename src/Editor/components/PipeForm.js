@@ -122,9 +122,8 @@ export default class PipeForm extends React.Component {
                     autocompleteCallback={(value, suggestion) => {
                         return suggestion.type === spec.pipe_type && suggestion.name.indexOf(value) !== -1
                     }}
-                    renderSuggestion={ suggestion => {
-                        return suggestion.name
-                    } }
+                    renderSuggestion={ suggestion => suggestion.name }
+                    extractValueFromSuggestion={ suggestion => suggestion.name }
                     placeholder={ "[" + param + "]" }
                 />
             }

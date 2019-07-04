@@ -15,6 +15,7 @@ const LookUpField = ({
         return suggestion.indexOf(value) !== -1
     },
     renderSuggestion = (suggestion) => ( suggestion ),
+    extractValueFromSuggestion = (suggestion) => ( suggestion ),
     onAutocomplete, 
     onChange, 
     onValidate,
@@ -61,9 +62,10 @@ const LookUpField = ({
 
     const onClickSuggestion = (suggestion) => {
         setIsAutocomplete(true) 
-        setInputValue(suggestion)
+        const value = extractValueFromSuggestion(suggestion)
+        setInputValue(value)
         setSuggestions([])
-        onAutocomplete && onAutocomplete(suggestion)
+        onAutocomplete && onAutocomplete(value)
         ref.focus()
     }
 
