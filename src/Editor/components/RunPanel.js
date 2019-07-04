@@ -21,9 +21,6 @@ class RunPanel extends React.Component {
     constructor(props) {
         super(props)
 
-        this.msgManager = new MessageManager()
-        this.msgManager.messageCallback = this.onMessage.bind(this)
-
         this.onMessage = this.onMessage.bind(this)
         this.clickPlay = this.clickPlay.bind(this)
         this.togglePause = this.togglePause.bind(this)
@@ -33,16 +30,13 @@ class RunPanel extends React.Component {
     }
 
     onMessage = (msg) => {
-        if (typeof msg.data === "string") {
-            const event = JSON.parse(msg.data)
-            switch(event.name) {
-            case "execution-stopped":
-                console.log(event)
-                break
-            case "pipe-called":
-                console.log(event.payload)
-                break
-            }
+        switch(msg.name) {
+        case "execution-stopped":
+            console.log(msg)
+            break
+        case "pipe-called":
+            console.log(msg.payload)
+            break
         }
     }
     
@@ -94,12 +88,14 @@ class RunPanel extends React.Component {
         }
     }
 
-    componentDidMount() {
-        window.addEventListener("message", this.onMessage, false)
+    componentWillMount() {
+        this.msgManager = new MessageManager()
+        this.msgManager.messageCallback = this.onMessage.bind(this)
     }
 
     componentWillUnmount() {
-        window.removeEventListener("message", this.onMessage)
+        this.msgManager.destoy()
+        this.msgManager = null
     }
 
     render() {

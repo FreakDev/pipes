@@ -3,6 +3,8 @@ import WebsocketClient, { I_AM_EDITOR } from "./WebsocketClient"
 export const MODE_WEB = "web"
 export const MODE_NODE = "node"
 
+const MESSAGE_CLOSING = "Closing"
+
 export default class MessageManager {
 
     _messageCallback
@@ -16,8 +18,12 @@ export default class MessageManager {
 
     _mode = MODE_WEB
 
+    get mode() {
+        return this._mode
+    }
+
     get isRunning() {
-        return !!(this._runnerWindow || this._wsClient)
+        return !!( (this.mode === MODE_WEB && this._runnerWindow) || (this.mode === MODE_NODE && this._wsClient && this._wsClient.connected) )
     }
 
     constructor() {
@@ -30,26 +36,39 @@ export default class MessageManager {
         this._setup()
     }
 
-    get mode() {
-        return this._mode
-    }
-
-    start() {
+    start(dimension = {}) {
         return new Promise((resolve) => {
             if (this.mode === MODE_WEB) {
                 if (!this._runnerWindow)
-                    this._createChildWindow().then(resolve)
+                    this._createChildWindow(dimension)
+                        .then(resolve)
             } else {
                 if (!this._wsClient)
-                    this._createWebSocketClient().then(resolve)
+                    this._createWebSocketClient()
+                        .then(resolve)
             }
         })
+    }
+
+    stop() {
+        if (this.mode === MODE_WEB) {
+            this._runnerWindow = null
+        } else {
+            this._wsClient /* && this._wsClient.stop() */
+        }
+    } 
+
+    destroy() {
+        this._unset()
     }
 
     postMessage(d) {
         if (this.mode === MODE_WEB) {
             this._runnerWindow && this._runnerWindow.postMessage(d, "*")
         } else {
+            if (!this._wsClient.connected) {
+                alert("No runner client found")
+            }
             this._wsClient && this._wsClient.postMessage(d)
         }
     }
@@ -63,16 +82,16 @@ export default class MessageManager {
     }
 
     _setup() {
-        if (this._mode === MODE_NODE) {
-            if (this._wsClient)
-                this._wsClient.addEventListener(this._onMessage)
-        } else {
+        if (this._mode === MODE_WEB) {
             if (this._runnerWindow)
                 window.addEventListener("message", this._onMessage)
+        } else {
+            if (this._wsClient)
+                this._wsClient.addEventListener(this._onMessage)
         }
     }
 
-    _createChildWindow(width = 500, height = 350) {
+    _createChildWindow({ width = 500, height = 350 }) {
         return new Promise(resolve => {
             this._runnerWindow = window.open("runner-for-editor.html", "Pipe Runner", "height=" + height + ",width=" + width)
             this._runnerWindow.onload = () => {
@@ -93,7 +112,18 @@ export default class MessageManager {
     }
 
     _onMessage(e) {
-        this._messageCallback.call(this, e)
+        let d = e
+        if (this.mode === MODE_WEB) {
+            d = e.data
+        }
+
+        if (d.name === MESSAGE_CLOSING) {
+            if (d.payload.platform === MODE_WEB) {
+                this._runnerWindow = null
+            }
+        }
+
+        this._messageCallback.call(this, d)
     }
 
 }

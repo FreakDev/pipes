@@ -1,6 +1,8 @@
 
 import RuntimeDebugger from "./RuntimeDebugger"
 
+const MESSAGE_CLOSING = "Closing"
+
 new RuntimeDebugger(() => {
     return new Promise((resolve) => {
         resolve( {
@@ -10,3 +12,11 @@ new RuntimeDebugger(() => {
     })
 }).start()
 
+window.onbeforeunload = () => {
+    window.opener.postMessage({
+        name : MESSAGE_CLOSING,
+        payload: {
+            platform: "web"
+        }
+    }, "*")
+}

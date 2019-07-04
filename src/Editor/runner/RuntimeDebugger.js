@@ -68,10 +68,10 @@ export default class RuntimeDebugger {
     }
 
     emit(name, payload) {
-        this._postMessage(JSON.stringify({
+        this._postMessage({
             name,
             payload
-        }))
+        })
     }
 
     onMessageLoad({ program }) {
