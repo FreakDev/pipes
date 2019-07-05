@@ -18,7 +18,7 @@ export default class PipeFunc extends Pipe {
 
     get params() {
         return this._params
-    } 
+    }
 
     _parent
 
@@ -36,9 +36,9 @@ export default class PipeFunc extends Pipe {
         this._runner = context.runner
         this._pipeFactory = context.factory
 
-        this._context = { 
-            invoke: this._invoke.bind(this), 
-            getVarValue: this._getVarValue.bind(this), 
+        this._context = {
+            invoke: this._invoke.bind(this),
+            getVarValue: this._getVarValue.bind(this),
             setVarValue: this._setVarValue.bind(this),
             addVarListener: this._addVarListener.bind(this),
             removeVarListener: this._removeVarListener.bind(this)

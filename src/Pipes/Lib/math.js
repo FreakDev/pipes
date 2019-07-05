@@ -13,13 +13,13 @@ export default {
      * @Pipe\param valueToAdd -
      * @Pipe\param getValueToAdd -
      */
-    add: ({valueToAdd, getValueToAdd}, input, context) => {
+    add: function ({valueToAdd, getValueToAdd}, input) {
         return new Promise((resolve) => {
             if (typeof valueToAdd === "number") {
                 resolve(input + valueToAdd)
             }
             else {
-                context.invoke(getValueToAdd).then((valueToAdd) => {
+                this.invoke(getValueToAdd).then((valueToAdd) => {
                     resolve(valueToAdd + input)
                 })
             }
@@ -35,23 +35,23 @@ export default {
      * @Pipe\param value - and %s as B or (if left empty)
      * @Pipe\param variable - the value from box labelled %s
      */
-    operation: ({ operator, value, variable }, input, context) => {
+    operation: function ({ operator, value, variable }, input) {
         let result
         switch (operator) {
         case "+":
-            result = input + (value || context.getVarValue(variable))
+            result = input + (value || this.getVarValue(variable))
             break
         case "-":
-            result = input - (value || context.getVarValue(variable))
+            result = input - (value || this.getVarValue(variable))
             break
         case "*":
-            result = input + (value || context.getVarValue(variable))
+            result = input + (value || this.getVarValue(variable))
             break
         case "/":
-            result = input - (value || context.getVarValue(variable))
+            result = input - (value || this.getVarValue(variable))
             break
         case "%":
-            result = input + (value || context.getVarValue(variable))
+            result = input + (value || this.getVarValue(variable))
             break
         }
         return result
@@ -68,29 +68,29 @@ export default {
      * @Pipe\param outputTrue {Pipe|pipe-func} - Then data flow will be forwarded to %s if the comparison result is true
      * @Pipe\param outputFalse {Pipe|pipe-func} - or to %s if the comparison result is false (if left empty data flow will stop)
      */
-    compare: ({ operator, value, variable, outputTrue, outputFalse }, input, context) => {
+    compare: function ({ operator, value, variable, outputTrue, outputFalse }, input) {
         let result
         switch (operator) {
         case "=":
-            result = input == (value || context.getVarValue(variable))
+            result = input == (value || this.getVarValue(variable))
             break
         case ">":
-            result = input > (value || context.getVarValue(variable))
+            result = input > (value || this.getVarValue(variable))
             break
         case "<":
-            result = input < (value || context.getVarValue(variable))
+            result = input < (value || this.getVarValue(variable))
             break
         case ">=":
-            result = input >= (value || context.getVarValue(variable))
+            result = input >= (value || this.getVarValue(variable))
             break
         case "<=":
-            result = input <= (value || context.getVarValue(variable))
+            result = input <= (value || this.getVarValue(variable))
             break
         case "!=":
-            result = input != (value || context.getVarValue(variable))
+            result = input != (value || this.getVarValue(variable))
             break
         }
-        return result ? context.invoke(outputTrue, input) : context.invoke(outputFalse, input)
+        return result ? this.invoke(outputTrue, input) : this.invoke(outputFalse, input)
     },
 
     /**
@@ -101,7 +101,7 @@ export default {
      * @Pipe\param [to] {Free} - a
      * @Pipe\param [inputAsMax] {Free} - (default false)
      */
-    random: ({ from = 0, to = 1, inputAsMax = false }, input) => {
+    random: function ({ from = 0, to = 1, inputAsMax = false }, input) {
         return (Math.random() * (inputAsMax ? parseFloat(input) : parseFloat(to))) + from
     },
 
@@ -111,7 +111,7 @@ export default {
      * @Pipe\type pipe-native
      * @Pipe\param [mode] {OneOf[round,up,down]} - a
      */
-    round: ({ mode = "round" }, input) => {
+    round: function ({ mode = "round" }, input) {
         const modeMap = {
             "round": "round",
             "up": "ceil",

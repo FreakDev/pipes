@@ -12,10 +12,10 @@ export default {
      * often used to start a sequence
      * @Pipe\param value - %s will be outputed by the the pipe
      */
-    dataEmitter: ({value}) => {
+    dataEmitter: function ({value}) {
         return value
     },
-    
+
     /**
      * @PipeDEF
      * @Pipe\name write
@@ -23,16 +23,16 @@ export default {
      * @Pipe\description write the input value into a variable
      * @Pipe\param name {Pipe|pipe-var} - will write the input value into box %s, and output the same value as input
      */
-    write: ({ name }, input, context) => {        
+    write: function ({ name }, input) {
         try {
-            context.setVarValue(name, input)
+            this.setVarValue(name, input)
             return input
         } catch (e) {
             console.warn (e)
         }
     },
 
-    
+
     /**
      * @PipeDEF
      * @Pipe\name read
@@ -40,17 +40,17 @@ export default {
      * @Pipe\description read a variable value
      * @Pipe\param name {Pipe|pipe-var} - will output the content of the box named %s or (if left empty) the inputed name
      */
-    read: ({ name }, input, context) => {
+    read: function ({ name }, input) {
         let searchedName = name || input
-        
+
         try {
-            return context.getVarValue(searchedName)
+            return this.getVarValue(searchedName)
         } catch (e) {
             console.warn (e)
         }
     },
 
-    
+
     /**
      * @PipeDEF
      * @Pipe\name forward
@@ -58,8 +58,8 @@ export default {
      * @Pipe\description forward to a another pipe (data feed is broken)
      * @Pipe\param identifier {Pipe|pipe-func} - the next pipe to be executed will be %s or will be the inputed one
      */
-    forward: ({ identifier }, input, context) => {
-        return context.invoke(identifier || input)
+    forward: function ({ identifier }, input) {
+        return this.invoke(identifier || input)
     },
 
     /**
@@ -69,8 +69,8 @@ export default {
      * @Pipe\description invoke a function (data feed is preserved)
      * @Pipe\param identifier {Pipe|pipe-func} - will output to %s the value recieved as input
      */
-    invoke: ({ identifier }, input, context) => {
-        return context.invoke(identifier, input)
+    invoke: function ({ identifier }, input) {
+        return this.invoke(identifier, input)
     },
 
     /**
@@ -78,12 +78,12 @@ export default {
      * @Pipe\name hold
      * @Pipe\type pipe-native
      * @Pipe\description hold the data feed for a given amount of time
-     * @Pipe\param [timeValue] {Free} - The data flow will be hold during %s ms 
+     * @Pipe\param [timeValue] {Free} - The data flow will be hold during %s ms
      * @Pipe\param [varValue] {Free} - if previous field left empty, waiting time will be the number store in the box %s
      */
-    hold: ({ timeValue, varValue }, input, context) => {
-        return new Promise(resolve => {
-            setTimeout(() => resolve(input), timeValue || context.getVarValue(varValue))
+    hold: function ({ timeValue, varValue }, input) {
+        return new Promise(resolve =>  {
+            setTimeout(() => resolve(input), timeValue || this.getVarValue(varValue))
         })
     },
 
@@ -92,10 +92,10 @@ export default {
      * @Pipe\name log
      * @Pipe\type pipe-native
      * @Pipe\description log to console
-     * @Pipe\param [before] {Free} - will print %s before input 
+     * @Pipe\param [before] {Free} - will print %s before input
      * @Pipe\param [after] {Free} - then %s after. will output the same as inputed
      */
-    log: ({ before, after }, input) => {
+    log: function ({ before, after }, input) {
         let params = []
         before && params.push(before)
         params.push(input)

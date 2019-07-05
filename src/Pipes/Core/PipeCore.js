@@ -19,7 +19,7 @@ const LIB = {
 export const MODE_DEBUG = "debug"
 export const MODE_PROD = "prod"
 
-export default class PipeCore 
+export default class PipeCore
 {
     _pipeFactory
 
@@ -47,7 +47,7 @@ export default class PipeCore
         this._debugger && this._debugger.program_started()
         return this._program.run()
             .then(() => {
-                this._debugger && this._debugger.program_stopped() 
+                this._debugger && this._debugger.program_stopped()
             })
     }
 
@@ -58,16 +58,16 @@ export default class PipeCore
 
     _compilePipe(context, debug = false, pipe) {
         let fn = null
-            
+
         if (pipe.type !== PIPE_NATIVE) {
             fn = pipe.run.bind(pipe)
         }
-        
+
         if (!fn) {
-            fn = this._resolveNS(pipe.alias || pipe.name, LIB).bind(global, pipe.params || {})
+            fn = this._resolveNS(pipe.alias || pipe.name, LIB).bind(context, pipe.params || {})
         }
-        
-        return !debug ? 
+
+        return !debug ?
             (input) => {
                 return fn(input, context)
             }

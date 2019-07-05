@@ -16,7 +16,7 @@ export default {
      * @Pipe\param question {Free} - a
      * @Pipe\output {String}
      */
-    readInput: ({ useParam = true, question }, input) => {
+    readInput: function ({ useParam = true, question }, input) {
         return new Promise(resolve => {
             const rl = readline.createInterface({
                 input: process.stdin,

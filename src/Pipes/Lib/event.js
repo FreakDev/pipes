@@ -7,10 +7,10 @@ export default {
      * @Pipe\param eventName -
      * @Pipe\param forward -
      */
-    listen: ({ eventName, forward }, input, context) => {
+    listen: function ({ eventName, forward }, input) {
         return new Promise((resolve => {
             window.setTimeout(function () {
-                resolve(context.invoke(forward))
+                resolve(this.invoke(forward))
             }, 1000)
         }))
     }

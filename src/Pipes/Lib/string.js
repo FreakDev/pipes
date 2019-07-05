@@ -7,14 +7,14 @@ export default {
      * @PipeDEF
      * @Pipe\name concat
      * @Pipe\type pipe-native
-     * @Pipe\description concatenate two strings together 
+     * @Pipe\description concatenate two strings together
      * @Pipe\param withString {Free} - This pipe will output the input value concatenate with %s or (if left empty)
-     * @Pipe\param withVar {Pipe|pipe-var} - the value from the box %s 
+     * @Pipe\param withVar {Pipe|pipe-var} - the value from the box %s
      * @Pipe\param [isBefore] {OneOf[before,after]} -  placed %s it
      */
-    concat: ({ withString, withVar, isBefore = "after" }, input, context) => {
+    concat: function ({ withString, withVar, isBefore = "after" }, input) {
         const IS_BEFORE = isBefore === "before"
-        const stringToConcat = withString || context.getVarValue(withVar)
+        const stringToConcat = withString || this.getVarValue(withVar)
         return "" + (IS_BEFORE ? stringToConcat : "") + input + (IS_BEFORE ? "" : stringToConcat)
     },
 
@@ -24,23 +24,23 @@ export default {
      * @Pipe\type pipe-native
      * @Pipe\description output the charachter from the string (parameter) at inputed position (string starts at 0)
      * @Pipe\param stringValue {Free} - Will output the character at inputed position from the string %s or (if left empty)
-     * @Pipe\param varValue {Pipe|pipe-var} - the one from the box %s 
+     * @Pipe\param varValue {Pipe|pipe-var} - the one from the box %s
      */
-    charAt: ({ stringValue, varValue }, input, context) => {
-        return (stringValue || context.getVarValue(varValue))[input]
+    charAt: function ({ stringValue, varValue }, input) {
+        return (stringValue || this.getVarValue(varValue))[input]
     },
 
     /**
      * @PipeDEF
      * @Pipe\name subString
      * @Pipe\type pipe-native
-     * @Pipe\description substract a part of a string 
+     * @Pipe\description substract a part of a string
      * @Pipe\param stringValue {Free} - Will output a sub-string of the string %s or (if left empty)
-     * @Pipe\param varValue {Pipe|pipe-var} - the one from the box %s, 
+     * @Pipe\param varValue {Pipe|pipe-var} - the one from the box %s,
      * @Pipe\param from {Pipe|pipe-var} - taken from position %s (if negative starts from the end of the string), and on inputed length
      */
-    subString: ({ stringValue, varValue, from }, input, context) => {
-        (stringValue || context.getVarValue(varValue)).substr(from, input)
-        return 
+    subString: function ({ stringValue, varValue, from }, input) {
+        (stringValue || this.getVarValue(varValue)).substr(from, input)
+        return
     }
 }
