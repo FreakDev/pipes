@@ -324,6 +324,7 @@ export default class Main extends React.Component {
         context.pipes = __removePipe(context.pipes, pipe)
 
         this.setState({
+            currentPath: this.state.currentPath.slice(0, -1),
             program: newProgram,
         })
     }
@@ -478,7 +479,6 @@ export default class Main extends React.Component {
                         clipboard: __copyTreeStructure(this.state.program, this.state.selected)
                     })
                     if (keyCombo.indexOf(KEY_X) === 1) {
-                        const activePipe = this.resolveCurrentPath(true)
                         const newProgram = { ...this.state.program },
                             base = __resolvePath(newProgram, __dir(this.state.currentPath).slice(0, -1))
                         this.state.selected.forEach(s => {
@@ -487,8 +487,8 @@ export default class Main extends React.Component {
                         })
                         this.setState({
                             program: newProgram,
-                            selected: [],
-                            clipboard: __copyTreeStructure(this.state.program, this.state.selected)
+                            currentPath: this.state.currentPath.slice(0, -1),
+                            selected: []
                         })
                     }
                 } else if (keyCombo.indexOf(KEY_V) === 1) {
