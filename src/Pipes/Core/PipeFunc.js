@@ -46,7 +46,7 @@ export default class PipeFunc extends Pipe {
 
     }
 
-    run(input) {
+    run(input, context) {
         if (!this.length)
             this._value.forEach(e => this._add(this._pipeFactory.build(e, this, this._runner), e.type !== PIPE_NATIVE))
         let main = "main"
@@ -55,11 +55,25 @@ export default class PipeFunc extends Pipe {
             main = chainHeads[0].name
         }
 
-        try {
+        const variables = this._find((p) => p.type === PIPE_VAR, this, true)
+        const variableInitialValue = {}
+        variables.forEach((variable) => {
+            variableInitialValue[variable.name] = variable.value
+            if (this.params[variable.name]) {
+                variable.value = context.getVarValue(this.params[variable.name])
+            }
+        })
+
+        // try {
             return this._invoke(main, input)
-        } catch (e) {
-            throw Error("Invalid Pipe : several chains or pipes and none called \"main\" in \"" + this.name + "\" (" + this.id + ") run failed with message " + e)   
-        }
+                .then(() => {
+                    variables.forEach((variable) => {
+                        variable.value = variableInitialValue[variable.name]
+                    })
+                })
+        // } catch (e) {
+        //     throw Error("Invalid Pipe : several chains or pipes and none called \"main\" in \"" + this.name + "\" (" + this.id + ") run failed with message " + e)
+        // }
     }
 
     _invoke(callable, input) {
@@ -144,8 +158,8 @@ export default class PipeFunc extends Pipe {
             if (Object.keys(this._index).indexOf(key) !== -1) {
                 throw Error(`Key ${key} already exists`)
             }
-    
-            this._index[key] = this._storage.length    
+
+            this._index[key] = this._storage.length
         }
         this._storage.push(element)
     }

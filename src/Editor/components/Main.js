@@ -16,11 +16,13 @@ export const PIPE_TYPE_FUNC = 'pipe-func'
 export const PIPE_TYPE_NATIVE = 'pipe-native'
 export const PIPE_TYPE_VAR = 'pipe-var'
 
+export const EDITOR_PARAM_PREFIX = "#EDITOR#_"
+
 const PIPE_FUNC_DEF = {
     "type":PIPE_TYPE_FUNC,
     "description":"a pipe",
     "params":{
-        "name":{
+        [EDITOR_PARAM_PREFIX + "name"]:{
             "type":"Free",
             "optional":false,
             "description":"You may reference to this pipe with \'%s\' (choose it wisely)"
@@ -163,16 +165,22 @@ const __copyTreeStructure = (treeSrc, ids) => {
 
 const __addPipe = (base, pipe, connectedToId = null) => {
 
-    if (pipe.type === PIPE_TYPE_FUNC || pipe.type === PIPE_TYPE_VAR) {
+    if (pipe.type === PIPE_TYPE_VAR) {
         let params = pipe.params
         delete pipe.params
-        pipe = {
-            ...pipe,
-            ...params,
+        let value
+        Object.assign(pipe, params)
+        
+        value = pipe.value
+        delete pipe.value
+        pipe.params = Object.assign(pipe.params || {}, { value })
+        
+    } else if (pipe.type === PIPE_TYPE_FUNC) {
+        if (pipe.params[EDITOR_PARAM_PREFIX + "name"]) {
+            pipe.name = pipe.params[EDITOR_PARAM_PREFIX + "name"]
+            delete pipe.params[EDITOR_PARAM_PREFIX + "name"]
         }
-        if (pipe.type === PIPE_TYPE_FUNC) {
-            pipe.pipes = pipe.pipes || []
-        }
+        pipe.pipes = pipe.pipes || []
     }
 
     if (pipe.pipes)
@@ -534,7 +542,7 @@ export default class Main extends React.Component {
         let currentActive = this.resolveCurrentPath(),
             currentActiveId = typeof currentActive === "object" ? currentActive.id : null
 
-        const defs = { ...PIPES_DEFINITIONS, pipe: PIPE_FUNC_DEF, var: PIPE_VAR_DEF }
+        const defs = { ...PIPES_DEFINITIONS, pipe: PIPE_FUNC_DEF, box: PIPE_VAR_DEF }
 
         const buildPipeInScope = () => {
             const pipesInScope = []

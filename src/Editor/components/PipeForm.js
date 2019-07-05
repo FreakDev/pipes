@@ -4,6 +4,7 @@ import uuid from "uuid/v4"
 import LookUpField from "./formFields/LookUpField"
 import FreeField from "./formFields/FreeField"
 import OneOfField from "./formFields/OneOfField"
+import { PIPE_TYPE_FUNC, PIPE_TYPE_VAR, EDITOR_PARAM_PREFIX } from './Main';
 
 
 export const MODE_CREATE = "mode-create"
@@ -86,7 +87,7 @@ export default class PipeForm extends React.Component {
             return v.name === "" && v.type === "" && Object.keys(v.params).length === 0
         }
 
-        const specToCheck = this.props.value ? this.props.pipesDefs[this.props.value.name].params : this.state.pipeSpec
+        const specToCheck = this.getCurrentSpec()
 
         const optionalFieldCheck = specToCheck ?
             Object.keys(specToCheck).map(specName => {
@@ -95,6 +96,39 @@ export default class PipeForm extends React.Component {
             : true
 
         return !isEmpty() || optionalFieldCheck
+    }
+
+    getCurrentSpec() {
+        let currentSpec = this.state.pipeSpec
+        let value = this.props.value
+        if (value) {
+            if (this.props.pipesDefs[value.name]) {
+                currentSpec = pipesDefs[value.name].params
+            }
+            if (value.type === PIPE_TYPE_FUNC) {
+                const vars = value.pipes.filter(p => p.type === PIPE_TYPE_VAR)
+                currentSpec = {}
+                vars.forEach(variable => {
+                    currentSpec[variable.name] = {
+                        "type": "Pipe",
+                        "pipe_type": PIPE_TYPE_VAR,
+                        "optional": true,
+                        "description": "use box %s to feed pipe parameter '" + variable.name + "'"
+                    }
+                });
+            }
+
+            if (value.type === PIPE_TYPE_VAR) {
+                currentSpec = {
+                    value: {
+                        "type":"Free",
+                        "optional": true,
+                        "description": "Initial box value : %s"
+                    }
+                }
+            }
+        }
+        return currentSpec        
     }
 
     resetSpec() {
@@ -109,11 +143,13 @@ export default class PipeForm extends React.Component {
         let descriptionParts = spec[param].description ? spec[param].description.split('%s') : []
 
         const buildField = (type, spec, props) => {
+            const paramDisplay = param.indexOf(EDITOR_PARAM_PREFIX) === 0 ? param.substr(EDITOR_PARAM_PREFIX.length) : param
+
             if (type.indexOf("Free") === 0) {
-                return <FreeField key={ "pipe_form_ipnut" } { ...props } placeholder={ "[" + param + "]" } />
+                return <FreeField key={ "pipe_form_ipnut" } { ...props } placeholder={ "[" + paramDisplay + "]" } />
             } else if (type.indexOf("OneOf") === 0) {
                 const availableChoices = spec.choices
-                return <OneOfField key={ "pipe_form_ipnut" } { ...props } availableValues={ availableChoices } placeholder={ "[" + param + "]" }  />
+                return <OneOfField key={ "pipe_form_ipnut" } { ...props } availableValues={ availableChoices } placeholder={ "[" + paramDisplay + "]" }  />
             } else if (type.indexOf("Pipe") === 0) {
                 return <LookUpField
                     key={ "pipe_form_ipnut" }
@@ -124,7 +160,7 @@ export default class PipeForm extends React.Component {
                     }}
                     renderSuggestion={ suggestion => suggestion.name }
                     extractValueFromSuggestion={ suggestion => suggestion.name }
-                    placeholder={ "[" + param + "]" }
+                    placeholder={ "[" + paramDisplay + "]" }
                 />
             }
         }
@@ -147,11 +183,11 @@ export default class PipeForm extends React.Component {
 
     render () {
         const { value, mode, pipesDefs, label, onRemove } = this.props
-        const { pipeSpec, fieldValues } = this.state
+        const { fieldValues } = this.state
 
         const connectedCheckId = "connected_checkbox_" + uuid()
-        const specToDisplay = value ? pipesDefs[value.name] ? pipesDefs[value.name].params : pipeSpec : pipeSpec
-
+        const specToDisplay = this.getCurrentSpec()
+        
         return (
             <fieldset>
                 {
@@ -172,7 +208,7 @@ export default class PipeForm extends React.Component {
                     specToDisplay ?
                         Object.keys(specToDisplay).map((paramName, k) => {
                             return <div key={ "pipe_form_param_" + k }>
-                                { this.renderParamField(paramName, specToDisplay, value ? value.params[paramName] : null) }
+                                { this.renderParamField(paramName, specToDisplay, value && value.params ? value.params[paramName] : null) }
                             </div>
                         })
                         : null
@@ -185,7 +221,9 @@ export default class PipeForm extends React.Component {
                         </div> ,
                         <input key={ "pipeform_button_2" } type="submit" onClick={ this.onSubmit } disabled={ !this.isValid() } value="Create" />
                     ]
-                        : <input type="button" onClick={ onRemove } value="Remove" />
+                    : [
+                        <input key={ "pipeform_button_2" } type="button" onClick={ onRemove } value="Remove" />
+                    ]
                 }
             </fieldset>
         )
