@@ -40,7 +40,7 @@ export default class MessageManager {
         return new Promise((resolve, reject) => {
             if (this.mode === MODE_WEB) {
                 if (!this._runnerWindow)
-                    this._createChildWindow(dimension)
+                    return this._createChildWindow(dimension)
                         .then(resolve)
             } else {
                 if (!this._wsClient)
