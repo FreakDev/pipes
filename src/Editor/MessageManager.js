@@ -37,16 +37,21 @@ export default class MessageManager {
     }
 
     start(dimension = {}) {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             if (this.mode === MODE_WEB) {
                 if (!this._runnerWindow)
                     this._createChildWindow(dimension)
                         .then(resolve)
             } else {
                 if (!this._wsClient)
-                    this._createWebSocketClient()
+                    return this._createWebSocketClient()
                         .then(resolve)
+                else if (!this._wsClient.connected) {
+                    alert("No runner connecter - connect one and relaunch")
+                }
             }
+
+            reject()
         })
     }
 
@@ -66,10 +71,11 @@ export default class MessageManager {
         if (this.mode === MODE_WEB) {
             this._runnerWindow && this._runnerWindow.postMessage(d, "*")
         } else {
-            if (!this._wsClient.connected) {
+            if (this._wsClient && this._wsClient.connected) {
+                this._wsClient.postMessage(d)
+            } else {
                 alert("No runner client found")
             }
-            this._wsClient && this._wsClient.postMessage(d)
         }
     }
 
@@ -106,6 +112,9 @@ export default class MessageManager {
             this._wsClient = new WebsocketClient(I_AM_EDITOR)
             this._wsClient.connect(/* same url as served page */).then(() => {
                 this._setup()
+                if (!this._wsClient.connected) {
+                    alert("No runner client found")
+                }    
                 resolve()
             })
         })

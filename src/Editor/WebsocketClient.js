@@ -4,6 +4,8 @@ export const I_AM_RUNNER = "Runner"
 export const I_AM_EDITOR = "Editor"
 
 const MESSAGE_RUNNER_CONNECTED = "RunnerConnected"
+const MESSAGE_RUNNER_NOT_CONNECTED = "RunnerNotConnected"
+const MESSAGE_CLOSING = "Closing"
 
 export default class WebsocketClient {
 
@@ -28,7 +30,6 @@ export default class WebsocketClient {
         return new Promise((resolve) => {
             this._socket = io(server)
 
-            this._socket.on('message', this.onMessage.bind(this))
             this._socket.on('disconnect', () => {
                 this._connectedToServer = false
                 this._connectedToRunner = false
@@ -39,20 +40,39 @@ export default class WebsocketClient {
                     name: "IAm" + this._iAm
                 })
                 this._connectedToServer = true
-                resolve()
+
+                if (this._iAm === I_AM_EDITOR) {
+                    const onInitMessage = (e) => {
+                        if (e.name === MESSAGE_RUNNER_CONNECTED || e.name === MESSAGE_RUNNER_NOT_CONNECTED) {
+                            if (e.name === MESSAGE_RUNNER_CONNECTED) {
+                                this._connectedToRunner = true
+                                this._socket.off("message", onInitMessage)
+                            } else {
+                                this._connectedToRunner = false
+                            }
+                        }
+                        this._socket.off("message", onInitMessage)
+                        this._socket.on('message', this.onMessage.bind(this))
+                        resolve()
+                    }
+                    this._socket.on("message", onInitMessage)    
+                } else {
+                    this._socket.on('message', this.onMessage.bind(this))
+                    resolve()
+                }
             })
         })
     }
 
     onMessage(e) {
-        if (e.name === MESSAGE_RUNNER_CONNECTED) {
-            this._connectedToRunner = true
-        } else if (e.name === MESSAGE_CLOSING) {
+        if (e.name === MESSAGE_CLOSING) {
             this._connectedToRunner = false
+        } else if (e.name === MESSAGE_RUNNER_CONNECTED) {
+            this._connectedToRunner = true
         } else {
             this._eventListener.forEach(listener => {
                 listener.call(this, e)
-            });
+            })    
         }
     }
 

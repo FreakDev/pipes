@@ -60,6 +60,7 @@ class RunPanel extends React.Component {
         if (!this.msgManager.isRunning) {
             this.msgManager.start().then(runProgram)
         } else {
+            this.sendMessage(MESSAGE_LOAD, { program: this.props.program })
             this.sendMessage(MESSAGE_RUN, { mode })
         }
     }
