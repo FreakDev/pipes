@@ -493,7 +493,19 @@ export default class Main extends React.Component {
                     }
                 } else if (keyCombo.indexOf(KEY_V) === 1) {
                     let prev = null
+                    const currentDir = this.resolveCurrentPath(true)
                     __sortInChainOrder(this.state.clipboard).forEach(p => {
+                        if (p.type === PIPE_TYPE_FUNC && currentDir.find(e => e.name === p.name)) {
+                            let i = 1, name = p.name
+                            do {
+                                if (name.slice(name.lastIndexOf("_")).match(/_[0-9]+/)) {
+                                    name = name.slice(0, name.lastIndexOf("_"))
+                                }
+                                name += ("_" + i)
+                                i++
+                            } while(currentDir.find(e => e.name === name))
+                            p.name = name
+                        }
                         this.addPipe(p, true, prev ? prev : null)
                         prev = p.id
                     })
@@ -536,7 +548,7 @@ export default class Main extends React.Component {
                 pipesInScope.push(...currentDir.filter(p => [PIPE_TYPE_FUNC, PIPE_TYPE_VAR].indexOf(p.type) !== -1))
             } while ( path.length > 1)
 
-            return pipesInScope  
+            return pipesInScope
         }
 
         return (
