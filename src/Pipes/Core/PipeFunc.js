@@ -39,6 +39,7 @@ export default class PipeFunc extends Pipe {
         
         this._context = {
             invoke: this._invoke.bind(this),
+            forward: this._runFrom.bind(this),
             getVarValue: this._getVarValue.bind(this),
             setVarValue: this._setVarValue.bind(this),
             addVarListener: this._addVarListener.bind(this),
@@ -51,7 +52,7 @@ export default class PipeFunc extends Pipe {
         if (!this.length)
             this.value.forEach(e => this._add(this._pipeFactory.build(e, this, this._runner), e.type !== PIPE_NATIVE))
         let main = "main"
-        const chainHeads = this._filter(p => !p.previous)
+        const chainHeads = this._findHeads()
         if (chainHeads.length === 1) {
             main = chainHeads[0].name
         }
@@ -66,7 +67,7 @@ export default class PipeFunc extends Pipe {
         })
 
         // try {
-            return this._invoke(main, input)
+            return this._runFrom(main, input)
                 .then(() => {
                     variables.forEach((variable) => {
                         variable.value = variableInitialValue[variable.name]
@@ -77,16 +78,18 @@ export default class PipeFunc extends Pipe {
         // }
     }
 
+    _runFrom(callable, input) {
+        let pipe = this._find(pipe => pipe.name === callable)
+        if (pipe) {
+            return this._doRun(this._buildAndCompile(pipe), input)
+        }
+    }
+
     _invoke(callable, input) {
         if (typeof callable === 'string') {
-            let pipe = this._find(pipe => pipe.name === callable)
-            if (pipe) {
-                return this._doRun(this._buildAndCompile(pipe), input)
-            }
-        } else if ([PIPE_NATIVE, PIPE_FUNC].indexOf(callable.type) !== -1) {
-            return this._doRun(this._compile([callable]), input)
+            callable = this._find(pipe => pipe.name === callable)
         }
-        throw Error(`Error : ${ callable } is not callable`)
+        return callable && this._doRun(this._compile([callable]), input)
     }
 
     _getVarValue(varName) {
@@ -144,6 +147,14 @@ export default class PipeFunc extends Pipe {
 
     _compile(pipes) {
         return this._runner.compile(pipes, this._context)
+    }
+
+    _findHeads(name = "") {
+        const chainHeads = this._filter(p => !p.previous)
+        if (name) {
+            return chainHeads.find(p => p.name === name)
+        }
+        return chainHeads
     }
 
     _find(searchCallback, thisArg = this, disableLookUp = false) {

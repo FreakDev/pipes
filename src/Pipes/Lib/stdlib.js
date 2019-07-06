@@ -55,18 +55,18 @@ export default {
      * @PipeDEF
      * @Pipe\name forward
      * @Pipe\type pipe-native
-     * @Pipe\description forward to a another pipe (data feed is broken)
+     * @Pipe\description forward data feed to a another pipe
      * @Pipe\param identifier {Pipe|pipe-func} - the next pipe to be executed will be %s or will be the inputed one
      */
     forward: function ({ identifier }, input) {
-        return this.invoke(identifier || input)
+        this.forward(identifier, input)
     },
 
     /**
      * @PipeDEF
      * @Pipe\name invoke
      * @Pipe\type pipe-native
-     * @Pipe\description invoke a function (data feed is preserved)
+     * @Pipe\description call another pipe, but only it. If any, its chain will not be executed, its returned value will flow in the caller ouput
      * @Pipe\param identifier {Pipe|pipe-func} - will output to %s the value recieved as input
      */
     invoke: function ({ identifier }, input) {
