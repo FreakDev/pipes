@@ -103,7 +103,7 @@ export default class PipeForm extends React.Component {
         let value = this.props.value
         if (value) {
             if (this.props.pipesDefs[value.name]) {
-                currentSpec = pipesDefs[value.name].params
+                currentSpec = this.props.pipesDefs[value.name].params
             }
             if (value.type === PIPE_TYPE_FUNC) {
                 const vars = value.pipes.filter(p => p.type === PIPE_TYPE_VAR)

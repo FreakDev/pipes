@@ -36,6 +36,13 @@ class RunPanel extends React.Component {
             break
         case "pipe-called":
             console.log(msg.payload)
+            let path = ['pipes']
+            msg.payload.pipe.path.forEach(el => {
+                path.push({ id: el }, 'pipes')
+            });
+            path.push({ id: msg.payload.pipe.id })
+            // this.props.onDebuggerHighlight && 
+            this.props.onDebuggerHighlight(path)
             break
         }
     }

@@ -16,6 +16,10 @@ export default class PipeFunc extends Pipe {
 
     _parent
 
+    get parent() {
+        return this._parent
+    }
+
     _context
 
     _runner
@@ -79,7 +83,7 @@ export default class PipeFunc extends Pipe {
     }
 
     _runFrom(callable, input) {
-        let pipe = this._find(pipe => pipe.name === callable)
+        let pipe = this._find(pipe => pipe.name === callable, this, true)
         if (pipe) {
             return this._doRun(this._buildAndCompile(pipe), input)
         }
@@ -87,7 +91,7 @@ export default class PipeFunc extends Pipe {
 
     _invoke(callable, input) {
         if (typeof callable === 'string') {
-            callable = this._find(pipe => pipe.name === callable)
+            callable = this._find(pipe => pipe.name === callable, this, true)
         }
         return callable && this._doRun(this._compile([callable]), input)
     }

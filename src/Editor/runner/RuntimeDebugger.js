@@ -134,9 +134,21 @@ export default class RuntimeDebugger {
             this._paused = true
         }
 
+        const buildPath = () => {
+            let path = [],
+                current = payload.pipe
+            do {
+                path.unshift(current.id)
+                current = current.parent
+            } while (current)
+            return path.slice(1, -1)
+        }
+
+        const path = buildPath()
+
         this.emit(RUNTIME_PIPE_CALLED, {
             ...payload,
-            pipe: { id: payload.pipe.id, name: payload.pipe.name, params: payload.pipe.params }
+            pipe: { id: payload.pipe.id, name: payload.pipe.name, params: payload.pipe.params, path }
         })
 
     }

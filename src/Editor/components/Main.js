@@ -277,6 +277,8 @@ export default class Main extends React.Component {
         this.onKeyUp = this.onKeyUp.bind(this)
         this.onLoadProgram = this.onLoadProgram.bind(this)
 
+        this.onDebuggerHighlight = this.onDebuggerHighlight.bind(this)
+
     }
 
     onLoadProgram(program) {
@@ -525,6 +527,10 @@ export default class Main extends React.Component {
         }
     }
 
+    onDebuggerHighlight(path) {
+        this.navigateTo(path)
+    }
+
     resolveCurrentPath(digUntilLastFolder = false) {
         let path = this.state.currentPath.slice()
         if (digUntilLastFolder) {
@@ -559,7 +565,7 @@ export default class Main extends React.Component {
         return (
             <div className={ cssClasses.main } onKeyDown={ this.onKeyDown } onKeyUp={ this.onKeyUp } tabIndex="0">
                 <div className={ cssClasses.row_top }>
-                    <GenerateButton program={ program } />
+                    <GenerateButton onDebuggerHighlight={ this.onDebuggerHighlight } program={ program } />
                     <Menu onLoadProgram={ this.onLoadProgram } program={ program } />
                 </div>
                 <div className={ cssClasses.left_col }>
