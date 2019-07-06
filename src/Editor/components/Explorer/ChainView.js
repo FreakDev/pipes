@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 
 import Pipe from "./Pipe"
 
@@ -7,6 +7,9 @@ import css from "./ChainView.sass"
 const ChainView = ({ chain, active, selected, onSelectOne, onClickElseWhere, onDblClickElseWhere }) => {
     let groups
     
+    const [isMouseDown, setMouseDown] = useState(false)
+    const [wrapperCoord, setWrapperCoord] = useState({top: 10, left:10})
+
     groups = chain.filter((e) => !e.previous).map(head => {
         let group = [],
             current = head,
@@ -19,9 +22,17 @@ const ChainView = ({ chain, active, selected, onSelectOne, onClickElseWhere, onD
         return group
     })
         
+    const onMouseDown = () => setMouseDown(true)
+    const onMouseUp = () => setMouseDown(false)
+    const onMouseMove = (e) => {
+        if (isMouseDown) {
+            setWrapperCoord({left: wrapperCoord.left + e.movementX, top: wrapperCoord.top + e.movementY})
+        }
+    }
+
     return (
-        <div className={ css.chain_view } onClick={ onClickElseWhere } onDoubleClick={ onDblClickElseWhere }>
-            <div className={ css.wrapper_inner }>
+        <div className={ css.chain_view } onMouseDown={ onMouseDown } onMouseUp={ onMouseUp } onMouseMove={ onMouseMove } onClick={ onClickElseWhere } onDoubleClick={ onDblClickElseWhere }>
+            <div className={ css.wrapper_inner } style={ wrapperCoord }>
                 { 
                     groups.map( (group, k) => {
                         return (
