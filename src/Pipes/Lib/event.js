@@ -9,7 +9,7 @@ export default {
      */
     listen: function ({ eventName, forward }, input) {
         return new Promise((resolve => {
-            window.setTimeout(function () {
+            window.setTimeout(() => {
                 resolve(this.invoke(forward))
             }, 1000)
         }))
