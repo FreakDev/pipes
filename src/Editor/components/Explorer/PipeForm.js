@@ -4,7 +4,8 @@ import uuid from "uuid/v4"
 import LookUpField from "./formFields/LookUpField"
 import FreeField from "./formFields/FreeField"
 import OneOfField from "./formFields/OneOfField"
-import { PIPE_TYPE_FUNC, PIPE_TYPE_VAR, EDITOR_PARAM_PREFIX } from './Main';
+import { PIPE_TYPE_FUNC, PIPE_TYPE_VAR } from '../../../constants';
+import { EDITOR_PARAM_PREFIX } from '../../constants'
 
 
 export const MODE_CREATE = "mode-create"

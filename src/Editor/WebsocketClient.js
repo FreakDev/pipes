@@ -1,11 +1,13 @@
 import io from "socket.io-client"
 
-export const I_AM_RUNNER = "Runner"
-export const I_AM_EDITOR = "Editor"
-
-const MESSAGE_RUNNER_CONNECTED = "RunnerConnected"
-const MESSAGE_RUNNER_NOT_CONNECTED = "RunnerNotConnected"
-const MESSAGE_CLOSING = "Closing"
+import {
+    I_AM_RUNNER,
+    I_AM_EDITOR,
+    
+    MESSAGE_RUNNER_CONNECTED,
+    MESSAGE_RUNNER_NOT_CONNECTED,
+    MESSAGE_CLOSING    
+} from "../constants"
 
 export default class WebsocketClient {
 

@@ -1,7 +1,9 @@
 
 import RuntimeDebugger from "./RuntimeDebugger"
 
-const MESSAGE_CLOSING = "Closing"
+import { 
+    MESSAGE_CLOSING
+} from "../../constants"
 
 new RuntimeDebugger(() => {
     return new Promise((resolve) => {

@@ -1,19 +1,19 @@
 import React from "react"
-
 import uuid from "uuid/v4"
 
-import ChainView from "./ChainView"
-import PipeInspector from "./PipeInspector"
-import Menu from "./Menu"
-import TreeView from "./TreeView"
-import GenerateButton from "./GenerateButton"
-
-import PIPES_DEFINITIONS from "../../pipes-definitions.json"
-
-import cssClasses from "./Main.sass"
+import { __sortInChainOrder, __dir, __resolvePath } from "../utils"
 
 import { PIPE_TYPE_FUNC, PIPE_TYPE_VAR, PIPE_TYPE_NATIVE } from "../../constants";
 import { EDITOR_PARAM_PREFIX } from "../constants";
+
+import ChainView from "./Explorer/ChainView"
+import PipeInspector from "./Explorer/PipeInspector"
+import TreeView from "./Explorer/TreeView"
+
+import PIPES_DEFINITIONS from "../../pipes-definitions.json"
+
+import cssClasses from "./Explorer.sass"
+
 
 const PIPE_FUNC_DEF = {
     "type":PIPE_TYPE_FUNC,
@@ -147,17 +147,6 @@ const __findInTree = (tree, needleId) => {
 
 // deprecated stuff
 
-const __addPipe = (base, pipe, connectedToId = null) => {
-    throw "use reducer"
-}
-
-const __removePipe = (base, pipe) => {
-    throw "use reducer"
-}
-
-import { __sortInChainOrder, __dir, __resolvePath } from "../utils"
-
-
 const __cleanTree = (tree) => {
     // const dirtyTree = tree.pipes,
     //     idsMap = {}
@@ -177,7 +166,7 @@ const __cleanTree = (tree) => {
 
 // the component 
 
-export default class Main extends React.Component {
+export default class Explorer extends React.Component {
 
     state = {
         // program: INITIAL_PROGRAM,
@@ -200,14 +189,6 @@ export default class Main extends React.Component {
         this.navigateDown = this.navigateDown.bind(this)
         this.onKeyDown = this.onKeyDown.bind(this)
         this.onKeyUp = this.onKeyUp.bind(this)
-        this.onLoadProgram = this.onLoadProgram.bind(this)
-
-        this.onDebuggerHighlight = this.onDebuggerHighlight.bind(this)
-
-    }
-
-    onLoadProgram(program) {
-        this.props.loadProgram(program)
     }
 
     addPipe(pipe, connected, connectedTo = null) {        
@@ -408,10 +389,6 @@ export default class Main extends React.Component {
         }
     }
 
-    onDebuggerHighlight(path) {
-        this.navigateTo(path)
-    }
-
     resolveCurrentPath(digUntilLastFolder = false) {
         let path = this.state.currentPath.slice()
         if (digUntilLastFolder) {
@@ -446,10 +423,6 @@ export default class Main extends React.Component {
 
         return (
             <div className={ cssClasses.main } onKeyDown={ this.onKeyDown } onKeyUp={ this.onKeyUp } tabIndex="0">
-                <div className={ cssClasses.row_top }>
-                    <GenerateButton onDebuggerHighlight={ this.onDebuggerHighlight } program={ program } />
-                    <Menu onLoadProgram={ this.onLoadProgram } program={ program } />
-                </div>
                 <div className={ cssClasses.left_col }>
                     <TreeView
                         program={ program }

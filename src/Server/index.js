@@ -18,10 +18,12 @@ const sockets = {
     editor: []
 }
 
-const MESSAGE_I_AM = "IAm"
-const MESSAGE_CLOSING = "Closing"
-const MESSAGE_RUNNER_CONNECTED = "RunnerConnected"
-const MESSAGE_RUNNER_NOT_CONNECTED = "RunnerNotConnected"
+const {
+    MESSAGE_I_AM,
+    MESSAGE_CLOSING,
+    MESSAGE_RUNNER_CONNECTED,
+    MESSAGE_RUNNER_NOT_CONNECTED
+} = require ("../constants")
 
 io.on("connection", function(socket){
     console.log("a user connected which is a...   ")

@@ -8,9 +8,9 @@ import {
     MESSAGE_RUN,
     MODE_STEP,
     MODE_TURTLE
-} from "../runner/RuntimeDebugger"
+} from "../../constants"
 
-import MessageManager, { MODE_WEB, MODE_NODE } from "../MessageManager"
+import MessageManager, { MODE_WEB, MODE_NODE } from "../../MessageManager"
 
 class RunPanel extends React.Component {
 

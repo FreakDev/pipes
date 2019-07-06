@@ -1,29 +1,23 @@
 import React from "react"
-import { connect } from 'react-redux'
 
-import {
-    addPipeAction,
-    savePipeAction,
-    removePipeAction,
-    savePropAction,
-    loadAction,
-    cleanSubTreeAction
-} from "../store/actions/program"
+import Toolbar from "../containers/Toolbar"
+import Explorer from "../containers/Explorer"
+import Runner from "../containers/Runner"
 
-import Main from "./Main"
+import css from "./Editor.sass"
 
-const Editor = connect(
-    state => ({
-        program: state.program,
-    }),
-    dispatch => ({
-        addPipe: (pipe, connected, connectedTo, currentPath) => dispatch(addPipeAction(pipe, connected, connectedTo, currentPath)), 
-        savePipe: (old, pipe, currentPath) => dispatch(savePipeAction(old, pipe, currentPath)), 
-        removePipe: (pipe, currentPath) => dispatch(removePipeAction(pipe, currentPath)), 
-        saveProp: (props, value) => dispatch(savePropAction(props, value)),
-        loadProgram: (program) => dispatch(loadAction(program)),
-        cleanSubTree: (program, path) => dispatch(cleanSubTreeAction(program, path))
-    })
-)(Main)
+const Editor = () => {
+    return (
+        <div className={ css.grid }>
+            <div className={ css.row_top }>
+                <Toolbar />
+            </div>
+            <div className={ css.row_main }>
+                <Explorer />
+                <Runner />
+            </div>
+        </div>
+    )
+}
 
 export default Editor

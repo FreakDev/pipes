@@ -1,21 +1,23 @@
 import PipeCore, { MODE_DEBUG } from "../../Pipes/Core/PipeCore"
 
-export const RUNTIME_PIPE_CALLED = "pipe-called"
-export const RUNTIME_EXECUTION_STOPPED = "execution-stopped"
-export const RUNTIME_EXECUTION_STARTED = "execution-started"
-export const RUNTIME_EXECUTION_IDLE = "execution-idle"
+import {
+    RUNTIME_PIPE_CALLED,
+    RUNTIME_EXECUTION_STOPPED,
+    RUNTIME_EXECUTION_STARTED,
+    RUNTIME_EXECUTION_IDLE
+} from "../../constants"
 
-export const MESSAGE_RUNNER_READY = "MessageRunnerReady"
-
-export const MESSAGE_LOAD = "MessageLoad"
-export const MESSAGE_START = "MessageStart"
-export const MESSAGE_PAUSE = "MessagePause"
-export const MESSAGE_RUN_ONE = "MessageRunOne"
-export const MESSAGE_RUN = "MessageRun"
-
-export const MODE_NORMAL = "normal"
-export const MODE_TURTLE = "turtle"
-export const MODE_STEP = "step"
+import {
+    MESSAGE_RUNNER_READY,
+    MESSAGE_LOAD,
+    MESSAGE_START,
+    MESSAGE_PAUSE,
+    MESSAGE_RUN_ONE,
+    MESSAGE_RUN,
+    MODE_NORMAL,
+    MODE_TURTLE,
+    MODE_STEP 
+} from "../constants"
 
 export default class RuntimeDebugger {
 
