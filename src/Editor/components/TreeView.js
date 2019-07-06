@@ -37,7 +37,7 @@ const TreeView = ({
     }
 
     const onValidateField = (value) => {
-        onChangeProgramName(["name"], value)
+        onChangeProgramName("name", value)
     }
 
     const listChild = (context, path, level = 0) => {

@@ -1,9 +1,20 @@
-import React from 'react'
+import React from "react"
 import ReactDOM from "react-dom"
-import Main from "./components/Main"
+import { Provider } from "react-redux"
 
-import cssClasses from './index.sass'
+import createStore from "./store/createStore"
 
-document.getElementById('root').classList.add(cssClasses.root)
+import Editor from "./components/Editor"
 
-ReactDOM.render(<Main />, document.getElementById('root'))
+import cssClasses from "./index.sass"
+
+const store = createStore()
+
+document.getElementById("root").classList.add(cssClasses.root)
+ReactDOM.render(
+    <Provider store={store}>
+        <Editor />
+    </Provider>
+    , 
+    document.getElementById("root")
+)

@@ -12,11 +12,8 @@ import PIPES_DEFINITIONS from "../../pipes-definitions.json"
 
 import cssClasses from "./Main.sass"
 
-export const PIPE_TYPE_FUNC = 'pipe-func'
-export const PIPE_TYPE_NATIVE = 'pipe-native'
-export const PIPE_TYPE_VAR = 'pipe-var'
-
-export const EDITOR_PARAM_PREFIX = "#EDITOR#_"
+import { PIPE_TYPE_FUNC, PIPE_TYPE_VAR, PIPE_TYPE_NATIVE } from "../../constants";
+import { EDITOR_PARAM_PREFIX } from "../constants";
 
 const PIPE_FUNC_DEF = {
     "type":PIPE_TYPE_FUNC,
@@ -47,12 +44,6 @@ const PIPE_VAR_DEF = {
     }
 }
 
-const KEY_SHIFT = 16
-const KEY_CTRL = 17
-const KEY_C = 67
-const KEY_V = 86
-const KEY_X = 88
-
 const INITIAL_PROGRAM = {
     id: uuid(),
     name: "",
@@ -60,27 +51,8 @@ const INITIAL_PROGRAM = {
     pipes: []
 }
 
-const __dir = (path) => {
-    let newPath = path.slice()
-    while(typeof newPath[newPath.length - 1] !== "string") newPath.pop()
-    return newPath
-}
 
-const __resolvePath = (context, path) => {
-    let base = context
-    for(let idx = 0, len = path.length; idx < len; idx++) {
-        let curPath = path[idx]
-        if (typeof curPath !== "string")
-        curPath = base.findIndex(e => e.id === curPath.id)
-
-        base = base[curPath]
-
-        if (base === undefined)
-            return undefined
-    }
-    return base
-}
-
+// navigate
 const __findInChain = (needleId, chain, from) => {
     let [found, path] = __findAfterInChain(needleId, chain, from)
 
@@ -130,6 +102,15 @@ const __findBeforeInChain = (needleId, chain, from) => {
     return [found, path]
 }
 
+
+
+// copy / paste
+const KEY_SHIFT = 16
+const KEY_CTRL = 17
+const KEY_C = 67
+const KEY_V = 86
+const KEY_X = 88
+
 const KEY_COMPO = [
     [KEY_CTRL, KEY_C],
     [KEY_CTRL, KEY_V],
@@ -150,111 +131,56 @@ const __checkPressedKeys = (currentKeyDown) => {
     })
 }
 
+const __copyTreeStructure = (treeSrc, ids) => {
+    return JSON.parse(JSON.stringify(ids.map(__findInTree.bind(this, treeSrc))))
+}
+
 const __findInTree = (tree, needleId) => {
     const flattenTree = (tree, base = []) => {
         tree.pipes.forEach(p => base.push(p) && p.pipes && flattenTree(p, base))
         return base
     }
-
     return flattenTree(tree).find(e => e.id === needleId)
 }
 
-const __copyTreeStructure = (treeSrc, ids) => {
-    return JSON.parse(JSON.stringify(ids.map(__findInTree.bind(this, treeSrc))))
-}
+
+
+// deprecated stuff
 
 const __addPipe = (base, pipe, connectedToId = null) => {
-
-    if (pipe.type === PIPE_TYPE_VAR) {
-        let params = pipe.params
-        delete pipe.params
-        let value
-        Object.assign(pipe, params)
-        
-        value = pipe.value
-        delete pipe.value
-        pipe.params = Object.assign(pipe.params || {}, { value })
-        
-    } else if (pipe.type === PIPE_TYPE_FUNC) {
-        if (pipe.params[EDITOR_PARAM_PREFIX + "name"]) {
-            pipe.name = pipe.params[EDITOR_PARAM_PREFIX + "name"]
-            delete pipe.params[EDITOR_PARAM_PREFIX + "name"]
-        }
-        pipe.pipes = pipe.pipes || []
-    }
-
-    if (pipe.pipes)
-        pipe.__dirty = true
-
-    pipe.id = uuid()
-
-    if (connectedToId) {
-        let currentPipe = base.find(p => p.id === connectedToId)
-        if (currentPipe.id) {
-            pipe.previous = currentPipe.id
-
-            let previouslyConnectedIndex = base.findIndex(p => p.previous === currentPipe.id)
-            if (previouslyConnectedIndex !== -1) {
-                base[previouslyConnectedIndex].previous = pipe.id
-            }
-        }
-    } else {
-        delete pipe.previous
-    }
-
-    base.push(pipe)
-
-    return base
+    throw "use reducer"
 }
 
 const __removePipe = (base, pipe) => {
-    let currentPathPos = base.findIndex(e => e.id === pipe.id)
-
-    if (base[currentPathPos].id === pipe.id) {
-        base = [...base.slice(0, currentPathPos), ...base.slice(currentPathPos + 1)]
-    }
-
-    let previouslyConnectedIndex = base.findIndex(p => p.previous === pipe.id)
-    if (previouslyConnectedIndex !== -1) {
-        base[previouslyConnectedIndex].previous = pipe.previous
-    }
-
-    return base
+    throw "use reducer"
 }
 
-const __sortInChainOrder = (pipes) => {
-    let chains = pipes.filter(p => {
-        return pipes.find(e => e.id === p.previous) === undefined
-    }).map(headPipe => {
-        let chain = [],
-            cur = headPipe
-        do {
-            chain.push(cur)
-            cur = pipes.find(p => p.previous === cur.id)
-        } while(cur)
-        return chain
-    })
-    return chains.reduce((p, c) => [...p, ...c], [])
-}
+import { __sortInChainOrder, __dir, __resolvePath } from "../utils"
+
 
 const __cleanTree = (tree) => {
-    const dirtyTree = tree.pipes,
-        idsMap = {}
-    tree.pipes = []
+    // const dirtyTree = tree.pipes,
+    //     idsMap = {}
+    // tree.pipes = []
 
-    __sortInChainOrder(dirtyTree).forEach(p => {
-        let previousId = p.id
-        tree.pipes = __addPipe(tree.pipes, p, (p.previous ? idsMap[p.previous] : null))
-        idsMap[previousId] = p.id
-    })
+    // __sortInChainOrder(dirtyTree).forEach(p => {
+    //     let previousId = p.id
+    //     tree.pipes = __addPipe(tree.pipes, p, (p.previous ? idsMap[p.previous] : null))
+    //     idsMap[previousId] = p.id
+    // })
 
-    delete tree.__dirty
+    // delete tree.__dirty
+    throw "use reducer"
+
 }
+
+
+// the component 
 
 export default class Main extends React.Component {
 
     state = {
-        program: INITIAL_PROGRAM,
+        // program: INITIAL_PROGRAM,
         currentPath: ['pipes'],
         selected: [],
         keysDown: [],
@@ -272,7 +198,6 @@ export default class Main extends React.Component {
         this.navigateTo = this.navigateTo.bind(this)
         this.navigateUp = this.navigateUp.bind(this)
         this.navigateDown = this.navigateDown.bind(this)
-        this.updateProgram = this.updateProgram.bind(this)
         this.onKeyDown = this.onKeyDown.bind(this)
         this.onKeyUp = this.onKeyUp.bind(this)
         this.onLoadProgram = this.onLoadProgram.bind(this)
@@ -282,60 +207,23 @@ export default class Main extends React.Component {
     }
 
     onLoadProgram(program) {
-        this.setState({
-            program
-        })
+        this.props.loadProgram(program)
     }
 
-    addPipe(pipe, connected, connectedTo = null) {
+    addPipe(pipe, connected, connectedTo = null) {        
+        this.props.addPipe(pipe, connected, connectedTo, this.state.currentPath)
 
-        let newProgram = { ...this.state.program },
-            currentActive = this.resolveCurrentPath(),
-            currentContainer = __dir(this.state.currentPath)
-
-        let base = __resolvePath(newProgram, currentContainer)
-        let connectedToId = connected ? (connectedTo ? connectedTo : (currentActive && currentActive.id)) : null
-        __addPipe(base, pipe, connectedToId)
-
-        this.setState({
-            program: newProgram,
-        })
-
-        this.focus(newProgram.pipes[newProgram.pipes.length -1].id)
+        this.focus(pipe.id)
     }
 
     savePipe(old, newProps) {
-        let newProgram = { ...this.state.program }
-
-        let context = __resolvePath(newProgram, __dir(this.state.currentPath))
-        let currentPathPos = context.findIndex(e => e.id === this.state.currentPath[this.state.currentPath.length - 1].id)
-
-        if (context[currentPathPos].id === old.id) {
-            let newPipe = {
-                ...old,
-                params: {
-                    ...old.params,
-                    ...newProps
-                }
-            }
-
-            context[currentPathPos] = newPipe
-        }
-
-        this.setState({
-            program: newProgram,
-        })
+        this.props.savePipe(old, newProps, this.state.currentPath)
     }
 
     onRemove(pipe) {
-        let newProgram = { ...this.state.program }
-
-        let context = __resolvePath(newProgram, __dir(this.state.currentPath).slice(0, -1))
-        context.pipes = __removePipe(context.pipes, pipe)
-
+        this.props.removePipe(pipe, this.state.currentPath)
         this.setState({
             currentPath: this.state.currentPath.slice(0, -1),
-            program: newProgram,
         })
     }
 
@@ -430,18 +318,19 @@ export default class Main extends React.Component {
         }
 
         // check path
-        const newActive = __resolvePath(this.state.program, newPath)
+        const newActive = __resolvePath(this.props.program, newPath)
         if (newActive === undefined) {
             return false
         }
 
         if (newActive.pipes && newActive.__dirty) {
-            const newProgram = { ...this.state.program },
-                newActive = __resolvePath(newProgram, newPath)
-            __cleanTree(newActive)
-            this.setState({
-                program: newProgram
-            })
+            console.warn("tree cleaning is disabled during refactoring")
+            // const newProgram = { ...this.props.program },
+            //     newActive = __resolvePath(newProgram, newPath)
+            // __cleanTree(newActive)
+            // this.setState({
+            //     program: newProgram
+            // })
         }
 
         if (newActive.pipes) {
@@ -454,16 +343,6 @@ export default class Main extends React.Component {
             currentPath: newPath
         })
         return true;
-    }
-
-    updateProgram(path, value) {
-        const newProgram = { ...this.state.program }
-
-        newProgram[path] = value
-
-        this.setState({
-            program: newProgram
-        })
     }
 
     onKeyDown(e) {
@@ -486,39 +365,41 @@ export default class Main extends React.Component {
             if (keyCombo)
                 if (keyCombo.indexOf(KEY_C) === 1 || keyCombo.indexOf(KEY_X) === 1) {
                     this.setState({
-                        clipboard: __copyTreeStructure(this.state.program, this.state.selected)
+                        clipboard: __copyTreeStructure(this.props.program, this.state.selected)
                     })
                     if (keyCombo.indexOf(KEY_X) === 1) {
-                        const newProgram = { ...this.state.program },
-                            base = __resolvePath(newProgram, __dir(this.state.currentPath).slice(0, -1))
-                        this.state.selected.forEach(s => {
-                            const p = base.pipes.find(p => p.id === s)
-                            p && (base.pipes = __removePipe(base.pipes, p))
-                        })
-                        this.setState({
-                            program: newProgram,
-                            currentPath: this.state.currentPath.slice(0, -1),
-                            selected: []
-                        })
+                        console.warn("cut is disabled during refacto")
+                        // const newProgram = { ...this.props.program },
+                        //     base = __resolvePath(newProgram, __dir(this.state.currentPath).slice(0, -1))
+                        // this.state.selected.forEach(s => {
+                        //     const p = base.pipes.find(p => p.id === s)
+                        //     p && (base.pipes = __removePipe(base.pipes, p))
+                        // })
+                        // this.setState({
+                        //     program: newProgram,
+                        //     currentPath: this.state.currentPath.slice(0, -1),
+                        //     selected: []
+                        // })
                     }
                 } else if (keyCombo.indexOf(KEY_V) === 1) {
-                    let prev = null
-                    const currentDir = this.resolveCurrentPath(true)
-                    __sortInChainOrder(this.state.clipboard).forEach(p => {
-                        if (p.type === PIPE_TYPE_FUNC && currentDir.find(e => e.name === p.name)) {
-                            let i = 1, name = p.name
-                            do {
-                                if (name.slice(name.lastIndexOf("_")).match(/_[0-9]+/)) {
-                                    name = name.slice(0, name.lastIndexOf("_"))
-                                }
-                                name += ("_" + i)
-                                i++
-                            } while(currentDir.find(e => e.name === name))
-                            p.name = name
-                        }
-                        this.addPipe(p, true, prev ? prev : null)
-                        prev = p.id
-                    })
+                    console.warn("paste is disabled during refacto")
+                    // let prev = null
+                    // const currentDir = this.resolveCurrentPath(true)
+                    // __sortInChainOrder(this.state.clipboard).forEach(p => {
+                    //     if (p.type === PIPE_TYPE_FUNC && currentDir.find(e => e.name === p.name)) {
+                    //         let i = 1, name = p.name
+                    //         do {
+                    //             if (name.slice(name.lastIndexOf("_")).match(/_[0-9]+/)) {
+                    //                 name = name.slice(0, name.lastIndexOf("_"))
+                    //             }
+                    //             name += ("_" + i)
+                    //             i++
+                    //         } while(currentDir.find(e => e.name === name))
+                    //         p.name = name
+                    //     }
+                    //     this.addPipe(p, true, prev ? prev : null)
+                    //     prev = p.id
+                    // })
                 }
 
             this.setState({
@@ -536,11 +417,12 @@ export default class Main extends React.Component {
         if (digUntilLastFolder) {
             path = __dir(path)
         }
-        return __resolvePath(this.state.program, path)
+        return __resolvePath(this.props.program, path)
     }
 
     render() {
-        const { program, currentPath, selected } = this.state
+        const { currentPath, selected } = this.state
+        const { program, saveProp } = this.props
 
         let currentActive = this.resolveCurrentPath(),
             currentActiveId = typeof currentActive === "object" ? currentActive.id : null
@@ -575,7 +457,7 @@ export default class Main extends React.Component {
                         activePath={ currentPath }
                         onSelect={ this.navigateTo }
                         onNavigateDown={ this.navigateDown }
-                        onChangeProgramName={ this.updateProgram } />
+                        onChangeProgramName={ saveProp } />
                 </div>
                 <div  className={ cssClasses.col_main }>
                     <ChainView
