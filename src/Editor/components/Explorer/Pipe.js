@@ -1,18 +1,29 @@
 import React from "react"
 
+import { PIPE_TYPE_FUNC, PIPE_TYPE_VAR } from "../../../constants"
+
 import css from "./Pipe.sass"
 
-const Pipe = ({ name, params, active, selected }) => {
-    const lastDotIndex = name.lastIndexOf(".") + 1
+const Pipe = ({ name, type, params, active, selected }) => {
+    const lastDotIndex = name.lastIndexOf(".")
+
+    const TYPE_LABELS = {
+        [PIPE_TYPE_FUNC]: "pipe",
+        [PIPE_TYPE_VAR]: "box",
+    }
+
     return (
         <div data-name={ name } className={ [
             css.pipe,
             selected ?  css.selected : "",
-            active ? css.active : ""
+            active ? css.active : "",
+            css[type.substr(type.lastIndexOf("-") + 1)]
         ].join(" ") }>
             <div className={ css.header }>
-                { lastDotIndex !== -1 ? <span className={ css.namespace }>{ name.substr(0, lastDotIndex) }</span> : null }
-                { lastDotIndex !== -1 ? name.substr(lastDotIndex) : name }
+                <span className={ css.namespace }>
+                    { lastDotIndex !== -1 ? name.substr(0, lastDotIndex) : TYPE_LABELS[type] }
+                </span>
+                { lastDotIndex !== -1 ? name.substr(lastDotIndex + 1) : name }
             </div>
             <div className={ css.body }>
                 {

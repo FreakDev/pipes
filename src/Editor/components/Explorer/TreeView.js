@@ -47,13 +47,19 @@ const TreeView = ({
                     let currentPath = [...path, { id: pipe.id }]
                     const pathAsString = JSON.stringify(currentPath)
                     return (
-                        <li className={ active === pipe.id ? cssClasses.active : "" } 
+                        <li className={ [active === pipe.id ? cssClasses.active : null, cssClasses[pipe.type.substr(pipe.type.lastIndexOf("-") + 1)]].join(" ") } 
+
                             data-path={ currentPath.map(JSON.stringify).join("/") } 
                             onClick={ onClick.bind(this, currentPath) } 
                             key={ "tree_view_" + level + "_" + k } >
                             { pipe.pipes ? 
-                                <span onClick={ toggleOpenPath.bind(this, currentPath) } >{ openedPath.indexOf(pathAsString) !== -1 ? "-" : "+" }</span>
-                                : null 
+                                <span onClick={ toggleOpenPath.bind(this, currentPath) } >
+                                    { openedPath.indexOf(pathAsString) !== -1 ? 
+                                        <i className="icofont-caret-down"></i>
+                                        : <i className="icofont-caret-right"></i>
+                                    }
+                                </span>
+                                : null
                             }
                             <span>{ pipe.name }</span>
                             { pipe.pipes ? 

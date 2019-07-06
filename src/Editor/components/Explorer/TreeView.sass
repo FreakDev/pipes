@@ -1,5 +1,28 @@
+@import "../../_variables.sass"
 
 .tree_view
 
-    li.active > span
-        font-weight: bold
+    & > ul 
+        padding: 0
+
+        ul
+            padding-left: 10px
+
+        li
+            list-style: none
+            margin: 0
+
+            &.active > span
+                font-weight: bold
+
+            &.native, &.var
+                padding-left: 16px
+
+            &.native
+                color: transparentize($native_color, 0.3)
+
+            &.var
+                color: transparentize($var_color, 0.3)
+
+            &.func
+                color: transparentize($func_color, 0.3)

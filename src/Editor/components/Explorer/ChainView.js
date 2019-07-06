@@ -35,18 +35,24 @@ const ChainView = ({ chain, active, selected, onSelectOne, onClickElseWhere, onD
             <div className={ css.wrapper_inner } style={ wrapperCoord }>
                 { 
                     groups.map( (group, k) => {
+                        const position = {
+                            left: 0,
+                            top: k * 200
+                        }
                         return (
-                            <ul key={ "chain_view_chain_" + k }>
-                                { group.map((pipe, id) => 
-                                    <li 
-                                        onClick={ (e) => { e.stopPropagation(); onSelectOne(pipe.id) } } 
-                                        key={ "chain_view_item_" + id }>
-                                        <Pipe 
-                                            {...pipe}
-                                            active={ pipe.id === active }
-                                            selected={ selected.indexOf(pipe.id) !== -1 } />
-                                    </li>) }
-                            </ul>
+                            <div className={ css.chain } style={ position }>
+                                <ul key={ "chain_view_chain_" + k }>
+                                    { group.map((pipe, id) => 
+                                        <li 
+                                            onClick={ (e) => { e.stopPropagation(); onSelectOne(pipe.id) } } 
+                                            key={ "chain_view_item_" + id }>
+                                            <Pipe 
+                                                {...pipe}
+                                                active={ pipe.id === active }
+                                                selected={ selected.indexOf(pipe.id) !== -1 } />
+                                        </li>) }
+                                </ul>
+                            </div>
                         )
                     }) 
                 }
