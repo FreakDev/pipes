@@ -14,12 +14,6 @@ export default class PipeFunc extends Pipe {
     _index = {}
     _indexProp = "id"
 
-    _params
-
-    get params() {
-        return this._params
-    }
-
     _parent
 
     _context
@@ -28,14 +22,21 @@ export default class PipeFunc extends Pipe {
 
     _pipeFactory
 
-    constructor(type, id, name, children, context) {
-        super(type, id, name, children, context)
+    _value
 
-        this._params = context.params
+    get value() {
+        return this._value
+    }
+
+    constructor(type, id, name, context) {
+        super(type, id, name, context)
+
         this._parent = context.parent
         this._runner = context.runner
         this._pipeFactory = context.factory
 
+        this._value = context.value
+        
         this._context = {
             invoke: this._invoke.bind(this),
             getVarValue: this._getVarValue.bind(this),
@@ -48,14 +49,14 @@ export default class PipeFunc extends Pipe {
 
     run(input, context) {
         if (!this.length)
-            this._value.forEach(e => this._add(this._pipeFactory.build(e, this, this._runner), e.type !== PIPE_NATIVE))
+            this.value.forEach(e => this._add(this._pipeFactory.build(e, this, this._runner), e.type !== PIPE_NATIVE))
         let main = "main"
         const chainHeads = this._filter(p => !p.previous)
         if (chainHeads.length === 1) {
             main = chainHeads[0].name
         }
 
-        const variables = this._find((p) => p.type === PIPE_VAR, this, true)
+        const variables = this._filter(p => p.type === PIPE_VAR)
         const variableInitialValue = {}
         variables.forEach((variable) => {
             variableInitialValue[variable.name] = variable.value
@@ -128,7 +129,9 @@ export default class PipeFunc extends Pipe {
     _buildAndCompile(headPipe) {
         let chain = [], current = headPipe, next
         do {
-            chain.push(current)
+            if (current.type !== PIPE_VAR) {
+                chain.push(current)
+            }
             next = this._find(p => p.previous === current.id)
             current = next
         } while(next)

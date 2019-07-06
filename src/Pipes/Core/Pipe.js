@@ -28,21 +28,25 @@ export default class Pipe {
         return this._previous
     }
 
-    _value
+    _params
+
+    get params() {
+        return this._params
+    }
 
     get value() {
-        return this._value
+        return this.params.value
     }
 
     set value(val) {
         const oldValue = this._value
-        this._value = val
+        this.params.value = val
         this._valueChangeListener.forEach(listener => listener.call(this, this._value, oldValue))
     }
 
     _valueChangeListener = []
 
-    constructor(type, id, name, value, context) {
+    constructor(type, id, name, context) {
         if ([PIPE_VAR, PIPE_FUNC, PIPE_NATIVE].indexOf(type) === -1)
             throw Error('Invalid type')
 
@@ -55,8 +59,8 @@ export default class Pipe {
         this._id = id
         this._type = type
         this._name = name
-        this._value = value,
         this._previous = context.previous
+        this._params = context.params || {}
     }
 
     addListener (callback) {
