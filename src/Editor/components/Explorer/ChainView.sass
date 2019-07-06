@@ -1,18 +1,18 @@
 
+@import "../../_variables.sass"
 
 .chain_view
+    height: 100%
 
-    ul 
-        padding: 0
-        clear: both
+    .wrapper_inner
+        position: absolute
 
-        li
-            list-style: none
-            float: left
-            margin-bottom: 10px
+        & > ul 
+            padding: 0
+            clear: both
+            display: flex
+            flex-direction: row
 
-            &.selected
-                background: rgba(182,182,182, 0.3)                
-
-            &.active
-                background: rgba(128,128,128, 0.4)
+            & > li
+                list-style: none
+                cursor: pointer 

@@ -1,2 +1,27 @@
 
+@import "../_variables.sass"
+
 .toolbar
+    display: grid
+    grid-template-rows: [status] 20px [ribbon] auto
+    height: 100%
+
+    .status
+        grid-row: status
+        text-align: center
+
+        background: $baseGrey
+
+        h1
+            display: inline
+            position: absolute
+            margin: 0
+            font-size: 16px
+
+
+    .ribbon
+        grid-row: ribbon
+        display: flex
+        align-items: center
+
+        background: lighten($baseGrey, 10)

@@ -17,6 +17,8 @@ const INITIAL_FIELD_VALUES = {
     params: {}
 }
 
+import css from "./PipeForm.sass"
+
 export default class PipeForm extends React.Component {
 
     state = {
@@ -190,7 +192,7 @@ export default class PipeForm extends React.Component {
         const specToDisplay = this.getCurrentSpec()
         
         return (
-            <fieldset>
+            <fieldset className={ css.pipe_form }>
                 {
                     <legend>{ label }</legend>
                 }

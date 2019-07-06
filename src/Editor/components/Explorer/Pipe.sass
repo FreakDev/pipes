@@ -1,13 +1,47 @@
 
+@import "../../_variables.sass"
+
 .pipe
     box-sizing: border-box
-    height: 50px
-    padding: 5px
-    border: 1px solid grey
-    display: inline-block
+    height: 150px
+    width: 150px
+    user-select: none
+    border: 3px solid
 
-    &:first-child
-        margin-left: 0
+    background: darken($activeGrey, 20)
+    color: darken($baseGrey, 30)
+    border-color: $baseGrey
 
-    ul
-        padding: 0
+    &.selected
+        background: $activeGrey
+        color: $baseGrey
+        border-color: lighten($baseGrey, 30)
+
+    &.active
+        border-color: lighten($baseGrey, 70)
+
+    .header 
+        height: 40px
+        border-bottom: 1px
+        padding: 5px 10px
+
+        background: transparentize(darken($baseGrey, 20), 0.8)
+        display: flex
+        flex-direction: column
+        justify-content: flex-end
+        font-size: 1.2em
+
+        .namespace
+            font-size: 0.6em
+            display: block
+
+    .body
+        padding: 10px
+        padding-top: 0
+
+        ul.params
+            padding: 0
+
+            li
+                list-style: none
+

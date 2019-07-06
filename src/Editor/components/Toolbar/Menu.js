@@ -33,6 +33,10 @@ const Menu = ({ onLoadProgram, program }) => {
         saveButton.click()
     }
 
+    const clickGenerate = () => {
+        console.log(program)
+    }
+
     return  (
         <div className={ cssClasses.menu }>
             <input ref={ r => fileInput = r } type="file" id="fileElem" accept="application/json" style={{ display:"none" }} onChange={ handleFiles } />
@@ -40,7 +44,8 @@ const Menu = ({ onLoadProgram, program }) => {
 
             <a ref={ r => saveButton = r } style={{ display:"none" }} />
             <button onClick={ clickSave }>Save File</button>
-            <h1>PIPES</h1>
+
+            <button onClick={ clickGenerate }>Generate</button>
         </div>
     )
 }

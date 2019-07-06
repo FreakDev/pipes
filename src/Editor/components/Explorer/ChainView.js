@@ -2,7 +2,7 @@ import React from "react"
 
 import Pipe from "./Pipe"
 
-import cssClasses from "./ChainView.sass"
+import css from "./ChainView.sass"
 
 const ChainView = ({ chain, active, selected, onSelectOne, onClickElseWhere, onDblClickElseWhere }) => {
     let groups
@@ -20,28 +20,26 @@ const ChainView = ({ chain, active, selected, onSelectOne, onClickElseWhere, onD
     })
         
     return (
-        <div className={ cssClasses.chain_view } onClick={ onClickElseWhere } onDoubleClick={ onDblClickElseWhere }>
-            { 
-                groups.map( (group, k) => {
-                    return (
-                        <ul key={ "chain_view_chain_" + k }>
-                            { group.map((pipe, id) => 
-                                <li 
-                                    className={[
-                                        (selected.indexOf(pipe.id) !== -1 ?  cssClasses.selected : ""),
-                                        (pipe.id === active ? cssClasses.active : "")
-                                    ].join(" ")}
-                                    onClick={ (e) => { e.stopPropagation(); onSelectOne(pipe.id) } } 
-                                    key={ "chain_view_item_" + id }>
-                                    <Pipe 
-                                        {...pipe} 
-                                        active={ pipe.id === active }
-                                        selected={ selected.indexOf(pipe.id) !== -1 } />
-                                </li>) }
-                        </ul>
-                    )
-                }) 
-            }
+        <div className={ css.chain_view } onClick={ onClickElseWhere } onDoubleClick={ onDblClickElseWhere }>
+            <div className={ css.wrapper_inner }>
+                { 
+                    groups.map( (group, k) => {
+                        return (
+                            <ul key={ "chain_view_chain_" + k }>
+                                { group.map((pipe, id) => 
+                                    <li 
+                                        onClick={ (e) => { e.stopPropagation(); onSelectOne(pipe.id) } } 
+                                        key={ "chain_view_item_" + id }>
+                                        <Pipe 
+                                            {...pipe}
+                                            active={ pipe.id === active }
+                                            selected={ selected.indexOf(pipe.id) !== -1 } />
+                                    </li>) }
+                            </ul>
+                        )
+                    }) 
+                }
+            </div>
         </div>
     )
 }
