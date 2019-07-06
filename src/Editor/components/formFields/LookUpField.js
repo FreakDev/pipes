@@ -37,16 +37,20 @@ const LookUpField = ({
         onChange && onChange(e.target.value)
     }
 
+    const validateField = (value) => {
+        if (!onValidate || onValidate(value) !== false) {
+            setEditMode(false)
+
+            if (resetOnValidate) {
+                setInputValue("")
+            }
+        }
+    }
+
     const onKeyUp = (e) => {
         if (e.keyCode === 13) { // pressed enter
             if (!forceSuggestedValue || isAutocomplete)
-                if (!onValidate || onValidate(e.target.value) !== false) {
-                    setEditMode(false)
-
-                    if (resetOnValidate) {
-                        setInputValue("")
-                    }
-                }
+                validateField(e.target.value)
         } else if (e.keyCode === 27) {
             setInputValue(value || "")
             setEditMode(false)
@@ -66,6 +70,9 @@ const LookUpField = ({
         setInputValue(value)
         setSuggestions([])
         onAutocomplete && onAutocomplete(value)
+        if (forceSuggestedValue) {
+            validateField(suggestion)
+        }
         ref.focus()
     }
 
