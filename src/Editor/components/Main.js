@@ -517,9 +517,6 @@ export default class Main extends React.Component {
                         this.addPipe(p, true, prev ? prev : null)
                         prev = p.id
                     })
-                    this.setState({
-                        clipboard: []
-                    })
                 }
 
             this.setState({
