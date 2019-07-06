@@ -3,7 +3,9 @@
 node_modules/
 npm-debug.log
 
+!public/assets/
 public/
+
 build/
 
 src/pipes-definitions.json
