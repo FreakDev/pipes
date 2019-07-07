@@ -138,6 +138,28 @@ export default class PipeForm extends React.Component {
             })
     }
 
+    renderSuggestion(suggestion, isActive) {
+        const lastDotIndex = suggestion.name.lastIndexOf(".")
+
+        return (
+            <div className={ [css.suggestion, css[suggestion.type.substr( suggestion.type.lastIndexOf("-") + 1 )]].join(" ") }>
+                <span className={ css.suggestion_namespace }>
+                    { lastDotIndex !== -1 ? suggestion.name.substr(0, lastDotIndex) : TYPE_LABELS[suggestion.type] }
+                </span>
+                <p className={ css.suggestion_body }>
+                    { lastDotIndex !== -1 ? suggestion.name.substr(lastDotIndex + 1) : suggestion.name }
+                    { suggestion.description 
+                        && (<React.Fragment>&nbsp;-&nbsp; 
+                            { !isActive ? 
+                                <span className={ css.suggestion_description_short }>{ suggestion.description.substr(0, 10) + "..." }</span>
+                                : <span className={ css.suggestion_description_long }>{ suggestion.description }</span>
+                            }</React.Fragment>)
+                    }
+                </p>
+            </div>
+        )
+    }
+
     renderParamField(param, spec, value) {
         let descriptionParts = spec[param].description ? spec[param].description.split('%s') : []
 
@@ -157,7 +179,7 @@ export default class PipeForm extends React.Component {
                     autocompleteCallback={(value, suggestion) => {
                         return suggestion.type === spec.pipe_type && suggestion.name.indexOf(value) !== -1
                     }}
-                    renderSuggestion={ suggestion => <div className={ css[suggestion.type.substr(suggestion.type.lastIndexOf("-")) + 1] }>{ suggestion.name }</div> }
+                    renderSuggestion={ this.renderSuggestion }
                     extractValueFromSuggestion={ suggestion => suggestion.name }
                     placeholder={ "[" + paramDisplay + "]" }
                 />
@@ -188,7 +210,7 @@ export default class PipeForm extends React.Component {
         const specToDisplay = this.getCurrentSpec()
         
         return (
-            <fieldset className={ css.pipe_form }>
+            <fieldset className={ [css.pipe_form, value ? css.mode_edit : css.mode_create].join(" ") }>
                 {
                     <legend>{ label }</legend>
                 }
@@ -201,24 +223,8 @@ export default class PipeForm extends React.Component {
                             autocompleteCallback={(value, suggestion) => {
                                 return !!suggestion.name.match(value)
                             }}
-                            renderSuggestion={ (suggestion, isActive) => {
-                                const lastDotIndex = suggestion.name.lastIndexOf(".")
-
-                                return (
-                                    <div className={ [css.suggestion, css[suggestion.type.substr( suggestion.type.lastIndexOf("-") + 1 )]].join(" ") }>
-                                        <span className={ css.suggestion_namespace }>
-                                            { lastDotIndex !== -1 ? suggestion.name.substr(0, lastDotIndex) : TYPE_LABELS[suggestion.type] }
-                                        </span>
-                                        <p className={ css.suggestion_body }>
-                                            { lastDotIndex !== -1 ? suggestion.name.substr(lastDotIndex + 1) : suggestion.name }&nbsp;-&nbsp;
-                                            { !isActive ? 
-                                                <span className={ css.suggestion_description_short }>{ suggestion.description.substr(0, 10) + "..." }</span>
-                                                : <span className={ css.suggestion_description_long }>{ suggestion.description }</span>
-                                            }
-                                        </p>
-                                    </div>
-                                )
-                            } }
+                            renderSuggestion={ this.renderSuggestion }
+                            extractValueFromSuggestion={ suggestion => suggestion.name }
                             onValidate={ this.onNameFieldChange }
                             onChange={ this.resetSpec }
                             onCancel={ this.resetSpec } />
