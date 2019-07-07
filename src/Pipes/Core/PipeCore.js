@@ -40,7 +40,7 @@ export default class PipeCore
     loadJSON(programAsJson) {
         this._program = this._pipeFactory.build(programAsJson, null, {
             doRun: this._doRun.bind(this),
-            compile: this._mode === MODE_DEBUG ? this._compileWithDebug.bind(this) : this._compile.bind(this),
+            compile: this._compile.bind(this, this._mode === MODE_DEBUG),
             debug: this._mode === MODE_DEBUG ? this._debugger.log : () => {}
         })
         return this
@@ -56,7 +56,15 @@ export default class PipeCore
 
 
     _doRun(compiled, input) {
-        return compiled.reduce((prev, curr) => prev.then(curr), Promise.resolve(input))
+        const errHandler = () => {
+            // @todo error management
+            console.log("flow stopped")
+            return Promise.reject()
+        }
+
+        return compiled.reduce((prev, curr) => prev.then(i => {
+            return curr(i).then(false, errHandler)
+        }), Promise.resolve(input))
     }
 
     _compilePipe(context, debug = false, pipe) {
@@ -67,7 +75,7 @@ export default class PipeCore
         }
 
         if (!fn) {
-            fn = this._resolveNS(pipe.alias || pipe.name, LIB).bind(context, pipe.params || {})
+            fn = this._resolveNS(pipe.alias || pipe.name, LIB).bind({ id: pipe.id, name: pipe.name, ...context }, pipe.params || {})
         }
 
         return !debug ?
@@ -81,15 +89,12 @@ export default class PipeCore
                     .then(() => {
                         return fn(input, context)
                     })
+
             }).bind(this)
     }
 
-    _compile(pipes, context, debugOption = false) {
-        return pipes.map(this._compilePipe.bind(this, context, false))
-    }
-
-    _compileWithDebug(pipes, context) {
-        return pipes.map(this._compilePipe.bind(this, context, true))
+    _compile(withDebugger, pipes, context) {
+        return pipes.map(this._compilePipe.bind(this, context, withDebugger))
     }
 
     _resolveNS = (ns, ctxt) => {

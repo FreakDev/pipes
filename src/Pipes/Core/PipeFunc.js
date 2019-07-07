@@ -1,5 +1,7 @@
 import Pipe, { PIPE_VAR, PIPE_FUNC, PIPE_NATIVE } from "./Pipe"
 
+import { _CONNECTED_TO_ } from "./constants"
+
 export default class PipeFunc extends Pipe {
 
     _storage = []
@@ -84,7 +86,12 @@ export default class PipeFunc extends Pipe {
     }
 
     _runFrom(callable, input) {
-        let pipe = this._find(pipe => pipe.name === callable, this, true)
+        let pipe
+        if (typeof callable === "string") {
+            pipe = this._find(pipe => pipe.name === callable, this, true)
+        } else {
+            pipe = this._find(pipe => pipe.previous === callable[_CONNECTED_TO_], this, true)
+        }
         if (pipe) {
             return this._doRun(this._buildAndCompile(pipe), input)
         }
