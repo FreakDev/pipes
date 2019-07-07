@@ -12,9 +12,6 @@ import TreeView from "./Explorer/TreeView"
 
 import PIPES_DEFINITIONS from "../../pipes-definitions.json"
 
-import cssClasses from "./Explorer.sass"
-
-
 const PIPE_FUNC_DEF = {
     "type":PIPE_TYPE_FUNC,
     "description":"a pipe",
@@ -43,14 +40,6 @@ const PIPE_VAR_DEF = {
         }
     }
 }
-
-const INITIAL_PROGRAM = {
-    id: uuid(),
-    name: "",
-    type: PIPE_TYPE_FUNC,
-    pipes: []
-}
-
 
 // navigate
 const __findInChain = (needleId, chain, from) => {
@@ -144,32 +133,13 @@ const __findInTree = (tree, needleId) => {
 }
 
 
-
-// deprecated stuff
-
-const __cleanTree = (tree) => {
-    // const dirtyTree = tree.pipes,
-    //     idsMap = {}
-    // tree.pipes = []
-
-    // __sortInChainOrder(dirtyTree).forEach(p => {
-    //     let previousId = p.id
-    //     tree.pipes = __addPipe(tree.pipes, p, (p.previous ? idsMap[p.previous] : null))
-    //     idsMap[previousId] = p.id
-    // })
-
-    // delete tree.__dirty
-    throw "use reducer"
-
-}
-
-
 // the component 
+
+import cssClasses from "./Explorer.sass"
 
 export default class Explorer extends React.Component {
 
     state = {
-        // program: INITIAL_PROGRAM,
         currentPath: ['pipes'],
         selected: [],
         keysDown: [],
@@ -184,9 +154,9 @@ export default class Explorer extends React.Component {
         this.onRemove = this.onRemove.bind(this)
         this.focus = this.focus.bind(this)
         this.unFocus = this.unFocus.bind(this)
-        this.navigateTo = this.navigateTo.bind(this)
         this.navigateUp = this.navigateUp.bind(this)
         this.navigateDown = this.navigateDown.bind(this)
+        this.navigateTo = this.navigateTo.bind(this)
         this.onKeyDown = this.onKeyDown.bind(this)
         this.onKeyUp = this.onKeyUp.bind(this)
     }
@@ -305,13 +275,7 @@ export default class Explorer extends React.Component {
         }
 
         if (newActive.pipes && newActive.__dirty) {
-            console.warn("tree cleaning is disabled during refactoring")
-            // const newProgram = { ...this.props.program },
-            //     newActive = __resolvePath(newProgram, newPath)
-            // __cleanTree(newActive)
-            // this.setState({
-            //     program: newProgram
-            // })
+            this.props.cleanTree(newPath)
         }
 
         if (newActive.pipes) {
@@ -349,38 +313,35 @@ export default class Explorer extends React.Component {
                         clipboard: __copyTreeStructure(this.props.program, this.state.selected)
                     })
                     if (keyCombo.indexOf(KEY_X) === 1) {
-                        console.warn("cut is disabled during refacto")
-                        // const newProgram = { ...this.props.program },
-                        //     base = __resolvePath(newProgram, __dir(this.state.currentPath).slice(0, -1))
-                        // this.state.selected.forEach(s => {
-                        //     const p = base.pipes.find(p => p.id === s)
-                        //     p && (base.pipes = __removePipe(base.pipes, p))
-                        // })
-                        // this.setState({
-                        //     program: newProgram,
-                        //     currentPath: this.state.currentPath.slice(0, -1),
-                        //     selected: []
-                        // })
+                        const base = __resolvePath(this.props.program, __dir(this.state.currentPath).slice(0, -1))
+                        this.state.selected.forEach(s => {
+                            const p = base.pipes.find(p => p.id === s)
+                            p && (base.pipes = this.props.removePipe(p, this.state.currentPath))
+                        })
+                        this.setState({
+                            currentPath: this.state.currentPath.slice(0, -1),
+                            selected: []
+                        })
                     }
                 } else if (keyCombo.indexOf(KEY_V) === 1) {
                     console.warn("paste is disabled during refacto")
-                    // let prev = null
-                    // const currentDir = this.resolveCurrentPath(true)
-                    // __sortInChainOrder(this.state.clipboard).forEach(p => {
-                    //     if (p.type === PIPE_TYPE_FUNC && currentDir.find(e => e.name === p.name)) {
-                    //         let i = 1, name = p.name
-                    //         do {
-                    //             if (name.slice(name.lastIndexOf("_")).match(/_[0-9]+/)) {
-                    //                 name = name.slice(0, name.lastIndexOf("_"))
-                    //             }
-                    //             name += ("_" + i)
-                    //             i++
-                    //         } while(currentDir.find(e => e.name === name))
-                    //         p.name = name
-                    //     }
-                    //     this.addPipe(p, true, prev ? prev : null)
-                    //     prev = p.id
-                    // })
+                    let prev = this.resolveCurrentPath()
+                    const currentDir = this.resolveCurrentPath(true)
+                    __sortInChainOrder( this.state.clipboard.map(p => JSON.parse(JSON.stringify(p))) ).forEach(p => {
+                        if ([PIPE_TYPE_FUNC, PIPE_TYPE_VAR].indexOf(p.type) !== -1 && currentDir.find(e => e.name === p.name)) {
+                            let i = 1, name = p.name
+                            do {
+                                if (name.slice(name.lastIndexOf("_")).match(/_[0-9]+/)) {
+                                    name = name.slice(0, name.lastIndexOf("_"))
+                                }
+                                name += ("_" + i)
+                                i++
+                            } while(currentDir.find(e => e.name === name))
+                            p.name = name
+                        }
+                        this.props.addPipe(p, true, prev ? prev.id : null, this.state.currentPath)
+                        prev = p.id
+                    })
                 }
 
             this.setState({

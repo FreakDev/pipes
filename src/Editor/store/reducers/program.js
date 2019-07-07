@@ -19,8 +19,54 @@ import {
     PROGRAM_REMOVE_PIPE,
     PROGRAM_SAVE_PROP,
     PROGRAM_LOAD,
-    PROGRAM_CLEAN_SUBTREE
+    PROGRAM_CLEAN_TREE
 } from "../actions/program"
+
+
+const __addPipe = (base, pipe, connected, connectedTo) => {
+    const connectedToId = connected ? connectedTo : null
+
+    if (pipe.type === PIPE_TYPE_VAR) {
+        let params = pipe.params
+        delete pipe.params
+        let value
+        Object.assign(pipe, params)
+        
+        value = pipe.value
+        delete pipe.value
+        pipe.params = Object.assign(pipe.params || {}, { value })
+        
+    } else if (pipe.type === PIPE_TYPE_FUNC) {
+        if (pipe.params[EDITOR_PARAM_PREFIX + "name"]) {
+            pipe.name = pipe.params[EDITOR_PARAM_PREFIX + "name"]
+            delete pipe.params[EDITOR_PARAM_PREFIX + "name"]
+        }
+        pipe.pipes = pipe.pipes || []
+    }
+
+    if (pipe.pipes)
+        pipe.__dirty = true
+
+    pipe.id = uuid()
+
+    if (connectedToId) {
+        let currentPipe = base.find(p => p.id === connectedToId)
+        if (currentPipe.id) {
+            pipe.previous = currentPipe.id
+
+            let previouslyConnectedIndex = base.findIndex(p => p.previous === currentPipe.id)
+            if (previouslyConnectedIndex !== -1) {
+                base[previouslyConnectedIndex].previous = pipe.id
+            }
+        }
+    } else {
+        delete pipe.previous
+    }
+
+    base.push(pipe)
+    
+    return base
+}
 
 const reducers = {
     [PROGRAM_ADD_PIPE] : (state, action) => {
@@ -28,48 +74,9 @@ const reducers = {
             currentActive = __resolvePath(newProgram, action.payload.currentPath),
             currentContainer = __dir(action.payload.currentPath)
 
-        const base = __resolvePath(newProgram, currentContainer),
-            pipe = action.payload.pipe,
-            connectedToId = action.payload.connected ? (action.payload.connectedTo ? action.payload.connectedTo : (currentActive && currentActive.id)) : null
+        const base = __resolvePath(newProgram, currentContainer)
 
-        if (pipe.type === PIPE_TYPE_VAR) {
-            let params = pipe.params
-            delete pipe.params
-            let value
-            Object.assign(pipe, params)
-            
-            value = pipe.value
-            delete pipe.value
-            pipe.params = Object.assign(pipe.params || {}, { value })
-            
-        } else if (pipe.type === PIPE_TYPE_FUNC) {
-            if (pipe.params[EDITOR_PARAM_PREFIX + "name"]) {
-                pipe.name = pipe.params[EDITOR_PARAM_PREFIX + "name"]
-                delete pipe.params[EDITOR_PARAM_PREFIX + "name"]
-            }
-            pipe.pipes = pipe.pipes || []
-        }
-    
-        if (pipe.pipes)
-            pipe.__dirty = true
-    
-        pipe.id = uuid()
-    
-        if (connectedToId) {
-            let currentPipe = base.find(p => p.id === connectedToId)
-            if (currentPipe.id) {
-                pipe.previous = currentPipe.id
-    
-                let previouslyConnectedIndex = base.findIndex(p => p.previous === currentPipe.id)
-                if (previouslyConnectedIndex !== -1) {
-                    base[previouslyConnectedIndex].previous = pipe.id
-                }
-            }
-        } else {
-            delete pipe.previous
-        }
-    
-        base.push(pipe)
+        __addPipe(base, action.payload.pipe, action.payload.connected, action.payload.connectedTo || currentActive.id)
     
         return newProgram
     },
@@ -126,7 +133,7 @@ const reducers = {
     [PROGRAM_LOAD] : (state, action) => {
         return action.payload.program
     },
-    [PROGRAM_CLEAN_SUBTREE]: (state, action) => {
+    [PROGRAM_CLEAN_TREE]: (state, action) => {
         const newProgram = { ...state }
 
         const tree = __resolvePath(newProgram, action.payload.currentPath)
@@ -137,7 +144,7 @@ const reducers = {
 
         __sortInChainOrder(dirtyTree).forEach(p => {
             let previousId = p.id
-            tree.pipes = __addPipe(tree.pipes, p, (p.previous ? idsMap[p.previous] : null))
+            tree.pipes = __addPipe(tree.pipes, p, !!p.previous, (p.previous ? idsMap[p.previous] : null))
             idsMap[previousId] = p.id
         })
 

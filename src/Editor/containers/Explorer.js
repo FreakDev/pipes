@@ -5,7 +5,7 @@ import {
     savePipeAction,
     removePipeAction,
     savePropAction,
-    cleanSubTreeAction
+    cleanTreeAction
 } from "../store/actions/program"
 
 import { default as ExplorerCmp } from "../components/Explorer"
@@ -19,7 +19,7 @@ const Explorer = connect(
         savePipe: (old, pipe, currentPath) => dispatch(savePipeAction(old, pipe, currentPath)), 
         removePipe: (pipe, currentPath) => dispatch(removePipeAction(pipe, currentPath)), 
         saveProp: (props, value) => dispatch(savePropAction(props, value)),
-        cleanSubTree: (program, path) => dispatch(cleanSubTreeAction(program, path))
+        cleanTree: (path) => dispatch(cleanTreeAction(path))
     })
 )(ExplorerCmp)
 

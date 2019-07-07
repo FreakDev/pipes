@@ -4,6 +4,7 @@ export const PROGRAM_SAVE_PIPE = "PROGRAM_SAVE_PIPE"
 export const PROGRAM_REMOVE_PIPE = "PROGRAM_REMOVE_PIPE"
 export const PROGRAM_SAVE_PROP = "PROGRAM_SAVE_PROP"
 export const PROGRAM_LOAD = "PROGRAM_LOAD"
+export const PROGRAM_CLEAN_TREE = "PROGRAM_CLEAN_TREE"
 
 export const addPipeAction = (pipe, connected, connectedTo, currentPath) => {
     return {
@@ -52,6 +53,15 @@ export const loadAction = (program) => {
         type: PROGRAM_LOAD,
         payload: {
             program
+        }
+    }
+}
+
+export const cleanTreeAction = (currentPath) => {
+    return {
+        type: PROGRAM_CLEAN_TREE,
+        payload: {
+            currentPath
         }
     }
 }
