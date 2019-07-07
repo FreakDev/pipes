@@ -8,6 +8,7 @@ module.exports = {
     RUNTIME_EXECUTION_STOPPED : "execution-stopped",
     RUNTIME_EXECUTION_STARTED : "execution-started",
     RUNTIME_EXECUTION_IDLE : "execution-idle",
+    RUNTIME_EXECUTION_ERROR: "execution-error",
 
     DEBUGGER_LOG: "debugger-log",
 

@@ -73,16 +73,12 @@ export default class PipeFunc extends Pipe {
             }
         })
 
-        // try {
-            return this._runFrom(main, input)
-                .then(() => {
-                    variables.forEach((variable) => {
-                        variable.value = variableInitialValue[variable.name]
-                    })
+        return this._runFrom(main, input)
+            .then(() => {
+                variables.forEach((variable) => {
+                    variable.value = variableInitialValue[variable.name]
                 })
-        // } catch (e) {
-        //     throw Error("Invalid Pipe : several chains or pipes and none called \"main\" in \"" + this.name + "\" (" + this.id + ") run failed with message " + e)
-        // }
+            })
     }
 
     _runFrom(callable, input) {

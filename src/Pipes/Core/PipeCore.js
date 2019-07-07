@@ -51,15 +51,23 @@ export default class PipeCore
         return this._program.run()
             .then(() => {
                 this._debugger && this._debugger.program_stopped()
+            }, (e) => {
+                if (!this._debugger)
+                    throw e
+                else 
+                    this._debugger && this._debugger.program_error(e, { pipe: this })
             })
     }
 
 
     _doRun(compiled, input) {
-        const errHandler = () => {
-            // @todo error management
-            console.log("flow stopped")
-            return Promise.reject()
+        const errHandler = (e) => {
+            if (e instanceof Error) {
+                return Promise.reject(e)
+            } else {
+                // pipe has stopped the flow by will
+                return Promise.reject()
+            }
         }
 
         return compiled.reduce((prev, curr) => prev.then(i => {

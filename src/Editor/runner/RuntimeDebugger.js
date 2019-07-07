@@ -5,6 +5,7 @@ import {
     RUNTIME_EXECUTION_STOPPED,
     RUNTIME_EXECUTION_STARTED,
     RUNTIME_EXECUTION_IDLE,
+    RUNTIME_EXECUTION_ERROR,
     DEBUGGER_LOG
 } from "../../constants"
 
@@ -20,12 +21,22 @@ import {
     MODE_STEP 
 } from "../constants"
 
+const buildPath = (current, trim = true) => {
+    let path = []
+    do {
+        path.unshift(current.id)
+        current = current.parent
+    } while (current)
+    return trim ? path.slice(1, -1) : path
+}
+
 export default class RuntimeDebugger {
 
     _core
 
     _getMessageManager
     _postMessage
+    _onRuntimeError
 
     _running = false
 
@@ -49,6 +60,7 @@ export default class RuntimeDebugger {
             program_started: this.__program_started.bind(this),
             program_stopped: this.__program_stopped.bind(this),
             program_turned_idle: this.__program_turned_idle.bind(this),
+            program_error: this.__program_error.bind(this),
 
             hold: this.__holdRuntime.bind(this),
             log: this.__log.bind(this)
@@ -59,8 +71,9 @@ export default class RuntimeDebugger {
 
     start() {
         this._getMessageManager()
-            .then(({ addEventListener, postMessage }) => {
+            .then(({ addEventListener, postMessage, onRuntimeError = () => {} }) => {
                 this._postMessage = postMessage
+                this._onRuntimeError = onRuntimeError
 
                 addEventListener((e) => {
                     const message = e
@@ -138,17 +151,7 @@ export default class RuntimeDebugger {
             this._paused = true
         }
 
-        const buildPath = () => {
-            let path = [],
-                current = payload.pipe
-            do {
-                path.unshift(current.id)
-                current = current.parent
-            } while (current)
-            return path.slice(1, -1)
-        }
-
-        const path = buildPath()
+        const path = buildPath(payload.pipe)
 
         this.emit(RUNTIME_PIPE_CALLED, {
             ...payload,
@@ -169,6 +172,14 @@ export default class RuntimeDebugger {
 
     __program_turned_idle() {
         this.emit(RUNTIME_EXECUTION_IDLE)
+    }
+
+    __program_error(error, context) {
+        this.emit(RUNTIME_EXECUTION_ERROR, {
+            error: error.message,
+            callstack: buildPath(context.pipe)  
+        })
+        this._onRuntimeError()
     }
 
     __log(d) {

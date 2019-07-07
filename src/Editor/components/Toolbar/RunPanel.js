@@ -1,4 +1,11 @@
 import React, { useState } from "react"
+
+import {
+    RUNTIME_EXECUTION_STOPPED,
+    RUNTIME_PIPE_CALLED,
+    RUNTIME_EXECUTION_ERROR
+} from "../../../constants"
+
 import { 
     MESSAGE_LOAD, 
     MESSAGE_START, 
@@ -31,10 +38,10 @@ class RunPanel extends React.Component {
 
     onMessage = (msg) => {
         switch(msg.name) {
-        case "execution-stopped":
+        case RUNTIME_EXECUTION_STOPPED:
             console.log(msg)
             break
-        case "pipe-called":
+        case RUNTIME_PIPE_CALLED:
             console.log(msg.payload)
             let path = ['pipes']
             msg.payload.pipe.path.forEach(el => {
@@ -44,6 +51,8 @@ class RunPanel extends React.Component {
             // this.props.onDebuggerHighlight && 
             this.props.onDebuggerHighlight(path)
             break
+        case RUNTIME_EXECUTION_ERROR: 
+            console.error(msg.payload.error)
         }
     }
     
