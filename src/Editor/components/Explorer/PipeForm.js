@@ -5,11 +5,7 @@ import LookUpField from "./formFields/LookUpField"
 import FreeField from "./formFields/FreeField"
 import OneOfField from "./formFields/OneOfField"
 import { PIPE_TYPE_FUNC, PIPE_TYPE_VAR } from '../../../constants';
-import { EDITOR_PARAM_PREFIX } from '../../constants'
-
-
-export const MODE_CREATE = "mode-create"
-export const MODE_EDIT = "mode-edit"
+import { EDITOR_PARAM_PREFIX, TYPE_LABELS } from '../../constants'
 
 const INITIAL_FIELD_VALUES = {
     name: "",
@@ -161,7 +157,7 @@ export default class PipeForm extends React.Component {
                     autocompleteCallback={(value, suggestion) => {
                         return suggestion.type === spec.pipe_type && suggestion.name.indexOf(value) !== -1
                     }}
-                    renderSuggestion={ suggestion => suggestion.name }
+                    renderSuggestion={ suggestion => <div className={ css[suggestion.type.substr(suggestion.type.lastIndexOf("-")) + 1] }>{ suggestion.name }</div> }
                     extractValueFromSuggestion={ suggestion => suggestion.name }
                     placeholder={ "[" + paramDisplay + "]" }
                 />
@@ -201,7 +197,28 @@ export default class PipeForm extends React.Component {
                         <LookUpField
                             name="name"
                             value={ fieldValues.name || (value && value.name) || ""  }
-                            availableValues={ Object.keys(pipesDefs).filter(def => def !== "__version") }
+                            availableValues={ Object.keys(pipesDefs).filter(def => def !== "__version").map(def => ( { ...pipesDefs[def], name: def } ) ) }
+                            autocompleteCallback={(value, suggestion) => {
+                                return !!suggestion.name.match(value)
+                            }}
+                            renderSuggestion={ (suggestion, isActive) => {
+                                const lastDotIndex = suggestion.name.lastIndexOf(".")
+
+                                return (
+                                    <div className={ [css.suggestion, css[suggestion.type.substr( suggestion.type.lastIndexOf("-") + 1 )]].join(" ") }>
+                                        <span className={ css.suggestion_namespace }>
+                                            { lastDotIndex !== -1 ? suggestion.name.substr(0, lastDotIndex) : TYPE_LABELS[suggestion.type] }
+                                        </span>
+                                        <p className={ css.suggestion_body }>
+                                            { lastDotIndex !== -1 ? suggestion.name.substr(lastDotIndex + 1) : suggestion.name }&nbsp;-&nbsp;
+                                            { !isActive ? 
+                                                <span className={ css.suggestion_description_short }>{ suggestion.description.substr(0, 10) + "..." }</span>
+                                                : <span className={ css.suggestion_description_long }>{ suggestion.description }</span>
+                                            }
+                                        </p>
+                                    </div>
+                                )
+                            } }
                             onValidate={ this.onNameFieldChange }
                             onChange={ this.resetSpec }
                             onCancel={ this.resetSpec } />

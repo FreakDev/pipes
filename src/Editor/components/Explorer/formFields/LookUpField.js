@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import uuid from "uuid/v4"
 
-import cssClasses from "./LookUpField.sass"
+import css from "./LookUpField.sass"
 
 const LookUpField = ({ 
     name, 
@@ -17,6 +17,7 @@ const LookUpField = ({
         return suggestion.indexOf(value) !== -1
     },
     renderSuggestion = (suggestion) => ( suggestion ),
+    sortSuggestionCallback, 
     extractValueFromSuggestion = (suggestion) => ( suggestion ),
     onAutocomplete, 
     onChange, 
@@ -37,7 +38,18 @@ const LookUpField = ({
         setSelectedSuggestion(0)
         setInputValue(e.target.value)
         setIsAutocomplete(false)
-        setSuggestions(e.target.value !== "" ? availableValues.filter(autocompleteCallback.bind(this, e.target.value)) : [])
+
+        let filteredSuggestions
+        if (e.target.value !== "") {
+            filteredSuggestions = availableValues
+                .filter(autocompleteCallback.bind(this, e.target.value))
+
+            if (sortSuggestionCallback)
+                filteredSuggestions.sort(sortSuggestionCallback.bind(this, e.target.value))
+        } else {
+            filteredSuggestions = availableValues
+        }
+        setSuggestions(filteredSuggestions)
         onChange && onChange(e.target.value)
     }
 
@@ -93,17 +105,17 @@ const LookUpField = ({
     }
 
     return (
-        <span onClick={ onClick }>
+        <div onClick={ onClick }>
             { !editMode ? 
                 ( value || placeholder )
                 : <React.Fragment>
                     { label ? <label for={ fieldId }>{ label }</label> : null }
-                    <div className="autocomplete">
+                    <div className={ css.suggestions }>
                         <ul>
                             { suggestions.map((suggestion, k) => {
                                 return (
-                                    <li className={ k === selectedSuggestion ? cssClasses.active : "" } onMouseOver={ () => { setSelectedSuggestion(k) } } key={ "lookup_" + fieldId + "_suggestions_" + k } onClick={ () => { onClickSuggestion(suggestion) } }>
-                                        { renderSuggestion(suggestion) }
+                                    <li className={ k === selectedSuggestion ? css.active : "" } onMouseOver={ () => { setSelectedSuggestion(k) } } key={ "lookup_" + fieldId + "_suggestions_" + k } onClick={ () => { onClickSuggestion(suggestion) } }>
+                                        { renderSuggestion(suggestion, k === selectedSuggestion ? true : false) }
                                     </li>
                                 )
                             }) }
@@ -124,7 +136,7 @@ const LookUpField = ({
                     { error && !dirty ? <span>{ error }</span> : null }        
                 </React.Fragment>
             }
-        </span>
+        </div>
     )
 }
 

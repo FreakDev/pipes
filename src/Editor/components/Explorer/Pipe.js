@@ -1,16 +1,11 @@
 import React from "react"
 
-import { PIPE_TYPE_FUNC, PIPE_TYPE_VAR } from "../../../constants"
+import { TYPE_LABELS } from "../../constants"
 
 import css from "./Pipe.sass"
 
 const Pipe = ({ name, type, params, active, selected }) => {
     const lastDotIndex = name.lastIndexOf(".")
-
-    const TYPE_LABELS = {
-        [PIPE_TYPE_FUNC]: "pipe",
-        [PIPE_TYPE_VAR]: "box",
-    }
 
     return (
         <div data-name={ name } className={ [

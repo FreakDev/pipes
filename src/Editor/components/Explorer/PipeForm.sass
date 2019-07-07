@@ -1,3 +1,32 @@
+@import "../../_variables.sass"
+
 
 .pipe_form 
     border: 0
+
+.suggestion
+
+    height: 50px
+    padding: 0 20px 0 5px
+
+    &.func
+        color: transparentize($func_color, 0.2)
+
+    &.var
+        color: transparentize($var_color, 0.2)
+
+    &.native
+        color: transparentize($native_color, 0.2)
+
+    .suggestion_namespace
+        font-size: 0.6em
+
+    .suggestion_body
+        padding: 0
+        margin: 0
+
+        .suggestion_description_short
+            display: inline
+
+        .suggestion_description_long
+            display: inline-block

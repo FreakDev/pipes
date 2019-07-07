@@ -1,3 +1,29 @@
+@import "../../../_variables.sass"
 
-.active
-    background: rgba(182,182,182, 0.3)
+.suggestions
+    position: absolute
+    transform: translateY(-100%)
+    background: lighten($baseGrey, 20)
+    padding: 10px 0px
+
+    ul 
+        margin: 0
+        padding: 0
+
+        li
+            list-style: none
+            position: relative
+
+            &.active
+                &:after
+                    position: absolute
+                    content: ''
+                    display: block
+                    height: 100%
+                    width: 100%
+                    left: 0
+                    top: 0
+                    background: rgba(182,182,182, 0.3)
+
+
+
