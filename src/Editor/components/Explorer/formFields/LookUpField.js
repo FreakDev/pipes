@@ -99,7 +99,7 @@ const LookUpField = ({
         setSuggestions([])
         onAutocomplete && onAutocomplete(value)
         if (forceSuggestedValue) {
-            validateField(suggestion)
+            validateField(value)
         }
         ref.focus()
     }
