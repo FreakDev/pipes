@@ -9,6 +9,8 @@ module.exports = {
     RUNTIME_EXECUTION_STARTED : "execution-started",
     RUNTIME_EXECUTION_IDLE : "execution-idle",
 
+    DEBUGGER_LOG: "debugger-log",
+
     // server communication
     I_AM_RUNNER : "Runner",
     I_AM_EDITOR : "Editor",

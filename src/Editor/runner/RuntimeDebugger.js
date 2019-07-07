@@ -4,7 +4,8 @@ import {
     RUNTIME_PIPE_CALLED,
     RUNTIME_EXECUTION_STOPPED,
     RUNTIME_EXECUTION_STARTED,
-    RUNTIME_EXECUTION_IDLE
+    RUNTIME_EXECUTION_IDLE,
+    DEBUGGER_LOG
 } from "../../constants"
 
 import {
@@ -49,7 +50,8 @@ export default class RuntimeDebugger {
             program_stopped: this.__program_stopped.bind(this),
             program_turned_idle: this.__program_turned_idle.bind(this),
 
-            hold: this.__holdRuntime.bind(this)
+            hold: this.__holdRuntime.bind(this),
+            log: this.__log.bind(this)
         })
 
         this._getMessageManager = getMessageManager
@@ -167,5 +169,9 @@ export default class RuntimeDebugger {
 
     __program_turned_idle() {
         this.emit(RUNTIME_EXECUTION_IDLE)
+    }
+
+    __log(d) {
+        this.emit(DEBUGGER_LOG, d)
     }
 }

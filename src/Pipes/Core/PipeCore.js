@@ -7,12 +7,14 @@ import math from "../Lib/math"
 import event from "../Lib/event"
 import string from "../Lib/string"
 // import cli from "../Lib/cli"
+import time from "../Lib/time"
 
 const LIB = {
     stdlib,
     // cli,
     math,
     event,
+    time,
     string
 }
 
@@ -38,7 +40,8 @@ export default class PipeCore
     loadJSON(programAsJson) {
         this._program = this._pipeFactory.build(programAsJson, null, {
             doRun: this._doRun.bind(this),
-            compile: this._mode === MODE_DEBUG ? this._compileWithDebug.bind(this) : this._compile.bind(this)
+            compile: this._mode === MODE_DEBUG ? this._compileWithDebug.bind(this) : this._compile.bind(this),
+            debug: this._mode === MODE_DEBUG ? this._debugger.log : () => {}
         })
         return this
     }

@@ -47,7 +47,8 @@ export default class PipeFunc extends Pipe {
             getVarValue: this._getVarValue.bind(this),
             setVarValue: this._setVarValue.bind(this),
             addVarListener: this._addVarListener.bind(this),
-            removeVarListener: this._removeVarListener.bind(this)
+            removeVarListener: this._removeVarListener.bind(this),
+            debug: this._runner.debug
         }
 
     }
