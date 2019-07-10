@@ -1,6 +1,9 @@
-export const PIPE_VAR = "pipe-var"
-export const PIPE_FUNC = "pipe-func"
-export const PIPE_NATIVE = "pipe-native"
+
+import {
+    PIPE_TYPE_FUNC,
+    PIPE_TYPE_VAR,
+    PIPE_TYPE_NATIVE
+} from "../../constants"
 
 export default class Pipe {
 
@@ -47,7 +50,7 @@ export default class Pipe {
     _valueChangeListener = []
 
     constructor(type, id, name, context) {
-        if ([PIPE_VAR, PIPE_FUNC, PIPE_NATIVE].indexOf(type) === -1)
+        if ([PIPE_TYPE_VAR, PIPE_TYPE_FUNC, PIPE_TYPE_NATIVE].indexOf(type) === -1)
             throw Error('Invalid type')
 
         if (typeof id !== "string" || id === "") 

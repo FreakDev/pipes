@@ -1,6 +1,6 @@
+import { PIPE_TYPE_NATIVE } from "../../constants"
 
 import PipeFactory from "./PipeFactory"
-import { PIPE_NATIVE } from "./Pipe"
 
 import stdlib from "../Lib/stdlib"
 import math from "../Lib/math"
@@ -78,7 +78,7 @@ export default class PipeCore
     _compilePipe(context, debug = false, pipe) {
         let fn = null
 
-        if (pipe.type !== PIPE_NATIVE) {
+        if (pipe.type !== PIPE_TYPE_NATIVE) {
             fn = pipe.run.bind(pipe)
         }
 

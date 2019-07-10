@@ -1,6 +1,8 @@
-import Pipe, { PIPE_VAR, PIPE_FUNC, PIPE_NATIVE } from "./Pipe"
+import { PIPE_TYPE_VAR, PIPE_TYPE_FUNC, PIPE_TYPE_NATIVE } from "../../constants"
 
 import { _CONNECTED_TO_ } from "./constants"
+
+import Pipe from "./Pipe"
 
 export default class PipeFunc extends Pipe {
 
@@ -57,14 +59,14 @@ export default class PipeFunc extends Pipe {
 
     run(input, context) {
         if (!this.length)
-            this.value.forEach(e => this._add(this._pipeFactory.build(e, this, this._runner), e.type !== PIPE_NATIVE))
+            this.value.forEach(e => this._add(this._pipeFactory.build(e, this, this._runner), e.type !== PIPE_TYPE_NATIVE))
         let main = "main"
         const chainHeads = this._findHeads()
         if (chainHeads.length === 1) {
             main = chainHeads[0].name
         }
 
-        const variables = this._filter(p => p.type === PIPE_VAR)
+        const variables = this._filter(p => p.type === PIPE_TYPE_VAR)
         const variableInitialValue = {}
         variables.forEach((variable) => {
             variableInitialValue[variable.name] = variable.value
@@ -101,7 +103,7 @@ export default class PipeFunc extends Pipe {
     }
 
     _getVarValue(varName) {
-        let targetVar = this._find(p => p.type === PIPE_VAR && p.name === varName)
+        let targetVar = this._find(p => p.type === PIPE_TYPE_VAR && p.name === varName)
         if (targetVar) {
             return targetVar.value
         } else {
@@ -110,7 +112,7 @@ export default class PipeFunc extends Pipe {
     }
 
     _setVarValue(varName, varValue) {
-        let targetVar = this._find(p => p.type === PIPE_VAR && p.name === varName)
+        let targetVar = this._find(p => p.type === PIPE_TYPE_VAR && p.name === varName)
         if (targetVar) {
             targetVar.value = varValue
         } else {
@@ -119,7 +121,7 @@ export default class PipeFunc extends Pipe {
     }
 
     _addVarListener(varName, callback) {
-        const pipeVar = this._find(p => p.type === PIPE_VAR && p.name === varName)
+        const pipeVar = this._find(p => p.type === PIPE_TYPE_VAR && p.name === varName)
 
         if (pipeVar) {
             pipeVar.addListener(callback)
@@ -129,7 +131,7 @@ export default class PipeFunc extends Pipe {
     }
 
     _removeVarListener(varName, callback) {
-        const pipeVar = this._find(p => p.type === PIPE_VAR && p.name === varName)
+        const pipeVar = this._find(p => p.type === PIPE_TYPE_VAR && p.name === varName)
 
         if (pipeVar) {
             return pipeVar.removeListener(callback)
@@ -140,7 +142,7 @@ export default class PipeFunc extends Pipe {
     _buildAndCompile(headPipe) {
         let chain = [], current = headPipe, next
         do {
-            if (current.type !== PIPE_VAR) {
+            if (current.type !== PIPE_TYPE_VAR) {
                 chain.push(current)
             }
             next = this._find(p => p.previous === current.id)

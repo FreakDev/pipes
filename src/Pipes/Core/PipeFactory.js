@@ -1,10 +1,12 @@
-import Pipe, { PIPE_VAR, PIPE_FUNC, PIPE_NATIVE } from "./Pipe"
+import { PIPE_TYPE_VAR, PIPE_TYPE_FUNC, PIPE_TYPE_NATIVE } from "../../constants"
+
+import Pipe from "./Pipe"
 import PipeFunc from "./PipeFunc"
 
 export default class PipeFactory {
     build(json, parent, runner) {
         switch (json.type) {
-        case PIPE_VAR:
+        case PIPE_TYPE_VAR:
             return new Pipe(
                 json.type, 
                 json.id, 
@@ -14,8 +16,8 @@ export default class PipeFactory {
                     previous: json.previous 
                 }
             )
-        case PIPE_FUNC:
-        case PIPE_NATIVE:
+        case PIPE_TYPE_FUNC:
+        case PIPE_TYPE_NATIVE:
             return new PipeFunc(
                 json.type, 
                 json.id, 
