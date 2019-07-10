@@ -16,10 +16,15 @@ export default {
         return new Promise((resolve, reject) => {
             let nbIter = 0,
                 intervalId = setInterval(() => {
-                    this.forward({ [_CONNECTED_TO_]: this.id }, input)
-                    nbIter++
-                    if (nbIter === parseInt(count, 10)) {
+                    try {
+                        this.forward({ [_CONNECTED_TO_]: this.id }, input)
+                        nbIter++
+                        if (nbIter === parseInt(count, 10)) {
+                            clearInterval(intervalId)
+                        }    
+                    } catch (e) {
                         clearInterval(intervalId)
+                        return reject(e)
                     }
                 }, parseInt(interval, 10))
             reject()
