@@ -166,7 +166,7 @@ export default class PipeForm extends React.Component {
         const buildField = (type, spec, props) => {
             const paramDisplay = param.indexOf(EDITOR_PARAM_PREFIX) === 0 ? param.substr(EDITOR_PARAM_PREFIX.length) : param
 
-            if (type.indexOf("Free") === 0) {
+            if ( ["String", "Number", "Boolean"].indexOf(type) !== -1) {
                 return <FreeField key={ "pipe_form_ipnut" } { ...props } placeholder={ "[" + paramDisplay + "]" } />
             } else if (type.indexOf("OneOf") === 0) {
                 const availableChoices = spec.choices

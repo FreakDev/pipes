@@ -12,8 +12,8 @@ export default {
      * #@Pipe\name readInput
      * @Pipe\type pipe-native
      * @Pipe\platform node
-     * @Pipe\param useParam {Free} - a
-     * @Pipe\param question {Free} - a
+     * @Pipe\param useParam {Boolean} - a
+     * @Pipe\param question {String} - a
      * @Pipe\output {String}
      */
     readInput: function ({ useParam = true, question }, input) {
@@ -23,7 +23,7 @@ export default {
                 output: process.stdout
             })
             
-            rl.question((useParam ? question : input), (answer) => {
+            rl.question((!!useParam ? question : input), (answer) => {
                 rl.close()
                 resolve(answer)
             })            

@@ -9,8 +9,8 @@ export default {
      * @PipeDEF
      * @Pipe\name interval
      * @Pipe\type pipe-native
-     * @Pipe\param interval - a
-     * @Pipe\param count - a
+     * @Pipe\param interval {Number} - a
+     * @Pipe\param count {Number} - a
      */
     interval: function ({ interval, count = 1 }, input) {
         return new Promise((resolve, reject) => {

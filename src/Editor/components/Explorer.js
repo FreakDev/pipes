@@ -17,7 +17,7 @@ const PIPE_FUNC_DEF = {
     "description":"a pipe",
     "params":{
         [EDITOR_PARAM_PREFIX + "name"]:{
-            "type":"Free",
+            "type":"String",
             "optional":false,
             "description":"You may reference to this pipe with \'%s\' (choose it wisely)"
         }
@@ -29,12 +29,12 @@ const PIPE_VAR_DEF = {
     "description":"a variable",
     "params":{
         "name":{
-            "type":"Free",
+            "type":"String",
             "optional":false,
             "description":"You may reference to this variable with \'%s\' (choose it wisely)"
         },
         "value":{
-            "type":"Free",
+            "type":"String",
             "optional":true,
             "description":"At startup your variable will contain \'%s\'"
         }

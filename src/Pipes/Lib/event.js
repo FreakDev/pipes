@@ -1,17 +1,19 @@
+/**
+ * @PipeDEF
+ * @Pipe\lib event
+ */
 export default {
     /**
-     * @deprecated
      * @PipeDEF
-     * @Pipe\name listen
+     * @Pipe\name onBoxChangeTrigger
      * @Pipe\type pipe-native
-     * @Pipe\param eventName -
-     * @Pipe\param forward -
+     * @Pipe\param boxName {Pipe|pipe-var} - a
+     * @Pipe\param trigger {Pipe|pipe-func} - a
      */
-    listen: function ({ eventName, forward }, input) {
-        return new Promise((resolve => {
-            window.setTimeout(() => {
-                resolve(this.invoke(forward))
-            }, 1000)
-        }))
+    onBoxChangeTrigger: function ({ boxName, trigger }, input) {
+        this.addVarListener(boxName, (value) => {
+            this.forward(trigger, value)
+        })
+        return input
     }
 }

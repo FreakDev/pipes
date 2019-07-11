@@ -10,7 +10,7 @@ export default {
      * @Pipe\type pipe-native
      * @Pipe\description emit a value
      * often used to start a sequence
-     * @Pipe\param value - %s will be outputed by the the pipe
+     * @Pipe\param value {String} - %s will be outputed by the the pipe
      */
     dataEmitter: function ({value}) {
         return value
@@ -75,11 +75,34 @@ export default {
 
     /**
      * @PipeDEF
+     * @Pipe\name followOrFoward
+     * @Pipe\type pipe-func
+     * @Pipe\param mode {Boolean} - if True Follow
+     * @Pipe\param forwardTo { Pipe|pipe-func } - a
+     */
+    followOrFoward: function ({ mode = false, forwardTo }, input) {
+        return new Promise((resolve, reject) => {
+            let updatedInput = !!input
+            if (mode) {
+                updatedInput = !updatedInput
+            }
+    
+            if (updatedInput === true) {
+                resolve(input)
+            } else if (forwardTo) {
+                this.forward(forwardTo)
+            }
+            reject()    
+        })
+    },
+
+    /**
+     * @PipeDEF
      * @Pipe\name hold
      * @Pipe\type pipe-native
      * @Pipe\description hold the data feed for a given amount of time
-     * @Pipe\param [timeValue] {Free} - The data flow will be hold during %s ms
-     * @Pipe\param [varValue] {Free} - if previous field left empty, waiting time will be the number store in the box %s
+     * @Pipe\param [timeValue] {Number} - The data flow will be hold during %s ms
+     * @Pipe\param [varValue] {Pipe|pipe-var} - if previous field left empty, waiting time will be the number store in the box %s
      */
     hold: function ({ timeValue, varValue }, input) {
         return new Promise(resolve =>  {
@@ -92,8 +115,8 @@ export default {
      * @Pipe\name log
      * @Pipe\type pipe-native
      * @Pipe\description log to console
-     * @Pipe\param [before] {Free} - will print %s before input
-     * @Pipe\param [after] {Free} - then %s after. will output the same as inputed
+     * @Pipe\param [before] {String} - will print %s before input
+     * @Pipe\param [after] {String} - then %s after. will output the same as inputed
      */
     log: function ({ before, after }, input) {
         let params = []
