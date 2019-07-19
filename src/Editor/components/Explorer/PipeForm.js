@@ -166,7 +166,9 @@ export default class PipeForm extends React.Component {
         const buildField = (type, spec, props) => {
             const paramDisplay = param.indexOf(EDITOR_PARAM_PREFIX) === 0 ? param.substr(EDITOR_PARAM_PREFIX.length) : param
 
-            if ( ["String", "Number", "Boolean"].indexOf(type) !== -1) {
+            if ( "Boolean" === type ) {
+                return <FreeField key={ "pipe_form_ipnut" } { ...props } placeholder={ "[" + paramDisplay + "]" } />
+            } else if ( ["String", "Number"].indexOf(type) !== -1 ) {
                 return <FreeField key={ "pipe_form_ipnut" } { ...props } placeholder={ "[" + paramDisplay + "]" } />
             } else if (type.indexOf("OneOf") === 0) {
                 const availableChoices = spec.choices
@@ -183,6 +185,9 @@ export default class PipeForm extends React.Component {
                     extractValueFromSuggestion={ suggestion => suggestion.name }
                     placeholder={ "[" + paramDisplay + "]" }
                 />
+            } else if (type[0] === "~") {
+                if (this.state.fieldValues.params[type.slice(1)])
+                    return buildField(this.state.fieldValues.params[type.slice(1)])
             }
         }
 
@@ -195,7 +200,8 @@ export default class PipeForm extends React.Component {
                     value: this.state.fieldValues.params[param] || value || "",
                     edit: value ? false : true,
                     name:param,
-                    onValidate: this.onParamFieldChange.bind(this, param)
+                    onValidate: this.onParamFieldChange.bind(this, param),
+                    validateOnChange: true
                 }
             ),
             " ", ...descriptionParts.slice(1)

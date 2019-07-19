@@ -8,6 +8,7 @@ const OneOfField = ({
     edit,
     placeholder = "choisir une valeur",
     availableValues,
+    validateOnChange,
     onChange,
     onValidate,
     onCancel
@@ -16,8 +17,12 @@ const OneOfField = ({
 
     const fieldId = name + "_" + uuid()
 
-    const onInputChange = (e) => {
-        onChange && onChange(e.target.value)
+    const onInputChange = (value) => {
+        onChange && onChange(value)
+
+        if (validateOnChange) {
+            onValidate(value) !== false && setEditMode(false)
+        }
     }
 
     const onKeyUp = (e) => {
@@ -43,12 +48,12 @@ const OneOfField = ({
                         id={ fieldId }
                         autoFocus
                         name={ name }
-                        onChange={ onInputChange }
+                        onChange={ (e) => onInputChange(e.target.value) }
                         onKeyUp={ onKeyUp }
                     >
                         {
                             availableValues.map((val, id) => (
-                                <option key={ "onefield_opt_" + id } defaultValue={ value === val }>{ val }</option>
+                                <option onClick={ (e) => { e.target.innerText !== value && onInputChange(e.target.innerText) } } key={ "onefield_opt_" + id } selected={ value === val }>{ val }</option>
                             ))
                         }
                     </select>
