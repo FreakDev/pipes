@@ -33,3 +33,15 @@ export const __resolvePath = (context, path) => {
     }
     return base
 }
+
+export const __copyTreeStructure = (treeSrc, ids) => {
+    return JSON.parse(JSON.stringify(ids.map(__findInTree.bind(this, treeSrc))))
+}
+
+export const __findInTree = (tree, needleId) => {
+    const flattenTree = (tree, base = []) => {
+        tree.pipes.forEach(p => base.push(p) && p.pipes && flattenTree(p, base))
+        return base
+    }
+    return flattenTree(tree).find(e => e.id === needleId)
+}

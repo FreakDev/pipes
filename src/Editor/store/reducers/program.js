@@ -19,7 +19,7 @@ import {
     PROGRAM_REMOVE_PIPE,
     PROGRAM_SAVE_PROP,
     PROGRAM_LOAD,
-    PROGRAM_CLEAN_TREE
+    PROGRAM_CLEAN_TREE,
 } from "../actions/program"
 
 
@@ -76,7 +76,7 @@ const reducers = {
 
         const base = __resolvePath(newProgram, currentContainer)
 
-        __addPipe(base, action.payload.pipe, action.payload.connected, action.payload.connectedTo || currentActive.id)
+        __addPipe(base, action.payload.pipe, action.payload.connected, action.payload.connectedTo || (currentActive ? currentActive.id : null))
     
         return newProgram
     },

@@ -6,7 +6,7 @@ import { __sortInChainOrder, __dir, __resolvePath } from "../utils"
 import { PIPE_TYPE_FUNC, PIPE_TYPE_VAR, PIPE_TYPE_NATIVE } from "../../constants";
 import { EDITOR_PARAM_PREFIX } from "../constants";
 
-import ChainView from "./Explorer/ChainView"
+import ChainView from "./Explorer/ChainView/ChainView"
 import PipeInspector from "./Explorer/PipeInspector"
 import TreeView from "./Explorer/TreeView"
 
@@ -120,19 +120,6 @@ const __checkPressedKeys = (currentKeyDown) => {
     })
 }
 
-const __copyTreeStructure = (treeSrc, ids) => {
-    return JSON.parse(JSON.stringify(ids.map(__findInTree.bind(this, treeSrc))))
-}
-
-const __findInTree = (tree, needleId) => {
-    const flattenTree = (tree, base = []) => {
-        tree.pipes.forEach(p => base.push(p) && p.pipes && flattenTree(p, base))
-        return base
-    }
-    return flattenTree(tree).find(e => e.id === needleId)
-}
-
-
 // the component 
 
 import cssClasses from "./Explorer.sass"
@@ -159,6 +146,7 @@ export default class Explorer extends React.Component {
         this.navigateTo = this.navigateTo.bind(this)
         this.onKeyDown = this.onKeyDown.bind(this)
         this.onKeyUp = this.onKeyUp.bind(this)
+        this.onMovePipe = this.onMovePipe.bind(this)
     }
 
     addPipe(pipe, connected, connectedTo = null) {        
@@ -171,10 +159,22 @@ export default class Explorer extends React.Component {
         this.props.savePipe(old, newProps, this.state.currentPath)
     }
 
+    onMovePipe(id, previous) {
+        const pathToCurrentDir = this.state.currentPath.slice(0, -1)
+        const newPath = [...pathToCurrentDir, {id: previous}]
+        this.props.cutPipes(this.state.selected, this.state.currentPath)
+        setTimeout(() => {
+            this.props.pastePipes(newPath)
+            this.setState({
+                currentPath: pathToCurrentDir
+            })                
+        }, 10);
+    }
+
     onRemove(pipe) {
         this.props.removePipe(pipe, this.state.currentPath)
         this.setState({
-            currentPath: this.state.currentPath.slice(0, -1),
+            currentPath: this.state.currentPath.slice(0, -1)
         })
     }
 
@@ -308,40 +308,16 @@ export default class Explorer extends React.Component {
             const keyCombo = __checkPressedKeys(keysDown)
 
             if (keyCombo)
-                if (keyCombo.indexOf(KEY_C) === 1 || keyCombo.indexOf(KEY_X) === 1) {
+                if (keyCombo.indexOf(KEY_C) === 1) {
+                    this.props.copyPipes(this.state.selected)
+                } else if (keyCombo.indexOf(KEY_X) === 1) {
+                    this.props.cutPipes(this.state.selected, this.state.currentPath)
                     this.setState({
-                        clipboard: __copyTreeStructure(this.props.program, this.state.selected)
+                        currentPath: this.state.currentPath.slice(0, -1),
+                        selected: []
                     })
-                    if (keyCombo.indexOf(KEY_X) === 1) {
-                        const base = __resolvePath(this.props.program, __dir(this.state.currentPath).slice(0, -1))
-                        this.state.selected.forEach(s => {
-                            const p = base.pipes.find(p => p.id === s)
-                            p && (base.pipes = this.props.removePipe(p, this.state.currentPath))
-                        })
-                        this.setState({
-                            currentPath: this.state.currentPath.slice(0, -1),
-                            selected: []
-                        })
-                    }
                 } else if (keyCombo.indexOf(KEY_V) === 1) {
-                    console.warn("paste is disabled during refacto")
-                    let prev = this.resolveCurrentPath()
-                    const currentDir = this.resolveCurrentPath(true)
-                    __sortInChainOrder( this.state.clipboard.map(p => JSON.parse(JSON.stringify(p))) ).forEach(p => {
-                        if ([PIPE_TYPE_FUNC, PIPE_TYPE_VAR].indexOf(p.type) !== -1 && currentDir.find(e => e.name === p.name)) {
-                            let i = 1, name = p.name
-                            do {
-                                if (name.slice(name.lastIndexOf("_")).match(/_[0-9]+/)) {
-                                    name = name.slice(0, name.lastIndexOf("_"))
-                                }
-                                name += ("_" + i)
-                                i++
-                            } while(currentDir.find(e => e.name === name))
-                            p.name = name
-                        }
-                        this.props.addPipe(p, true, prev ? prev.id : null, this.state.currentPath)
-                        prev = p.id
-                    })
+                    this.props.pastePipes(this.state.currentPath)
                 }
 
             this.setState({
@@ -400,7 +376,8 @@ export default class Explorer extends React.Component {
                         selected={ selected }
                         onSelectOne={ this.focus }
                         onClickElseWhere={ this.unFocus }
-                        onDblClickElseWhere={ this.navigateUp }/>
+                        onDblClickElseWhere={ this.navigateUp }
+                        onMovePipe={ this.onMovePipe } />
                     <PipeInspector
                         active={ !Array.isArray(currentActive) ? currentActive : null }
                         pipesInScope={ buildPipeInScope() }

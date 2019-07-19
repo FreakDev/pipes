@@ -5,8 +5,15 @@ import {
     savePipeAction,
     removePipeAction,
     savePropAction,
-    cleanTreeAction
+    cleanTreeAction,
+    movePipeAction
 } from "../store/actions/program"
+
+import {
+    copyPipes,
+    cutPipes,
+    pastePipes
+} from "../store/actions/ux"
 
 import { default as ExplorerCmp } from "../components/Explorer"
 
@@ -19,7 +26,11 @@ const Explorer = connect(
         savePipe: (old, pipe, currentPath) => dispatch(savePipeAction(old, pipe, currentPath)), 
         removePipe: (pipe, currentPath) => dispatch(removePipeAction(pipe, currentPath)), 
         saveProp: (props, value) => dispatch(savePropAction(props, value)),
-        cleanTree: (path) => dispatch(cleanTreeAction(path))
+        cleanTree: (path) => dispatch(cleanTreeAction(path)),
+        movePipe: (newPrevious, path) => dispatch(movePipeAction(newPrevious, path)),
+        copyPipes: (selected) => dispatch(copyPipes(selected)),
+        cutPipes: (selected, currentPath) => dispatch(cutPipes(selected, currentPath)),
+        pastePipes: (previous) => dispatch(pastePipes(previous))
     })
 )(ExplorerCmp)
 

@@ -1,9 +1,12 @@
 
-@import "../../_variables.sass"
+@import "../../../_variables.sass"
 
 .chain_view
     height: 100%
     overflow: hidden
+
+    .drop_zone
+        height: 100%
 
     .wrapper_inner
         position: relative
@@ -23,3 +26,7 @@
                 & > li
                     list-style: none
                     cursor: pointer 
+
+                    .drop_zone
+                        width: 20px
+                        border: 1px dashed $baseGrey

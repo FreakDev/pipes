@@ -1,5 +1,5 @@
 
-@import "../../_variables.sass"
+@import "../../../_variables.sass"
 
 .pipe
     box-sizing: border-box
@@ -11,6 +11,7 @@
     background: darken($activeGrey, 20)
     color: darken($baseGrey, 30)
     border-color: $baseGrey
+    position: relative
 
     &.selected
         background: $activeGrey
@@ -35,16 +36,6 @@
             font-size: 0.6em
             display: block
 
-    .body
-        padding: 10px
-        padding-top: 0
-
-        ul.params
-            padding: 0
-
-            li
-                list-style: none
-
     &.func
         .header
             background: transparentize($func_color, 0.7)
@@ -56,3 +47,27 @@
     &.native
         .header
             background: transparentize($native_color, 0.7)
+
+    .body
+        padding: 10px
+        padding-top: 0
+
+        ul.params
+            padding: 0
+
+            li
+                list-style: none
+
+    .drop_zone
+        position: absolute
+        width: 50%
+        height: 100%
+        top: 0
+    
+        &.hover
+            background: darken($activeGrey, 5)
+
+        &:last-child
+            left: 50%
+
+        

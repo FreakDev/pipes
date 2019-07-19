@@ -1,10 +1,12 @@
-import React from "react"
+import React, { useState, useRef } from "react"
 
-import { TYPE_LABELS } from "../../constants"
+import { TYPE_LABELS } from "../../../constants"
+
+import useDrag from "../../../hooks/useDrag"
 
 import css from "./Pipe.sass"
 
-const Pipe = ({ name, type, params, active, selected }) => {
+const Pipe = ({ id, name, type, params, active, selected }) => {
     const lastDotIndex = name.lastIndexOf(".")
 
     return (
