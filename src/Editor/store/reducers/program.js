@@ -29,12 +29,14 @@ const __addPipe = (base, pipe, connected, connectedTo) => {
     if (pipe.type === PIPE_TYPE_VAR) {
         let params = pipe.params
         delete pipe.params
-        let value
         Object.assign(pipe, params)
         
+        let value, dataType        
         value = pipe.value
+        dataType = pipe.dataType
         delete pipe.value
-        pipe.params = Object.assign(pipe.params || {}, { value })
+        delete pipe.dataType
+        pipe.params = Object.assign(pipe.params || {}, { value, dataType })
         
     } else if (pipe.type === PIPE_TYPE_FUNC) {
         if (pipe.params[EDITOR_PARAM_PREFIX + "name"]) {

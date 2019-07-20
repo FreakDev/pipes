@@ -2,10 +2,20 @@ import React from 'react'
 import uuid from "uuid/v4"
 
 import LookUpField from "./formFields/LookUpField"
-import FreeField from "./formFields/FreeField"
-import OneOfField from "./formFields/OneOfField"
-import { PIPE_TYPE_FUNC, PIPE_TYPE_VAR } from '../../../constants';
-import { EDITOR_PARAM_PREFIX, TYPE_LABELS } from '../../constants'
+import TypedField from "./formFields/TypedField"
+
+import { 
+    PIPE_TYPE_FUNC, 
+    PIPE_TYPE_VAR,
+
+    DATATYPE_BOOLEAN, 
+    DATATYPE_NUMBER, 
+    DATATYPE_STRING, 
+    DATATYPE_ARRAY, 
+    DATATYPE_OBJECT, 
+    DATATYPE_PIPE
+} from "../../../constants"
+import { TYPE_LABELS } from "../../constants"
 
 const INITIAL_FIELD_VALUES = {
     name: "",
@@ -119,10 +129,16 @@ export default class PipeForm extends React.Component {
 
             if (value.type === PIPE_TYPE_VAR) {
                 currentSpec = {
+                    dataType: {
+                        "type":"OneOf",
+                        "choices": [DATATYPE_BOOLEAN, DATATYPE_NUMBER, DATATYPE_STRING, DATATYPE_ARRAY, DATATYPE_OBJECT, DATATYPE_PIPE],
+                        "optional": false,
+                        "description": "Type of data stored into the box "
+                    },
                     value: {
-                        "type":"Free",
+                        "type":"~dataType",
                         "optional": true,
-                        "description": "Initial box value : %s"
+                        "description": "Initial box value : "
                     }
                 }
             }
@@ -163,47 +179,31 @@ export default class PipeForm extends React.Component {
     renderParamField(param, spec, value) {
         let descriptionParts = spec[param].description ? spec[param].description.split('%s') : []
 
-        const buildField = (type, spec, props) => {
-            const paramDisplay = param.indexOf(EDITOR_PARAM_PREFIX) === 0 ? param.substr(EDITOR_PARAM_PREFIX.length) : param
-
-            if ( "Boolean" === type ) {
-                return <FreeField key={ "pipe_form_ipnut" } { ...props } placeholder={ "[" + paramDisplay + "]" } />
-            } else if ( ["String", "Number"].indexOf(type) !== -1 ) {
-                return <FreeField key={ "pipe_form_ipnut" } { ...props } placeholder={ "[" + paramDisplay + "]" } />
-            } else if (type.indexOf("OneOf") === 0) {
-                const availableChoices = spec.choices
-                return <OneOfField key={ "pipe_form_ipnut" } { ...props } availableValues={ availableChoices } placeholder={ "[" + paramDisplay + "]" }  />
-            } else if (type.indexOf("Pipe") === 0) {
-                return <LookUpField
-                    key={ "pipe_form_ipnut" }
-                    { ...props }
-                    availableValues={ this.props.pipesInScope }
-                    autocompleteCallback={(value, suggestion) => {
-                        return suggestion.type === spec.pipe_type && suggestion.name.indexOf(value) !== -1
-                    }}
-                    renderSuggestion={ this.renderSuggestion }
-                    extractValueFromSuggestion={ suggestion => suggestion.name }
-                    placeholder={ "[" + paramDisplay + "]" }
-                />
-            } else if (type[0] === "~") {
-                if (this.state.fieldValues.params[type.slice(1)])
-                    return buildField(this.state.fieldValues.params[type.slice(1)])
-            }
+        let type = spec[param].type
+        if (spec[param].type[0] === "~") {
+            if (this.props.value && this.props.value.params[type.slice(1)]) {
+                type = this.props.value.params[type.slice(1)]
+            } else if (this.state.fieldValues.params[type.slice(1)]) {
+                type = this.state.fieldValues.params[type.slice(1)]
+            }            
+                
         }
 
         return [
             descriptionParts[0], " ",
-            buildField(
-                spec[param].type,
-                spec[param],
-                {
-                    value: this.state.fieldValues.params[param] || value || "",
+            <TypedField 
+                key={ "field_" + param }
+                type={ type } 
+                spec={ spec[param] } 
+                name={ param } 
+                props={ {
+                    value: this.state.fieldValues.params[param] || value,
                     edit: value ? false : true,
                     name:param,
                     onValidate: this.onParamFieldChange.bind(this, param),
                     validateOnChange: true
-                }
-            ),
+                } } 
+            />,
             " ", ...descriptionParts.slice(1)
         ]
     }
@@ -240,7 +240,7 @@ export default class PipeForm extends React.Component {
                     specToDisplay ?
                         Object.keys(specToDisplay).map((paramName, k) => {
                             return <div key={ "pipe_form_param_" + k }>
-                                { this.renderParamField(paramName, specToDisplay, value && value.params ? value.params[paramName] : null) }
+                                { this.renderParamField(paramName, specToDisplay, value && value.params ? value.params[paramName] : undefined) }
                             </div>
                         })
                         : null

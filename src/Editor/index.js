@@ -11,6 +11,8 @@ import cssClasses from "./index.sass"
 const store = createStore()
 
 document.getElementById("root").classList.add(cssClasses.root)
+document.getElementById("modal-root").classList.add(cssClasses.modal_root)
+
 ReactDOM.render(
     <Provider store={store}>
         <Editor />

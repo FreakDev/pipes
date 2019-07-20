@@ -50,10 +50,11 @@ const OneOfField = ({
                         name={ name }
                         onChange={ (e) => onInputChange(e.target.value) }
                         onKeyUp={ onKeyUp }
+                        defaultValue={ value }
                     >
                         {
                             availableValues.map((val, id) => (
-                                <option onClick={ (e) => { e.target.innerText !== value && onInputChange(e.target.innerText) } } key={ "onefield_opt_" + id } selected={ value === val }>{ val }</option>
+                                <option onClick={ (e) => { e.target.innerText !== value && onInputChange(e.target.innerText) } } key={ "onefield_opt_" + id }>{ val }</option>
                             ))
                         }
                     </select>

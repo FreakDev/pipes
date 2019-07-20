@@ -33,14 +33,14 @@ const PIPE_VAR_DEF = {
             "optional":false,
             "description":"You may reference to this variable with '%s' (you won't be able to change it, choose it wisely)"
         },
-        "type":{
+        "dataType":{
             "type":"OneOf",
             "choices": ["Boolean","Number","String","Array","Object","Pipe"],
             "optional":false,
             "description":"What type of data will be stored in this box ? (you won't be able to change it, choose it wisely)"
         },        
         "value":{
-            "type":"~type",
+            "type":"~dataType",
             "optional":true,
             "description":"At startup your variable will contain \'%s\'"
         }

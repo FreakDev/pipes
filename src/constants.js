@@ -3,6 +3,13 @@ module.exports = {
     PIPE_TYPE_NATIVE : "pipe-native",
     PIPE_TYPE_VAR : "pipe-var",
 
+    DATATYPE_BOOLEAN : "Boolean",
+    DATATYPE_NUMBER : "Number",
+    DATATYPE_STRING : "String",
+    DATATYPE_ARRAY : "Array",
+    DATATYPE_OBJECT : "Object",
+    DATATYPE_PIPE : "Pipe",
+
     // debugger constants
     RUNTIME_PIPE_CALLED : "pipe-called",
     RUNTIME_EXECUTION_STOPPED : "execution-stopped",
